@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+.input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  border: 1px solid white !important;
+}
+
+@theme {
+  --breakpoint-lg: 75rem;
+
+  --color-primary-light: #ecfab1;
+  --color-primary: #848d5e;
+  --color-primary-dark: #4c5429;
+
+  --font-elmessiri: ElMessiri, sans-serif;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility scrollbar-hidden {
+  /* For Firefox */
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+  }
+}
+
+@layer utilities {
+  @font-face {
+    font-family: "Livvic";
+    src: local("Livvic"), url("@/assets/fonts/Livvic/Livvic-Regular.ttf") format("truetype");
+    font-weight: 400; /* Regular weight */
+  }
+  @font-face {
+    font-family: "Livvic";
+    src: local("Livvic"), url("@/assets/fonts/Livvic/Livvic-Bold.ttf") format("truetype");
+    font-weight: 700; /* Bold weight */
+  }
+  @font-face {
+    font-family: "Livvic";
+    src: local("Livvic"), url("@/assets/fonts/Livvic/Livvic-Medium.ttf") format("truetype");
+    font-weight: 500; /* medium weight */
+  }
+  @font-face {
+    font-family: "Livvic";
+    src: local("Livvic"), url("@/assets/fonts/Livvic/Livvic-SemiBold.ttf") format("truetype");
+    font-weight: 600; /* semi-bold weight */
+  }
+
+  @font-face {
+    font-family: "ElMessiri";
+    src: local("ElMessiri"),
+      url("@/assets/fonts/ElMessiri/ElMessiri-Regular.ttf") format("truetype");
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Livvic, Inter, system-ui, sans-serif;
+  }
+
+  /* for editor hidden */
+  .ql-tooltip {
+    display: none;
+  }
+
+  .container {
+    @apply max-w-(--breakpoint-2xl) mx-auto;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+/* Custom style for the "Today" button */
+.rc-calendar-footer {
+  @apply flex justify-end;
+  /* Align the "Today" button to the right */
+}
+
+.rc-calendar-footer .rc-calendar-today-btn {
+  @apply mr-2 /* Optional: Adds some space to the right */;
+}
+.rdrDefinedRangesWrapper {
+  @apply hidden;
+}
+
+input.custom-autofill:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  border: 2px solid black !important;
+}
+
+input.custom-no-autofill:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  border: none !important;
+}
