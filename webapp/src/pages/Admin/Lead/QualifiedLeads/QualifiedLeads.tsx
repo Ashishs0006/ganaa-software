@@ -21,9 +21,14 @@ import toast from "react-hot-toast";
 import ConfirmModal from "@/components/ConfirmModal/ConfirmModal";
 import handleError from "@/utils/handleError";
 import Search from "@/components/Search/Search";
-
+import Filter from "@/components/Filter/Filter";
+import { useAuth } from "@/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
 const QualifiedLeads = () => {
   const [searchParams] = useSearchParams();
+    const [selected, setSelected] = useState("All");
+      const { auth } = useAuth();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -74,6 +79,14 @@ const QualifiedLeads = () => {
   });
 
   const fetchAllQualifiedLeads = async () => {
+     // Get query parameters
+    let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-leadDateTime";
 
@@ -88,10 +101,12 @@ const QualifiedLeads = () => {
         sort,
         page: currentPage,
         status: "Qualified",
-        ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
+          centers: centers.join(","),
+        ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber,assignedTo.firstName,assignedTo.lastName" }),
 
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
+      console.log("response of qulified leads is :", response);
 
       dispatch(setQualifiedLead(response?.data));
       setState((prev) => ({
@@ -109,6 +124,13 @@ const QualifiedLeads = () => {
   };
 
   const fetchAllQualifiedLeadsFilter = async () => {
+       let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-leadDateTime";
 
@@ -118,7 +140,8 @@ const QualifiedLeads = () => {
         sort,
         page: currentPage,
         status: "Qualified",
-        ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
+         centers: centers.join(","),
+        ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber,assignedTo.firstName,assignedTo.lastName" }),
 
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
@@ -130,6 +153,13 @@ const QualifiedLeads = () => {
   };
 
   useEffect(() => {
+       let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-leadDateTime";
 
@@ -153,7 +183,8 @@ const QualifiedLeads = () => {
             sort,
             page: currentPage,
             status: "Qualified",
-            ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
+     centers: centers.join(","),
+            ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber,assignedTo.firstName,assignedTo.lastName" }),
 
             ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
           },
@@ -193,15 +224,16 @@ const QualifiedLeads = () => {
     };
   }, [searchParams.get("search")]);
 
-  useEffect(() => {
-    fetchAllQualifiedLeadsFilter();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.get("page"), searchParams.get("sort")]);
+useEffect(() => {
+  fetchAllQualifiedLeadsFilter();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [searchParams.get("page"), searchParams.get("sort"), selected]); // ✅ selected add
 
-  useEffect(() => {
-    fetchAllQualifiedLeads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+useEffect(() => {
+  fetchAllQualifiedLeads();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [selected]); 
+
 
   const handleOpenMenu = (data?: ISingleLead) => {
     if (data) setSingleleadData(data);
@@ -242,20 +274,16 @@ const QualifiedLeads = () => {
     }));
     toggleModalAdmit();
   };
-  const [admitLoading, setAdmitLoading] = useState(false);
+
   const handleadmit = async () => {
-    if (admitLoading) return;
     try {
-      setAdmitLoading(true);
       const response = await admitLead(state.admitId, {});
       if (response.status === 200) {
         toast.success("Lead admitted Successfully");
         fetchAllQualifiedLeads();
       }
-      setAdmitLoading(false);
       toggleModalAdmit();
     } catch (error) {
-      setAdmitLoading(false);
       handleError(error);
     }
   };
@@ -297,6 +325,7 @@ const QualifiedLeads = () => {
                   { title: "Follow Up Date", value: "nextFollowUpDate" }
                 ]}
               />
+                 <Filter selected={selected} setSelected={setSelected} />
               {/* <div className="flex cursor-pointer bg-[#575F4A] text-white font-semibold items-center text-xs justify-center px-3 py-2 border border-[#D4D4D4] rounded-lg">
                 All Filters
                 <MdKeyboardArrowDown size={15} />
@@ -403,14 +432,37 @@ const QualifiedLeads = () => {
                         <div className="flex items-center gap-5">
                           <img
                             src={eye}
-                            className="cursor-pointer"
+                            className={`${
+                              data?.progressStatus !== "Admit"
+                                ? "cursor-pointer"
+                                : "cursor-not-allowed opacity-45"
+                            }`}
                             onClick={() => {
-                              handleOpenMenu(data);
+                              if (data?.progressStatus !== "Admit") handleOpenMenu(data);
                             }}
                           />
-                          <Link to={`/admin/lead/update-lead/${data?._id}`}>
-                            <img src={edit} className="cursor-pointer" />
-                          </Link>
+                          {data?.progressStatus !== "Admit" ? (
+                            <Link to={`/admin/lead/update-lead/${data?._id}`}>
+                              <img
+                                src={edit}
+                                className={`${
+                                  data?.progressStatus !== "Admit"
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed "
+                                }`}
+                              />
+                            </Link>
+                          ) : (
+                            <img
+                              src={edit}
+                              className={`${
+                                data?.progressStatus !== "Admit"
+                                  ? "cursor-pointer"
+                                  : "cursor-not-allowed opacity-45"
+                              }`}
+                            />
+                          )}
+
                           <img
                             src={bin}
                             onClick={() => {

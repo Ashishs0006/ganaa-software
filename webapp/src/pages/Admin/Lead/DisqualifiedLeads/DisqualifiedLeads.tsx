@@ -20,9 +20,15 @@ import { ISingleLead } from "@/pages/Admin/Lead/QualifiedLeads/types";
 import { IState } from "@/pages/Admin/Lead/DisqualifiedLeads/types";
 import toast from "react-hot-toast";
 import Search from "@/components/Search/Search";
+import Filter from "@/components/Filter/Filter";
+import { useAuth } from "@/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const DisqualifiedLeads = () => {
   const [searchParams] = useSearchParams();
+      const [selected, setSelected] = useState("All");
+      const { auth } = useAuth();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -72,6 +78,13 @@ const DisqualifiedLeads = () => {
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   const fetchAllDisQualifiedLeads = async () => {
+       let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-leadDateTime";
 
@@ -82,11 +95,12 @@ const DisqualifiedLeads = () => {
 
     try {
       const response = await getAllLeads({
-        limit: leadData?.disQualifiedLead?.pagination?.limit || 10, // Provide a fallback if undefined
+        limit: leadData?.disQualifiedLead?.pagination?.limit || 10,
         sort,
         page: currentPage,
         status: "Unqualified",
-        ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
+        centers: centers.join(","),
+        ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber" }),
 
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
@@ -108,6 +122,13 @@ const DisqualifiedLeads = () => {
     }
   };
   const fetchAllDisQualifiedLeadsFilter = async () => {
+       let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-leadDateTime";
 
@@ -117,8 +138,8 @@ const DisqualifiedLeads = () => {
         sort,
         page: currentPage,
         status: "Unqualified",
-        ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
-
+         centers: centers.join(","),
+        ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber" }),
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
 
@@ -130,6 +151,13 @@ const DisqualifiedLeads = () => {
   };
 
   useEffect(() => {
+       let centers;
+    if (selected === "All" || !selected) {
+      centers = auth.user.centerId.map((data) => data._id);
+      if (centers.length <= 0) navigate("/");
+    } else {
+      centers = [selected];
+    }
     const currentPage = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-createdAt";
 
@@ -153,7 +181,8 @@ const DisqualifiedLeads = () => {
             sort,
             page: currentPage,
             status: "Unqualified",
-            ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
+             centers: centers.join(","),
+            ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber" }),
             ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
           },
           undefined,
@@ -195,12 +224,12 @@ const DisqualifiedLeads = () => {
   useEffect(() => {
     fetchAllDisQualifiedLeadsFilter();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.get("page"), searchParams.get("sort")]);
+  }, [searchParams.get("page"), searchParams.get("sort"), selected]);
 
   useEffect(() => {
     fetchAllDisQualifiedLeads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selected]);
 
   const handleOpenMenu = (data?: ISingleLead) => {
     if (data) setSingleleadData(data);
@@ -271,6 +300,7 @@ const DisqualifiedLeads = () => {
                   { title: "Follow Up Date", value: "nextFollowUpDate" }
                 ]}
               />
+                <Filter selected={selected} setSelected={setSelected} />
               {/* <div className="flex cursor-pointer bg-[#575F4A] text-white font-semibold items-center text-xs justify-center px-3 py-2 border border-[#D4D4D4] rounded-lg">
                 All Filters
                 <MdKeyboardArrowDown size={15} />
