@@ -13,7 +13,18 @@ import { normalizeAndTitleCase } from '../utils/helper';
 
 export const getAllLeads = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    const features = new APIFeatures<ILead>(Lead.find(), req.query)
+    console.log("Query from frontend:", req.query);
+
+   
+    let centersFilter = {};
+    if (req.query.centers && typeof req.query.centers === "string") {
+      const centersArray = req.query.centers.split(",");
+      centersFilter = { centerId: { $in: centersArray } }; 
+      delete req.query.centers; 
+    }
+
+    
+    const features = new APIFeatures<ILead>(Lead.find({ ...centersFilter }), req.query)
       .filter()
       .search()
       .sort()
@@ -21,17 +32,24 @@ export const getAllLeads = catchAsync(
       .paginate();
 
     const rawQuery = features.rawQuery();
-    const data = await features.query;
+    console.log("Raw query after APIFeatures parsing:", rawQuery);
 
-    const paginationInfo = await PaginationInfo.exec(Lead.countDocuments(), req.query, rawQuery);
+    const data = await features.query.lean();
+
+    const paginationInfo = await PaginationInfo.exec(
+      Lead.countDocuments({ ...centersFilter, ...rawQuery }),
+      req.query,
+      rawQuery
+    );
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       pagination: paginationInfo,
       data: data,
     });
   }
 );
+
 
 export const createNewLead = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -168,8 +186,8 @@ export const updateSingleLead = catchAsync(
 
     const lead = await Lead.findOne({ _id: req.params.id });
     if (!lead) return next(new AppError('Please provide valid Lead ID', 400));
-    // if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
-    //   return next(new AppError('Lead Already Admitted', 400));
+    if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
+      return next(new AppError('Lead Already Admitted', 400));
 
     const data = await Lead.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
