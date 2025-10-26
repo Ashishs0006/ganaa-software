@@ -121,6 +121,7 @@ const selected = searchParams.get("filter") || "All";
       if (response.data.data) {
         setData(response.data.data);
       }
+      console.log("hii the patient data is :",response.data.data);
     } catch (error) {
       console.error("Error fetching Session data:", error);
     } finally {
@@ -217,7 +218,7 @@ const selected = searchParams.get("filter") || "All";
                       Center Name
                     </th>
                     <th className="   w-[120px]  bg-[#CCB69E]  px-3 py-4 align-top text-left text-[12px] leading-[15px] font-semibold text-black">
-                      Nurse Assigned
+                    Therapist Name
                     </th>
                     <th className="   w-[120px]  bg-[#CCB69E]  px-3 py-4 align-top text-[12px] leading-[15px] font-semibold text-black">
                       Vitals & Notes
@@ -291,11 +292,22 @@ const selected = searchParams.get("filter") || "All";
                               )?.label || "--"
                             : "--"}
                         </td>
-                        <td className=" w-[120px] py-4 text-xs font-semibold px-3">
-                          {patient.resourceAllocation
-                            ? patient.resourceAllocation.nurse || "--"
-                            : "--"}
-                        </td>
+                   <td className=" w-[120px] py-4 text-xs font-semibold px-3">
+  {(() => {
+    const findNote =
+      data?.therapistNotes?.find(
+        (note) => note.patientId === patient.patientId
+      ) || null;
+
+    if (!findNote?.therapistId) return "--";
+
+    const first = findNote.therapistId.firstName || "";
+    const last = findNote.therapistId.lastName || "";
+
+    return `${first} ${last}`.trim() || "--";
+  })()}
+</td>
+
                         <td className="w-[120px] py-4 text-xs font-medium text-center">
                           <div className="flex flex-col gap-1 justify-center">
                             <div className="flex items-center justify-center gap-2">

@@ -90,7 +90,7 @@ const DoctorPrescription = () => {
 
   const [prescriptionState, setPrescriptionState] = useState<IprescriptionState>({
     medicine: { label: "Select", value: "" },
-    durationFrequency: { label: "Today Only", value: "Today Only" },
+    durationFrequency: { label: "Daily", value: "Daily" },
     customDuration: "",
     prescribedWhen: { label: "Select", value: "" },
     instructions: "",
@@ -210,7 +210,6 @@ const DoctorPrescription = () => {
   const fetchDoctorPrescriptions = async () => {
     const page = searchParams.get("page") || "1";
     const sort = searchParams.get("sort") || "-createdAt";
-
     if (id && aId) {
       try {
         const { data: patientData } = await getSinglePatient(id);
@@ -424,7 +423,7 @@ const DoctorPrescription = () => {
           ...prev,
           [key]: value,
           customDuration: "",
-          durationFrequency: { label: "Today Only", value: "Today Only" },
+          durationFrequency: { label: "Daily", value: "Daily" },
           usages: [
             {
               frequency: "Morning",
@@ -507,7 +506,7 @@ const DoctorPrescription = () => {
 
       setPrescriptionState({
         medicine: { label: "Select", value: "" },
-        durationFrequency: { label: "Today Only", value: "Today Only" },
+        durationFrequency: { label: "Daily", value: "Daily" },
         customDuration: "",
         prescribedWhen: { label: "Select", value: "" },
         instructions: "",
@@ -683,44 +682,45 @@ const DoctorPrescription = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, aId]);
 
-  const handleUpdate = (data: IDoctorPrescrition) => {
-    setState((prev) => ({
-      ...prev,
-      doctorName: `${data?.doctorId?.firstName} ${data?.doctorId?.lastName}`
-    }));
+ const handleUpdate = (data: IDoctorPrescrition) => {
+  const now = moment(); // ✅ current date time
 
-    setData((prev) => ({
-      ...prev,
-      doctorId: data?.doctorId?._id,
-      noteDate: data?.noteDateTime && moment(data?.noteDateTime).format("YYYY-MM-DD"),
-      noteTime: data?.noteDateTime && moment(data?.noteDateTime).format("HH:mm:ss"),
+  setState((prev) => ({
+    ...prev,
+    doctorName: `${data?.doctorId?.firstName} ${data?.doctorId?.lastName}`
+  }));
 
-      id: data._id
-    }));
+  setData((prev) => ({
+    ...prev,
+    doctorId: data?.doctorId?._id,
+    noteDate: now.format("YYYY-MM-DD"),   // ✅ always today
+    noteTime: now.format("HH:mm:ss"),     // ✅ current time
+    id: data._id
+  }));
 
-    setPrescriptionToBeSaved(
-      data?.medicinesInfo?.map((item) => ({
-        medicine: {
-          label: `${item?.medicine?.name} (${item?.medicine?.genericName})`,
-          value: item?.medicine?._id
-        },
-        durationFrequency: {
-          label: item?.durationFrequency || "CustomDate",
-          value: item?.durationFrequency || "CustomDate"
-        },
-        customDuration: item?.customDuration || "", // Fixed missing comma
-        instructions: item?.instructions,
-        prescribedWhen: { label: item?.prescribedWhen, value: item?.prescribedWhen },
-        usages:
-          item?.usages?.map((usage) => ({
-            frequency: usage.frequency,
-            quantity: usage.quantity,
-            when: { label: usage.when, value: usage.when },
-            dosage: { label: usage.dosage, value: usage.dosage }
-          })) || [] // Ensures `usages` isn't empty if missing
-      })) || []
-    );
-  };
+  setPrescriptionToBeSaved(
+    data?.medicinesInfo?.map((item) => ({
+      medicine: {
+        label: `${item?.medicine?.name} (${item?.medicine?.genericName})`,
+        value: item?.medicine?._id
+      },
+      durationFrequency: {
+        label: item?.durationFrequency || "CustomDate",
+        value: item?.durationFrequency || "CustomDate"
+      },
+      customDuration: item?.customDuration || "",
+      instructions: item?.instructions,
+      prescribedWhen: { label: item?.prescribedWhen, value: item?.prescribedWhen },
+      usages:
+        item?.usages?.map((usage) => ({
+          frequency: usage.frequency,
+          quantity: usage.quantity,
+          when: { label: usage.when, value: usage.when },
+          dosage: { label: usage.dosage, value: usage.dosage }
+        })) || []
+    })) || []
+  );
+};
 
   const handleDeletePrescriptionToBeSaved = (indexToDelete: number) => {
     setPrescriptionToBeSaved((prev) => prev.filter((_, index) => index !== indexToDelete));
@@ -911,6 +911,7 @@ const DoctorPrescription = () => {
                     <div className=" flex p-4 items-center justify-between">
                       <div className="flex items-center justify-between w-full">
                         <p className="text-[13px] font-bold">Add Prescription</p>
+                        
                         <div className="flex">
                           <div className="ml-4 flex items-center text-gray-500">
                             <CustomCalendar
