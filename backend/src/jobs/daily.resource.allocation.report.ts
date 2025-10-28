@@ -27,7 +27,6 @@ export const buildDailyResourceAllocation = async () => {
     if (centers.length < 1) return;
 
     const roomTypes = await RoomType.find({ isDeleted: false }).lean();
-
     let roomTypesMap: IBasicObj = {};
 
     await Promise.all(
@@ -37,12 +36,13 @@ export const buildDailyResourceAllocation = async () => {
           roomTypeId: el._id,
           isDeleted: false,
         });
+
         const totalOccupiedBeds = await PatientAdmissionHistory.countDocuments({
           currentStatus: { $in: ['Inpatient', 'Discharge Initiated'] },
           'resourceAllocation.roomTypeId': el._id,
         });
 
-        const type = {
+        const roomTypeObj = {
           roomTypeId: el._id.toString(),
           name: el.name,
           maxOccupancy: el.maxOccupancy,
@@ -50,117 +50,111 @@ export const buildDailyResourceAllocation = async () => {
           totalOccupiedBeds,
         };
 
-        if (roomTypesMap.hasOwnProperty(centerId)) {
-          roomTypesMap[centerId].push(type);
-        } else {
-          roomTypesMap[centerId] = [type];
-        }
+        if (!roomTypesMap[centerId]) roomTypesMap[centerId] = [];
+        roomTypesMap[centerId].push(roomTypeObj);
       })
     );
 
     const allInfo = await Promise.all(
       centers.map(async (center) => {
-        let centerGenders = {
-          Male: 0,
-          Female: 0,
-          Other: 0,
-        };
+        let centerGenders = { Male: 0, Female: 0, Other: 0 };
         let repeatAdmission = 0;
         let newAdmission = 0;
-        let centerDischarge = 0;
 
-        // Step 1: Get today's admissions for this center
-        const todayAdmissions = await PatientAdmissionHistory.aggregate([
-          {
-            $match: {
-              dateOfAdmission: { $gte: todayStart, $lte: todayEnd },
-              'resourceAllocation.centerId': center._id,
-            },
-          },
-          {
-            $group: {
-              _id: '$patientId',
-              admissionIds: { $push: '$_id' },
-            },
-          },
-        ]);
-
-        const patientIdsToday = todayAdmissions.map((item) => item._id);
-
-        // Step 2: Check total admissions for those patients to classify repeat vs new
-        const allAdmissionsForPatients = await PatientAdmissionHistory.aggregate([
-          { $match: { patientId: { $in: patientIdsToday } } },
-          {
-            $group: {
-              _id: '$patientId',
-              totalAdmissions: { $sum: 1 },
-            },
-          },
-        ]);
-
-        allAdmissionsForPatients.forEach((p) => {
-          if (p.totalAdmissions > 1) {
-            repeatAdmission++;
-          } else {
-            newAdmission++;
-          }
-        });
-
-        // Step 3: Gender distribution for currently admitted patients
-        const patientAdmission = await PatientAdmissionHistory.find({
-          currentStatus: { $in: ['Inpatient', 'Discharge Initiated'] },
-          'resourceAllocation.centerId': center._id.toString(),
-        }).select('_id patientId');
-
-        const patientAdmissionIds = patientAdmission.map((el) => el.patientId);
-        const patientInfo = await Patient.find({ _id: { $in: patientAdmissionIds } })
-          .select('gender')
+        // ✅ FIXED POPULATE for nested resourceAllocation paths
+        const todayAdmissionsDetails = await PatientAdmissionHistory.find({
+          dateOfAdmission: { $gte: todayStart, $lte: todayEnd },
+          'resourceAllocation.centerId': center._id,
+        })
+          .populate({
+            path: 'patientId',
+            select: 'firstName lastName gender',
+          })
+          .populate({
+            path: 'resourceAllocation.centerId',
+            model: Center,
+            select: 'centerName',
+          })
+          .populate({
+            path: 'resourceAllocation.roomTypeId',
+            model: RoomType,
+            select: 'name',
+          })
           .lean();
 
-        patientInfo.forEach((patient) => {
-          const gender = patient.gender;
-          if (!gender) return;
-          centerGenders[gender]++;
-        });
+        const todayAdmissionsMapped = [];
 
-        const dischargeIds = await PatientAdmissionHistory.find({
+        for (const adm of todayAdmissionsDetails) {
+          const previousAdmissions = await PatientAdmissionHistory.countDocuments({
+            patientId: adm.patientId._id,
+            dateOfAdmission: { $lt: todayStart },
+          });
+
+          if (previousAdmissions > 0) repeatAdmission++;
+          else newAdmission++;
+
+          todayAdmissionsMapped.push({
+            patientName:
+              `${adm.patientId?.firstName ?? ''} ${adm.patientId?.lastName ?? ''}`.trim(),
+            centerName: adm.resourceAllocation?.centerId?.centerName || center.centerName,
+            roomType: adm.resourceAllocation?.roomTypeId?.name || 'NA',
+          });
+
+          const gender = adm.patientId?.gender;
+          if (gender) centerGenders[gender]++;
+        }
+
+        // ✅ Discharges Today Details
+        const dischargeRecords = await PatientAdmissionHistory.find({
           'resourceAllocation.centerId': center._id.toString(),
           dischargeId: { $exists: true, $ne: null },
         }).select('dischargeId');
 
-        const dischargeIdList = dischargeIds.map((doc) => doc.dischargeId);
+        const dischargeIdList = dischargeRecords.map((d) => d.dischargeId);
 
-        const dischargeCount = await PatientDischarge.countDocuments({
+        const todayDischargeDetails = await PatientDischarge.find({
           _id: { $in: dischargeIdList },
           date: { $gte: todayStart, $lt: todayEnd },
-        });
+        })
+          .populate('patientId', 'firstName lastName')
+          .lean();
 
-        centerDischarge = dischargeCount;
+        const todayDischargeMapped = todayDischargeDetails.map((dc) => {
+          console.log('✌️dcAllocation --->', dc);
+          // const stayDuration = Math.ceil(
+          //   (dc.date.getTime() - new Date(dc.date).getTime()) / (1000 * 60 * 60 * 24)
+          // );
+
+          
+            const diff = Math.ceil((new Date() - new Date(dc.date)) / (1000 * 60 * 60 * 24));
+            const stayDuration = `${diff} ${diff === 1 ? 'day' : 'days'}`;
+
+          return {
+            patientName: `${dc.patientId?.firstName ?? ''} ${dc.patientId?.lastName ?? ''}`.trim(),
+            dischargeType: dc.status || 'NA',
+            dischargeCondition: dc.conditionAtTheTimeOfDischarge || 'NA',
+            stayDuration,
+          };
+        });
 
         return {
           centerId: center._id.toString(),
           centerName: center.centerName,
           repeatAdmission,
           newAdmission,
-          centerDischarge,
-          roomTypes: roomTypesMap[center._id.toString()],
-          centerGenders: centerGenders.toLowerCaseKeys(),
+          centerDischarge: todayDischargeMapped.length,
+          roomTypes: roomTypesMap[center._id.toString()] ?? [],
+          centerGenders: centerGenders.toLowerCaseKeys?.() ?? centerGenders,
+          todayAdmissions: todayAdmissionsMapped,
+          todayDischarges: todayDischargeMapped,
         };
       })
     );
 
-    const todayAtElevenFiftyFivePM = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      23,
-      55,
-      0,
-      0
-    );
+    const reportDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 55, 0);
 
     return {
-      date: todayAtElevenFiftyFivePM,
+      date: reportDate,
       reports: allInfo,
     };
   } catch (error) {

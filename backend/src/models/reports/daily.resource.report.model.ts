@@ -31,6 +31,21 @@ const dailyResourceAllocationReportSchema =
           female: Number,
           other: Number,
         },
+         todayAdmissions: [
+      {
+        patientName: String,
+        roomType: String,
+      }
+    ],
+
+    todayDischarges: [
+      {
+        patientName: String,
+        stayDuration: Number,
+        dischargeType: String,
+        dischargeCondition: String,
+      },
+    ],
       },
     ],
     createdAt: {

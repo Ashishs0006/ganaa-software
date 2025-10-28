@@ -22,6 +22,19 @@ interface IRoomType {
   totalRooms?: number;
   _id?: string;
 }
+export interface ITodayAdmission {
+  patientName: string;
+  centerName: string;
+  roomType: string;
+}
+
+export interface ITodayDischarge {
+  patientName: string;
+  dischargeType: string;
+  dischargeCondition: string;
+  stayDuration: number;
+}
+
 interface IDailyReport {
   centerId?: string;
   centerName: string;
@@ -31,19 +44,22 @@ interface IDailyReport {
   centerDischarge?: number;
   centerGenders?: ICenterGender;
   roomTypes?: IRoomType[];
+  todayAdmissions: ITodayAdmission[];
+  todayDischarges: ITodayDischarge[];
 }
 
 const DailyReport = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<IDailyReport[]>([]);
+  console.log("✌️data --->", data);
   const [badName, setBadName] = useState<string[]>([]);
   function sortRoomTypes(roomList: string[]): string[] {
     const order: Record<string, number> = {
-      "Acute": 1,
-      "Single": 2,
-      "Double-sharing":3,
+      Acute: 1,
+      Single: 2,
+      "Double-sharing": 3,
       "Triple-sharing": 4,
-      "Quad-sharing": 5,
+      "Quad-sharing": 5
     };
 
     return roomList.sort((a, b) => order[a] - order[b]);
@@ -72,6 +88,7 @@ const DailyReport = () => {
       });
 
       const reports = data?.data?.date1?.reports || data?.data?.date2?.reports;
+      console.log("hii daily report data is :", reports);
       if (reports) {
         setData(reports);
 
@@ -349,6 +366,7 @@ const DailyReport = () => {
                         <td className=" py-4 flex w-[240px] items-center  pl-3 font-semibold text-black sticky z-10 left-0 bg-white">
                           New Admission
                         </td>
+
                         {data
                           ?.slice()
                           .sort((a, b) => a.centerName.localeCompare(b.centerName))
@@ -406,6 +424,112 @@ const DailyReport = () => {
                   </table>
                 ) : (
                   <EmptyPage links="/admin/registration" hidden title="No Daily report Found" />
+                )}
+              </div>
+
+              {/* ✅ Today Admissions Table */}
+              <h3 className="text-lg font-bold text-black mt-5 mb-3">Today Admissions</h3>
+              <div className="overflow-hidden rounded-xl ">
+                {data.some((d) => d?.todayAdmissions?.length > 0) && (
+                  <div className="">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="rounded-t-md bg-[#CCB69E] select-none">
+                          <th className="sticky z-10 left-0 w-[120px] bg-[#CCB69E]  px-3 py-2 text-left align-top text-[12px] leading-[15px] font-semibold text-black">
+                            Patient Name
+                          </th>
+
+                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                            Center
+                          </th>
+                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                            Room Type
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data
+                          ?.slice()
+                          .sort((a, b) => a.centerName.localeCompare(b.centerName))
+                          ?.flatMap((d) =>
+                            d?.todayAdmissions?.map((adm, idx) => (
+                              <tr
+                                key={`${adm.patientName}-${idx}`}
+                                className="border-b border-[#d9d4c9]"
+                              >
+                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black">
+                                  {adm?.patientName}
+                                </td>
+                                <td className="px-3 py-2 text-center font-bold">
+                                  {adm?.centerName}
+                                </td>
+                                <td className="px-3 py-2 text-center font-bold">
+                                  {adm?.roomType || "NA"}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              {/* ✅ Today Discharge Table */}
+              <h3 className="text-lg font-bold text-black mt-5 mb-3">Today Discharges</h3>
+              <div className="overflow-hidden rounded-xl ">
+                {data.some((d) => d?.todayDischarges?.length > 0) && (
+                  <div className="">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="rounded-t-md border-b border-[#c7bfa7] bg-[#CCB69E] select-none">
+                          <th className="sticky left-0 z-10 w-[120px] bg-[#CCB69E] px-3 py-2 text-left text-[12px] font-semibold">
+                            Patient Name
+                          </th>
+
+                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                            Type of Discharge
+                          </th>
+                          {/* <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                          Type of Discharge
+                        </th> */}
+                           
+                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                            Stay Duration
+                          </th>
+                             <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                         Condition at the time of discharge 
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data
+                          ?.slice()
+                          .sort((a, b) => a.centerName.localeCompare(b.centerName))
+                          ?.flatMap((d) =>
+                            d?.todayDischarges?.map((dis, idx) => (
+                              <tr
+                                key={`${dis.patientName}-${idx}`}
+                                className="border-b border-[#d9d4c9]"
+                              >
+                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black">
+                                  {dis?.patientName}
+                                </td>
+                                <td className="px-3 py-2 text-center font-bold">
+                                  {dis?.dischargeType || "NA"}
+                                </td>
+                                {/* <td className="px-3 py-2 text-center font-bold">{dis?.dischargeCondition}</td> */}
+                                <td className="px-3 py-2 text-center font-bold">
+                                  {dis?.stayDuration || "NA"}
+                                </td>
+                                  <td className="px-3 py-2 text-center font-bold">
+                                  {dis?.dischargeCondition || "NA"}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>
