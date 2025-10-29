@@ -1,7 +1,7 @@
 import { CustomCalendar, EmptyPage } from "@/components";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getDailyReport } from "@/apis";
+import { getAllCenter, getDailyReport } from "@/apis";
 import calendar from "@/assets/images/calender.svg";
 
 import handleError from "@/utils/handleError";
@@ -51,6 +51,7 @@ interface IDailyReport {
 const DailyReport = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<IDailyReport[]>([]);
+  const [center, setCenter] = useState<any>(null);
   console.log("✌️data --->", data);
   const [badName, setBadName] = useState<string[]>([]);
   function sortRoomTypes(roomList: string[]): string[] {
@@ -65,6 +66,26 @@ const DailyReport = () => {
     return roomList.sort((a, b) => order[a] - order[b]);
   }
 
+  const fetchAllCenter = async () => {
+    try {
+      const { data: centerData } = await getAllCenter({});
+
+      // Find the centerId in `data` where `todayDischarges` has a length > 0
+      const centerIdWithDischarges = data?.find((d) => d?.todayDischarges?.length > 0)?.centerId;
+
+      // If a valid centerId is found, filter centerData to match that centerId
+      if (centerIdWithDischarges) {
+        const currentCenter = centerData.data.filter((cen) => cen._id === centerIdWithDischarges);
+        setCenter(currentCenter);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCenter();
+  }, [data]);
   const fetchDailyReport = async () => {
     try {
       const endDateParam = searchParams.get("endDate");
@@ -88,7 +109,7 @@ const DailyReport = () => {
       });
 
       const reports = data?.data?.date1?.reports || data?.data?.date2?.reports;
-      console.log("hii daily report data is :", reports);
+
       if (reports) {
         setData(reports);
 
@@ -174,13 +195,13 @@ const DailyReport = () => {
             </div>
           </div>
           <div className="bg-white p-5   rounded-2xl">
-            <div className="font-sans  rounded-xl overflow-y-auto text-[13px] leading-[18px] text-[#1a1a1a]">
+            <div className="font-sans  rounded-xl overflow-y-auto text-[15px] leading-[18px] text-[#1a1a1a]">
               <div className="mx-auto overflow-x-auto rounded-md">
                 {data.length ? (
                   <table className="w-full  border-collapse">
                     <thead>
                       <tr className="rounded-t-md border-b border-[#c7bfa7] bg-[#CCB69E] select-none">
-                        <th className="sticky z-10 left-0 w-[120px] bg-[#CCB69E] border-[#c7bfa7] px-3 py-2 text-left align-top text-[12px] leading-[15px] font-semibold text-black">
+                        <th className="sticky z-10 left-0 w-[120px] bg-[#CCB69E] border-[#c7bfa7] px-3 py-2 text-left align-top text-[15px] leading-[15px] font-semibold text-black">
                           #
                         </th>
                         {data
@@ -189,13 +210,13 @@ const DailyReport = () => {
                           ?.map((data) => (
                             <th
                               key={data?.centerId}
-                              className="w-[90px] px-3 py-2 text-center align-top text-[12px] leading-[15px] font-semibold text-black"
+                              className="w-[90px] px-3 py-2 text-center align-top text-[15px] leading-[15px] font-semibold text-black"
                             >
                               {data?.centerName}
                             </th>
                           ))}
 
-                        <th className="sticky z-10 right-0 border-l-2 border-[#c7bfa7] bg-[#CCB69E]  w-[120px] px-3 py-2 text-center align-top text-[12px] leading-[15px] font-semibold text-black">
+                        <th className="sticky z-10 right-0 border-l-2 border-[#c7bfa7] bg-[#CCB69E]  w-[120px] px-3 py-2 text-center align-top text-[15px] leading-[15px] font-semibold text-black">
                           Total
                         </th>
                       </tr>
@@ -435,14 +456,14 @@ const DailyReport = () => {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="rounded-t-md bg-[#CCB69E] select-none">
-                          <th className="sticky z-10 left-0 w-[120px] bg-[#CCB69E]  px-3 py-2 text-left align-top text-[12px] leading-[15px] font-semibold text-black">
+                          <th className="sticky z-10 left-0 w-[120px] bg-[#CCB69E]  px-3 py-2 text-left align-top text-[15px] leading-[15px] font-semibold text-black">
                             Patient Name
                           </th>
 
-                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                          <th className="px-3 py-2 text-center text-[15px] font-semibold">
                             Center
                           </th>
-                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                          <th className="px-3 py-2 text-center text-[15px] font-semibold">
                             Room Type
                           </th>
                         </tr>
@@ -457,7 +478,7 @@ const DailyReport = () => {
                                 key={`${adm.patientName}-${idx}`}
                                 className="border-b border-[#d9d4c9]"
                               >
-                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black">
+                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis">
                                   {adm?.patientName}
                                 </td>
                                 <td className="px-3 py-2 text-center font-bold">
@@ -482,22 +503,21 @@ const DailyReport = () => {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="rounded-t-md border-b border-[#c7bfa7] bg-[#CCB69E] select-none">
-                          <th className="sticky left-0 z-10 w-[120px] bg-[#CCB69E] px-3 py-2 text-left text-[12px] font-semibold">
+                          <th className="sticky left-0 z-10 w-[120px] bg-[#CCB69E] px-3 py-2 text-left text-[15px] font-semibold">
                             Patient Name
                           </th>
+                          <th className="sticky left-0 z-10 w-[120px] bg-[#CCB69E] px-3 py-2 text-center text-[15px] font-semibold">
+                            Center
+                          </th>
 
-                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
+                          <th className="px-3 py-2 text-center text-[15px] font-semibold">
                             Type of Discharge
                           </th>
-                          {/* <th className="px-3 py-2 text-center text-[12px] font-semibold">
-                          Type of Discharge
-                        </th> */}
-                           
-                          <th className="px-3 py-2 text-center text-[12px] font-semibold">
-                            Stay Duration
+                          <th className="px-3 py-2 text-center text-[15px] font-semibold">
+                            Condition at the time of discharge
                           </th>
-                             <th className="px-3 py-2 text-center text-[12px] font-semibold">
-                         Condition at the time of discharge 
+                          <th className="px-3 py-2 text-center text-[15px] font-semibold">
+                            Stay Duration
                           </th>
                         </tr>
                       </thead>
@@ -511,18 +531,23 @@ const DailyReport = () => {
                                 key={`${dis.patientName}-${idx}`}
                                 className="border-b border-[#d9d4c9]"
                               >
-                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black">
+                                <td className="sticky left-0 z-10 bg-white px-3 py-2 font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis">
                                   {dis?.patientName}
                                 </td>
+
+                                <td className="sticky left-[120px] z-10 bg-white px-3 py-2 text-center font-bold whitespace-nowrap overflow-hidden text-ellipsis">
+                                  {center?.[0]?.centerName}
+                                </td>
+
                                 <td className="px-3 py-2 text-center font-bold">
                                   {dis?.dischargeType || "NA"}
+                                </td>
+                                <td className="px-3 py-2 text-center font-bold">
+                                  {dis?.dischargeCondition || "NA"}
                                 </td>
                                 {/* <td className="px-3 py-2 text-center font-bold">{dis?.dischargeCondition}</td> */}
                                 <td className="px-3 py-2 text-center font-bold">
                                   {dis?.stayDuration || "NA"}
-                                </td>
-                                  <td className="px-3 py-2 text-center font-bold">
-                                  {dis?.dischargeCondition || "NA"}
                                 </td>
                               </tr>
                             ))

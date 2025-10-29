@@ -977,9 +977,9 @@ const PatientFollowup = () => {
   }, []);
 
   return (
-    <div className="bg-[#F4F2F0]  min-h-[calc(100vh-64px)]">
+    <div className="bg-[#ffffff]  min-h-[calc(100vh-64px)]">
       <div className=" container">
-        <div className="flex lg:px-8 sm:px-2  bg-[#F4F2F0] justify-between md:flex-row flex-col md:items-center">
+        <div className="flex lg:px-8 sm:px-2  bg-[#ffffff] justify-between md:flex-row flex-col md:items-center">
           <div className="flex items-center gap-3">
             <div
               className="p-3 w-fit bg-white rounded-full cursor-pointer"
@@ -1072,7 +1072,7 @@ const PatientFollowup = () => {
           </div>
         </div>
 
-        <div className="w-full h-fit bg-[#ffffff] rounded-t-2xl px-5 py-6 ">
+        <div className="w-full h-fit bg-[#F4F2F0] border border-gray-300 rounded-t-2xl px-5 py-6 ">
           <div className="grid grid-cols-6">
             <div className="flex gap-2  items-center py-4">
               <div
@@ -1223,132 +1223,133 @@ const PatientFollowup = () => {
           </div>
         </div>
 
-        <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-          {!patient.loa.loa ? (
-            <div className=" bg-[#F4F2F0]  rounded-lg font-semibold">
-              <div className=" bg-white ">
-                <div className="mb-2 flex items-center justify-between border-b border-gray-300">
-                  <div className="flex items-center p-4">
-                    <IoIosArrowUp
-                      className={`cursor-pointer h-4 w-4 mr-1 ${
-                        !dropDownsState.displayAddForm ? "" : "rotate-180"
-                      }`}
-                      onClick={() => {
-                        setDropDownsState({
-                          ...dropDownsState,
-                          displayAddForm: !dropDownsState.displayAddForm
-                        });
-                      }}
-                    />
-                    <div className="text-[13px] text-nowrap whitespace-nowrap font-bold">
-                      Add Details
-                    </div>
-                    {!dropDownsState.displayAddForm && (
-                      <div className="flex text-nowrap text-xs whitespace-nowrap">
-                        <div className="ml-4 flex  items-center text-gray-500">
-                          <CustomCalendar
-                            value={data.noteDate}
-                            disabledDate={(current) => {
-                              if (!current) return false;
+        <div className="border border-gray-300">
+          <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
+            {!patient.loa.loa ? (
+              <div className="  rounded-lg font-semibold">
+                <div className=" ">
+                  <div className="mb-2 flex items-center justify-between border-b border-gray-300">
+                    <div className="flex items-center p-4">
+                      <IoIosArrowUp
+                        className={`cursor-pointer h-4 w-4 mr-1 ${
+                          !dropDownsState.displayAddForm ? "" : "rotate-180"
+                        }`}
+                        onClick={() => {
+                          setDropDownsState({
+                            ...dropDownsState,
+                            displayAddForm: !dropDownsState.displayAddForm
+                          });
+                        }}
+                      />
+                      <div className="text-[13px] text-nowrap whitespace-nowrap font-bold">
+                        Add Details
+                      </div>
+                      {!dropDownsState.displayAddForm && (
+                        <div className="flex text-nowrap text-xs whitespace-nowrap">
+                          <div className="ml-4 flex  items-center text-gray-500">
+                            <CustomCalendar
+                              value={data.noteDate}
+                              disabledDate={(current) => {
+                                if (!current) return false;
 
-                              const minDate = new Date(state.dateOfAdmission);
-                              minDate.setHours(0, 0, 0, 0); // normalize
+                                const minDate = new Date(state.dateOfAdmission);
+                                minDate.setHours(0, 0, 0, 0); // normalize
 
-                              const currentDate = current.toDate(); // Convert from Moment to JS Date
-                              currentDate.setHours(0, 0, 0, 0); // normalize
+                                const currentDate = current.toDate(); // Convert from Moment to JS Date
+                                currentDate.setHours(0, 0, 0, 0); // normalize
 
-                              return currentDate < minDate;
-                            }}
-                            onChange={(date) => {
-                              handleDateTimeChange(date, "date");
-                            }}
-                          >
-                            <div className="flex items-center">
-                              {data?.noteDate && formateNormalDate(data.noteDate)}
+                                return currentDate < minDate;
+                              }}
+                              onChange={(date) => {
+                                handleDateTimeChange(date, "date");
+                              }}
+                            >
+                              <div className="flex items-center">
+                                {data?.noteDate && formateNormalDate(data.noteDate)}
 
+                                <div className="flex items-center justify-center w-5 mx-1 h-5">
+                                  <img
+                                    alt="calender"
+                                    src={calendar}
+                                    className="w-full h-full cursor-pointer"
+                                  />
+                                </div>
+                              </div>
+                            </CustomCalendar>
+                            <span className="mx-2">|</span>
+
+                            <CustomTimePicker
+                              value={data.noteTime}
+                              onChange={(time) => {
+                                handleDateTimeChange(time, "time");
+                              }}
+                            >
+                              {data.noteTime && data.noteTime.split(":").slice(0, 2).join(":")}
                               <div className="flex items-center justify-center w-5 mx-1 h-5">
                                 <img
-                                  alt="calender"
-                                  src={calendar}
-                                  className="w-full h-full cursor-pointer"
+                                  src={clock}
+                                  alt="clock"
+                                  className="w-full h-full cursor-pointer ml-2"
                                 />
                               </div>
-                            </div>
-                          </CustomCalendar>
-                          <span className="mx-2">|</span>
-
-                          <CustomTimePicker
-                            value={data.noteTime}
-                            onChange={(time) => {
-                              handleDateTimeChange(time, "time");
-                            }}
-                          >
-                            {data.noteTime && data.noteTime.split(":").slice(0, 2).join(":")}
-                            <div className="flex items-center justify-center w-5 mx-1 h-5">
-                              <img
-                                src={clock}
-                                alt="clock"
-                                className="w-full h-full cursor-pointer ml-2"
-                              />
-                            </div>
-                          </CustomTimePicker>
-                        </div>
-
-                        <div className="ml-8  w-[160px] min-w-[160px] z-30 gap-1 relative text-xs cursor-pointer flex items-center text-gray-500">
-                          <div className="font-medium">Therapist: </div>
-                          <div
-                            onClick={() => {
-                              toggleTherapistsMenu();
-                            }}
-                            className="text-[#292929] w-[60%] truncate font-bold"
-                          >
-                            {state.therapistName}
+                            </CustomTimePicker>
                           </div>
-                          <IoIosArrowDown
-                            onClick={() => {
-                              toggleTherapistsMenu();
-                            }}
-                            className="text-black h-4 w-4 cursor-pointer"
-                          />
-                          {dropDownsState.displayDropdown && (
+
+                          <div className="ml-8  w-[160px] min-w-[160px] z-30 gap-1 relative text-xs cursor-pointer flex items-center text-gray-500">
+                            <div className="font-medium">Therapist: </div>
                             <div
-                              ref={therapistMenuRef}
-                              className="absolute top-5 left-5  mt-1  bg-white shadow-lg rounded-md w-[210px]"
+                              onClick={() => {
+                                toggleTherapistsMenu();
+                              }}
+                              className="text-[#292929] w-[60%] truncate font-bold"
                             >
-                              <ul className="py-2 px-2 flex gap-4 flex-col justify-center">
-                                {allTherapists.length >= 0 &&
-                                  allTherapists.map((value: IUser, index: number) => {
-                                    return (
-                                      <div className="" key={index}>
-                                        <div
-                                          onClick={() => {
-                                            setState({
-                                              ...state,
-                                              therapistName: `${value.firstName}  ${value.lastName}`
-                                            });
-                                            setData({
-                                              ...data,
-                                              therapistId: value._id
-                                            });
-                                            toggleTherapistsMenu();
-                                          }}
-                                          className="flex pb-1 gap-[30px]"
-                                        >
-                                          <li className=" text-wrap text-sm font-semibold cursor-pointer hover:bg-gray-100">
-                                            {value.firstName + " " + value.lastName}
-                                          </li>
+                              {state.therapistName}
+                            </div>
+                            <IoIosArrowDown
+                              onClick={() => {
+                                toggleTherapistsMenu();
+                              }}
+                              className="text-black h-4 w-4 cursor-pointer"
+                            />
+                            {dropDownsState.displayDropdown && (
+                              <div
+                                ref={therapistMenuRef}
+                                className="absolute top-5 left-5  mt-1  bg-white shadow-lg rounded-md w-[210px]"
+                              >
+                                <ul className="py-2 px-2 flex gap-4 flex-col justify-center">
+                                  {allTherapists.length >= 0 &&
+                                    allTherapists.map((value: IUser, index: number) => {
+                                      return (
+                                        <div className="" key={index}>
+                                          <div
+                                            onClick={() => {
+                                              setState({
+                                                ...state,
+                                                therapistName: `${value.firstName}  ${value.lastName}`
+                                              });
+                                              setData({
+                                                ...data,
+                                                therapistId: value._id
+                                              });
+                                              toggleTherapistsMenu();
+                                            }}
+                                            className="flex pb-1 gap-[30px]"
+                                          >
+                                            <li className=" text-wrap text-sm font-semibold cursor-pointer hover:bg-gray-100">
+                                              {value.firstName + " " + value.lastName}
+                                            </li>
+                                            <hr />
+                                          </div>
                                           <hr />
                                         </div>
-                                        <hr />
-                                      </div>
-                                    );
-                                  })}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
+                                      );
+                                    })}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
 
-                        <div className="ml-4 relative text-nowrap whitespace-nowrap cursor-pointer z-30 text-xs flex items-center text-gray-500">
+                          {/* <div className="ml-4 relative text-nowrap whitespace-nowrap cursor-pointer z-30 text-xs flex items-center text-gray-500">
                           <div className="font-medium">Session Type: </div>
                           <div
                             onClick={() => {
@@ -1356,11 +1357,6 @@ const PatientFollowup = () => {
                             }}
                             className="text-[#292929] flex items-center mx-2 font-bold"
                           >
-                            {/* {`${data.sessionType}${
-                            data.subSessionType ? ` (${data.subSessionType})` : ""
-                          }`} */}
-
-                            {/* <IoIosArrowDown className="text-black ml-2 h-4 w-4 cursor-pointer" /> */}
                           </div>
                           <MultiSelectDropdown
                             placeholder="Select Session"
@@ -1402,44 +1398,44 @@ const PatientFollowup = () => {
                           value={data.score}
                           onChange={handleChange}
                           maxLength={50}
-                        />
+                        /> */}
+                        </div>
+                      )}
+                    </div>
+                    {!patient?.loa?.loa && (
+                      <div className="flex sm:flex-col md:flex-row items-center px-4">
+                        <div
+                          className="mr-7 text-nowrap cursor-pointer whitespace-nowrap text-xs text-[#636363]"
+                          onClick={() => {
+                            resetState();
+                          }}
+                        >
+                          Clear all
+                        </div>
+                        <Button
+                          variant="outlined"
+                          disabled={handleDisabled()}
+                          onClick={() => {
+                            if (!state.isTodayNoteExist) {
+                              handleSubmit();
+                            }
+                          }}
+                          type="submit"
+                          className="rounded-xl! text-xs! bg-[#575F4A] px-6! py-1! text-white"
+                        >
+                          {data.id ? "Update" : "Save"}
+                        </Button>
                       </div>
                     )}
                   </div>
-                  {!patient?.loa?.loa && (
-                    <div className="flex sm:flex-col md:flex-row items-center px-4">
-                      <div
-                        className="mr-7 text-nowrap cursor-pointer whitespace-nowrap text-xs text-[#636363]"
-                        onClick={() => {
-                          resetState();
-                        }}
-                      >
-                        Clear all
-                      </div>
-                      <Button
-                        variant="outlined"
-                        disabled={handleDisabled()}
-                        onClick={() => {
-                          if (!state.isTodayNoteExist) {
-                            handleSubmit();
-                          }
-                        }}
-                        type="submit"
-                        className="rounded-xl! text-xs! bg-[#575F4A] px-6! py-1! text-white"
-                      >
-                        {data.id ? "Update" : "Save"}
-                      </Button>
-                    </div>
-                  )}
-                </div>
 
-                <div
-                  className={`${
-                    dropDownsState.displayAddForm ? "hidden" : "grid"
-                  } pb-5 grid-cols-1 px-5 py-1 items-center`}
-                >
-                  <div className="grid lg:grid-cols-5 grid-cols-2 gap-y-4 p-2 gap-x-[52px]">
-                    {/* <Input
+                  <div
+                    className={`${
+                      dropDownsState.displayAddForm ? "hidden" : "grid"
+                    } pb-5 grid-cols-1 px-5 py-1 items-center`}
+                  >
+                    <div className="grid lg:grid-cols-5 grid-cols-2 gap-y-4 p-2 gap-x-[52px]">
+                      {/* <Input
                       disabled={state.isTodayNoteExist}
                       label="Center"
                       labelClassName="text-black!"
@@ -1556,7 +1552,7 @@ const PatientFollowup = () => {
                       name="dischargePlan"
                       onChange={handleSelect}
                     /> */}
-                    {/* {data?.dischargePlan && (
+                      {/* {data?.dischargePlan && (
                       <Input
                         disabled
                         label="Discharge Plan Shared"
@@ -1568,7 +1564,7 @@ const PatientFollowup = () => {
                       />
                     )} */}
 
-                    <Input
+                      {/* <Input
                       disabled={state.isTodayNoteExist}
                       type="date"
                       label="Followup Date"
@@ -1580,9 +1576,9 @@ const PatientFollowup = () => {
                         data?.followupDate ? moment(data.followupDate).format("YYYY-MM-DD") : ""
                       }
                       onChange={handleChange}
-                    />
+                    /> */}
 
-                    <Select
+                      {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Current Status"
                           options={[
@@ -1601,28 +1597,29 @@ const PatientFollowup = () => {
                           onChange={(name, data) => {
                             handleSelect(name, data);
                           }}
-                        />
+                        /> */}
+                      {state.illnessType !== "Mental Disorder" && (
+                        <>
+                          {/* <Select
+                            disable={state.isTodayNoteExist}
+                            label="Medication Adherence"
+                            options={[
+                              { label: "No", value: "No" },
+                              { label: "Yes", value: "Yes" },
+                              { label: "Sometimes", value: "Sometimes" }
+                            ]}
+                            value={
+                              data?.adherence
+                                ? { label: data.adherence, value: data.adherence }
+                                : { label: "Select", value: "" }
+                            }
+                            name="adherence"
+                            onChange={(name, data) => {
+                              handleSelect(name, data);
+                            }}
+                          /> */}
 
-                         <Select
-                          disable={state.isTodayNoteExist}
-                          label="Medication Adherence"
-                          options={[
-                            { label: "No", value: "No" },
-                            { label: "Yes", value: "Yes" },
-                            { label: "Sometimes", value: "Sometimes" }
-                          ]}
-                          value={
-                            data?.adherence
-                              ? { label: data.adherence, value: data.adherence }
-                              : { label: "Select", value: "" }
-                          }
-                          name="adherence"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        />
-
-                         <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Attending Meeting"
                           options={[
@@ -1641,20 +1638,20 @@ const PatientFollowup = () => {
                           onChange={(name, data) => {
                             handleSelect(name, data);
                           }}
-                        />
+                        /> */}
 
-                         <Input
-                          disabled={state.isTodayNoteExist}
-                          label="Feedback from family"
-                          labelClassName="text-black!"
-                          className="rounded-lg! font-bold placeholder:font-normal"
-                          placeholder="Enter"
-                          name="feedbackFromFamily"
-                          value={data.feedbackFromFamily}
-                          onChange={handleChange}
-                        />
+                          <Input
+                            disabled={state.isTodayNoteExist}
+                            label="Feedback from family"
+                            labelClassName="text-black!"
+                            className="rounded-lg! font-bold placeholder:font-normal"
+                            placeholder="Enter"
+                            name="feedbackFromFamily"
+                            value={data.feedbackFromFamily}
+                            onChange={handleChange}
+                          />
 
-                    {/* <Input
+                          {/* <Input
                       disabled={state.isTodayNoteExist}
                       label="Therapist follow - up"
                       labelClassName="text-black!"
@@ -1665,9 +1662,7 @@ const PatientFollowup = () => {
                       onChange={handleChange}
                     /> */}
 
-                    {state.illnessType !== "Mental Disorder" && (
-                      <>
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Urge"
                           options={[
@@ -1684,91 +1679,95 @@ const PatientFollowup = () => {
                             handleSelect(name, data);
                           }}
                         /> */}
-                        <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Urge</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">Urge</label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="urge-yes"
-                                name="urge"
-                                value="Yes"
-                                checked={data?.urge === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("urge", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="urge-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.urge === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.urge === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="urge-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="urge-yes"
+                                  name="urge"
+                                  value="Yes"
+                                  checked={data?.urge === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("urge", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="urge-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.urge === "Yes" ? " border-[#586B3A]!" : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.urge === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="urge-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="urge-no"
-                                name="urge"
-                                value="No"
-                                checked={data?.urge === "No"}
-                                onChange={(e) =>
-                                  handleSelect("urge", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="urge-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.urge === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.urge === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="urge-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="urge-no"
+                                  name="urge"
+                                  value="No"
+                                  checked={data?.urge === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("urge", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="urge-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.urge === "No" ? " border-[#586B3A]!" : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.urge === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="urge-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* {data.urge && (
+                          {/* {data.urge && (
                           <Input
                             disabled
                             label="Urge Other Detail"
@@ -1780,9 +1779,7 @@ const PatientFollowup = () => {
                           />
                         )} */}
 
-                       
-
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Doing Prayer"
                           options={[
@@ -1800,91 +1797,99 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                        <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Doing Prayer</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">Doing Prayer</label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="prayer-yes"
-                                name="prayer"
-                                value="Yes"
-                                checked={data?.prayer === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("prayer", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="prayer-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.prayer === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.prayer === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="prayer-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="prayer-yes"
+                                  name="prayer"
+                                  value="Yes"
+                                  checked={data?.prayer === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("prayer", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="prayer-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.prayer === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.prayer === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="prayer-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="prayer-no"
-                                name="prayer"
-                                value="No"
-                                checked={data?.prayer === "No"}
-                                onChange={(e) =>
-                                  handleSelect("prayer", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="prayer-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.prayer === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.prayer === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="prayer-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="prayer-no"
+                                  name="prayer"
+                                  value="No"
+                                  checked={data?.prayer === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("prayer", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="prayer-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.prayer === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.prayer === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="prayer-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Reading AA literature"
                           options={[
@@ -1902,93 +1907,99 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                        <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Reading AA literature</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">Reading AA literature</label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="literature-yes"
-                                name="literature"
-                                value="Yes"
-                                checked={data?.literature === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("literature", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="literature-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.literature === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.literature === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="literature-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="literature-yes"
+                                  name="literature"
+                                  value="Yes"
+                                  checked={data?.literature === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("literature", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="literature-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.literature === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.literature === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="literature-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="literature-no"
-                                name="literature"
-                                value="No"
-                                checked={data?.literature === "No"}
-                                onChange={(e) =>
-                                  handleSelect("literature", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="literature-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.literature === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.literature === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="literature-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="literature-no"
+                                  name="literature"
+                                  value="No"
+                                  checked={data?.literature === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("literature", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="literature-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.literature === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.literature === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="literature-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                       
-
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Attending Daycare at Ganaa"
                           options={[
@@ -2006,91 +2017,101 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                         <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Attending Daycare at Ganaa</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">
+                              Attending Daycare at Ganaa
+                            </label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="daycareAtGanaa-yes"
-                                name="daycareAtGanaa"
-                                value="Yes"
-                                checked={data?.daycareAtGanaa === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("daycareAtGanaa", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="daycareAtGanaa-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.daycareAtGanaa === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.daycareAtGanaa === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="daycareAtGanaa-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="daycareAtGanaa-yes"
+                                  name="daycareAtGanaa"
+                                  value="Yes"
+                                  checked={data?.daycareAtGanaa === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("daycareAtGanaa", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="daycareAtGanaa-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.daycareAtGanaa === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.daycareAtGanaa === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="daycareAtGanaa-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="daycareAtGanaa-no"
-                                name="daycareAtGanaa"
-                                value="No"
-                                checked={data?.daycareAtGanaa === "No"}
-                                onChange={(e) =>
-                                  handleSelect("daycareAtGanaa", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="daycareAtGanaa-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.daycareAtGanaa === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.daycareAtGanaa === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="daycareAtGanaa-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="daycareAtGanaa-no"
+                                  name="daycareAtGanaa"
+                                  value="No"
+                                  checked={data?.daycareAtGanaa === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("daycareAtGanaa", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="daycareAtGanaa-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.daycareAtGanaa === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.daycareAtGanaa === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="daycareAtGanaa-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Making a sponsor"
                           options={[
@@ -2108,91 +2129,99 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                         <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Making a sponsor</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">Making a sponsor</label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="sponsor-yes"
-                                name="sponsor"
-                                value="Yes"
-                                checked={data?.sponsor === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("sponsor", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="sponsor-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.sponsor === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.sponsor === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="sponsor-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="sponsor-yes"
+                                  name="sponsor"
+                                  value="Yes"
+                                  checked={data?.sponsor === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("sponsor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="sponsor-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.sponsor === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.sponsor === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="sponsor-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="sponsor-no"
-                                name="sponsor"
-                                value="No"
-                                checked={data?.sponsor === "No"}
-                                onChange={(e) =>
-                                  handleSelect("sponsor", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="sponsor-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.sponsor === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.sponsor === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="sponsor-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="sponsor-no"
+                                  name="sponsor"
+                                  value="No"
+                                  checked={data?.sponsor === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("sponsor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="sponsor-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.sponsor === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.sponsor === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="sponsor-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Doing 12-step program"
                           options={[
@@ -2210,91 +2239,99 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                         <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Doing 12-step program</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">Doing 12-step program</label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="stepProgram-yes"
-                                name="stepProgram"
-                                value="Yes"
-                                checked={data?.stepProgram === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("stepProgram", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="stepProgram-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.stepProgram === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.stepProgram === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="stepProgram-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="stepProgram-yes"
+                                  name="stepProgram"
+                                  value="Yes"
+                                  checked={data?.stepProgram === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("stepProgram", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="stepProgram-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.stepProgram === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.stepProgram === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="stepProgram-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="stepProgram-no"
-                                name="stepProgram"
-                                value="No"
-                                checked={data?.stepProgram === "No"}
-                                onChange={(e) =>
-                                  handleSelect("stepProgram", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="stepProgram-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.stepProgram === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.stepProgram === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="stepProgram-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="stepProgram-no"
+                                  name="stepProgram"
+                                  value="No"
+                                  checked={data?.stepProgram === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("stepProgram", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="stepProgram-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.stepProgram === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.stepProgram === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="stepProgram-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* <Select
+                          {/* <Select
                           disable={state.isTodayNoteExist}
                           label="Doing review with Ganaa docotor"
                           options={[
@@ -2316,315 +2353,320 @@ const PatientFollowup = () => {
                           }}
                         /> */}
 
-                         <div className="flex gap-[10px] items-start justify-start flex-col">
-                          <label className="font-medium text-xs">Doing review with Ganaa docotor</label>
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                            <label className="font-medium text-xs">
+                              Doing review with Ganaa docotor
+                            </label>
 
-                          <div className="flex gap-5 items-center justify-center mb-3">
-                            {/* Yes option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="reviewWithGanaaDoctor-yes"
-                                name="reviewWithGanaaDoctor"
-                                value="Yes"
-                                checked={data?.reviewWithGanaaDoctor === "Yes"}
-                                onChange={(e) =>
-                                  handleSelect("reviewWithGanaaDoctor", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="reviewWithGanaaDoctor-yes"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.reviewWithGanaaDoctor === "Yes" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.reviewWithGanaaDoctor === "Yes" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="reviewWithGanaaDoctor-yes"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                Yes
-                              </label>
-                            </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="reviewWithGanaaDoctor-yes"
+                                  name="reviewWithGanaaDoctor"
+                                  value="Yes"
+                                  checked={data?.reviewWithGanaaDoctor === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("reviewWithGanaaDoctor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="reviewWithGanaaDoctor-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.reviewWithGanaaDoctor === "Yes"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.reviewWithGanaaDoctor === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="reviewWithGanaaDoctor-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-                            {/* No option */}
-                            <div className="flex items-center">
-                              <input
-                                type="radio"
-                                id="reviewWithGanaaDoctor-no"
-                                name="reviewWithGanaaDoctor"
-                                value="No"
-                                checked={data?.reviewWithGanaaDoctor === "No"}
-                                onChange={(e) =>
-                                  handleSelect("reviewWithGanaaDoctor", {
-                                    label: e.target.value,
-                                    value: e.target.value
-                                  })
-                                }
-                                disabled={state.isTodayNoteExist}
-                                className="hidden"
-                              />
-                              <label
-                                htmlFor="reviewWithGanaaDoctor-no"
-                                className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                  data?.reviewWithGanaaDoctor === "No" ? "border-gray-300" : "border-gray-300"
-                                } ${state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""}`}
-                              >
-                                {data?.reviewWithGanaaDoctor === "No" && (
-                                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                                )}
-                              </label>
-                              <label
-                                htmlFor="reviewWithGanaaDoctor-no"
-                                className={`ms-2 text-sm font-medium ${
-                                  state.isTodayNoteExist
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "cursor-pointer"
-                                }`}
-                              >
-                                No
-                              </label>
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="reviewWithGanaaDoctor-no"
+                                  name="reviewWithGanaaDoctor"
+                                  value="No"
+                                  checked={data?.reviewWithGanaaDoctor === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("reviewWithGanaaDoctor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="reviewWithGanaaDoctor-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.reviewWithGanaaDoctor === "No"
+                                      ? " border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.reviewWithGanaaDoctor === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="reviewWithGanaaDoctor-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        </>
+                      )}
+                    </div>
 
-                       
+                    <div className="col-span-1 col-start-1 ">
+                      <RichTextEditor
+                        name="note"
+                        disable={state.isTodayNoteExist}
+                        label="Notes"
+                        // required
+                        placeholder="Start typing..."
+                        maxLength={5000}
+                        value={data.note}
+                        onChange={handleChangeQuill}
+                      />
+                    </div>
 
-                        
-                      </>
-                    )}
-                  </div>
-
-                  <div className="col-span-1 col-start-1 ">
-                    <RichTextEditor
-                      name="note"
-                      disable={state.isTodayNoteExist}
-                      label="Notes"
-                      // required
-                      placeholder="Start typing..."
-                      maxLength={5000}
-                      value={data.note}
-                      onChange={handleChangeQuill}
-                    />
-                  </div>
-
-                  <div className="pb-6 mt-5">
-                    <CheckBox
-                      checked={true}
-                      name=""
-                      handleDeletes={handleDeleteFile}
-                      handleDrop={(files) => {
-                        handleDropFiles(files);
-                      }}
-                      files={data.file instanceof File ? [data.file] : []}
-                      filesString={
-                        data.file && !(data.file instanceof File)
-                          ? [
-                              {
-                                filePath: typeof data.file === "string" ? data.file : "",
-                                fileUrl: typeof data.file === "string" ? data.file : "",
-                                fileName: data.fileName || ""
-                              }
-                            ]
-                          : undefined
-                      }
-                      ContainerClass="col-span-3"
-                      checkHide
-                      label={""}
-                      handleCheck={function (_e: SyntheticEvent): void {
-                        throw new Error("Function not implemented.");
-                      }}
-                    />
+                    <div className="pb-6 mt-5">
+                      <CheckBox
+                        checked={true}
+                        name=""
+                        handleDeletes={handleDeleteFile}
+                        handleDrop={(files) => {
+                          handleDropFiles(files);
+                        }}
+                        files={data.file instanceof File ? [data.file] : []}
+                        filesString={
+                          data.file && !(data.file instanceof File)
+                            ? [
+                                {
+                                  filePath: typeof data.file === "string" ? data.file : "",
+                                  fileUrl: typeof data.file === "string" ? data.file : "",
+                                  fileName: data.fileName || ""
+                                }
+                              ]
+                            : undefined
+                        }
+                        ContainerClass="col-span-3"
+                        checkHide
+                        label={""}
+                        handleCheck={function (_e: SyntheticEvent): void {
+                          throw new Error("Function not implemented.");
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <LoaBlankScreen />
-          )}
-        </RBACGuard>
+            ) : (
+              <LoaBlankScreen />
+            )}
+          </RBACGuard>
 
-        <div className="px-8 bg-white font-semibold text-xs py-5">
-          <div>
-            {(searchParams.get("startDate") || therapistNotes.length > 0) && (
-              <div className="flex justify-between items-center w-full py-4 pl-3">
-                <p className="text-[14px] font-semibold ml-3">All Records</p>
+          <div className="px-8 bg-white font-semibold text-xs py-5">
+            <div>
+              {(searchParams.get("startDate") || therapistNotes.length > 0) && (
+                <div className="flex justify-between items-center w-full py-4 pl-3">
+                  <p className="text-[14px] font-semibold ml-3">All Records</p>
 
-                <div className="flex items-center justify-center gap-2">
-                  <DateRange>
-                    <Button
-                      variant="outlined"
-                      size="base"
-                      className="flex text-xs! py-2! border-[#D4D4D4]!  border! rounded-lg! text-[#505050] "
-                    >
-                      <img src={calendar} alt="calender" />
-                      {searchParams.get("startDate")
-                        ? `Date Range ${formatDate(searchParams.get("startDate"))} to ${formatDate(
-                            searchParams.get("endDate")
-                          )}`
-                        : "Date Range"}
-                    </Button>
-                  </DateRange>
+                  <div className="flex items-center justify-center gap-2">
+                    <DateRange>
+                      <Button
+                        variant="outlined"
+                        size="base"
+                        className="flex text-xs! py-2! border-[#D4D4D4]!  border! rounded-lg! text-[#505050] "
+                      >
+                        <img src={calendar} alt="calender" />
+                        {searchParams.get("startDate")
+                          ? `Date Range ${formatDate(
+                              searchParams.get("startDate")
+                            )} to ${formatDate(searchParams.get("endDate"))}`
+                          : "Date Range"}
+                      </Button>
+                    </DateRange>
+                  </div>
                 </div>
+              )}
+            </div>
+            {therapistNotes.length > 0 ? (
+              <div>
+                <table className="w-full text-xs font-semibold text-left">
+                  <thead className="bg-[#E9E8E5] w-full  top-0 sticky z-10 ">
+                    <tr className="text-[#505050]  font-medium">
+                      <th className="pl-7 py-3 w-1/7 text-xs">Date & Time</th>
+                      <th className="px-2 py-3 w-1/7 text-xs">Therapist</th>
+                      <th className="px-2 py-3 w-1/7 text-xs">Score</th>
+                      <th className="px-2 py-3 w-1/7 text-xs">File</th>
+                      <th className="px-2 py-3 w-1/7 text-xs">Notes</th>
+                      <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
+                        <th className="px-2 py-3 w-1/7 text-xs">{""}</th>
+                      </RBACGuard>
+                    </tr>
+                  </thead>
+
+                  <tbody className="bg-white w-full h-full">
+                    {therapistNotes.map((value: IPatientFollowup, index: number) => {
+                      return (
+                        <tr
+                          key={index}
+                          className="hover:bg-[#F6F6F6C7] border-b text-xs border-[#DCDCDCE0]"
+                        >
+                          <td className="pl-7 py-7 w-1/7">
+                            <div className="flex flex-col justify-center">
+                              <p>{value.noteDateTime && formatDate(value.noteDateTime)}</p>
+                              <p className="text-gray-500 ">
+                                {value.noteDateTime && convertBackendDateToTime(value.noteDateTime)}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="px-2 py-7 w-1/7 ">
+                            {value.therapistId.firstName} {value.therapistId.lastName}
+                          </td>
+                          <td className="px-2 py-7 w-1/7 ">{value.score || "--"}</td>
+                          {value.file?.filePath ? (
+                            <td className="px-2 py-7 w-1/7 ">
+                              <div
+                                id="view"
+                                ref={viewref}
+                                className="text-nowrap whitespace-nowrap"
+                              >
+                                <div
+                                  onClick={handleState}
+                                  className="border-dashed cursor-pointer relative border-[#CAD2AA] px-2 py-2 w-fit min-h-4 rounded-[7px] bg-[#FAFFE2] border-2  flex items-start justify-center gap-1"
+                                >
+                                  <img src={pdfFile} className="w-4" />
+                                  <p className="text-xs font-bold">View</p>
+                                </div>
+                                {value.file?.filePath && (
+                                  <div
+                                    className={`bg-gray-100 border absolute z-20 border-gray-50 py-2 px-2 ${
+                                      open ? "flex" : "hidden"
+                                    } flex-col gap-2 w-fit rounded-xl  shadow-xl`}
+                                  >
+                                    <div className="py-1  w-60 text-nowrap whitespace-normal pl-2 pr-10  flex gap-2 rounded-lg items-center  border-dashed border-[#A5A5A5] border-2 relative">
+                                      <a
+                                        target="_blank"
+                                        href={value.file.filePath}
+                                        className="flex gap-2 w-full items-center justify-center"
+                                      >
+                                        <div className=" w-[30px] h-[30px]  flex items-center overflow-hidden justify-center">
+                                          <img src={pdfFile} alt="file" className="w-full h-full" />
+                                        </div>
+                                        <div className="w-full truncate">
+                                          <p
+                                            title={value.file.fileName}
+                                            className="ml-5 w-[80%] truncate"
+                                          >
+                                            {value.file.fileName || ""}
+                                          </p>
+                                        </div>
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          ) : (
+                            <td className="px-2 py-7 w-1/7 ">--</td>
+                          )}
+                          <td
+                            className="px-2 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
+                            dangerouslySetInnerHTML={{ __html: value?.note }}
+                          ></td>
+                          <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
+                            <td className="pr-10 py-7 w-1/7 text-xs">
+                              <div
+                                onClick={() => {
+                                  if (!patient.loa.loa) {
+                                    toggleMenu(value?._id);
+                                  }
+                                }}
+                                className="bg-[#E5EBCD] relative flex w-5 h-7 items-center justify-center rounded-md hover:bg-[#D4E299] cursor-pointer"
+                              >
+                                <img src={kabab} alt="icon" className="w-full h-full" />
+                                {dropDownsState.openMenuId === value._id && (
+                                  <div
+                                    ref={menuRef}
+                                    className="absolute right-3 top-1 overflow-hidden shadow-[0px_0px_20px_#00000017] mt-2 w-fit bg-white border border-gray-300 rounded-lg z-10 flex items-center justify-center"
+                                  >
+                                    <div className="p-1  text-nowrap whitespace-nowrap gap-0 flex-col flex justify-center bg-white shadow-lg rounded-lg w-fit">
+                                      <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
+                                        <div
+                                          onClick={() => {
+                                            toggleFunctionType(value, "edit");
+                                            window.scrollTo({ top: 0 });
+                                          }}
+                                          className="flex items-center  cursor-pointer"
+                                        >
+                                          <p>Edit</p>
+                                        </div>
+                                      </div>
+                                      <hr />
+                                      <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
+                                        <div
+                                          onClick={() => {
+                                            toggleFunctionType(value, "delete");
+                                          }}
+                                          className="flex text-red-600 items-center  cursor-pointer"
+                                        >
+                                          <p>Delete</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </RBACGuard>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <Pagination totalPages={state.totalPages} />
+              </div>
+            ) : (
+              <div className="flex justify-center items-center bg-white py-[33px] font-semibold text-xs h-full">
+                <EmptyRecord />
               </div>
             )}
           </div>
-          {therapistNotes.length > 0 ? (
-            <div>
-              <table className="w-full text-xs font-semibold text-left">
-                <thead className="bg-[#E9E8E5] w-full  top-0 sticky z-10 ">
-                  <tr className="text-[#505050]  font-medium">
-                    <th className="pl-7 py-3 w-1/7 text-xs">Date & Time</th>
-                    <th className="px-2 py-3 w-1/7 text-xs">Therapist</th>
-                    <th className="px-2 py-3 w-1/7 text-xs">Session Type</th>
-                    <th className="px-2 py-3 w-1/7 text-xs">Score</th>
-                    <th className="px-2 py-3 w-1/7 text-xs">File</th>
-                    <th className="px-2 py-3 w-1/7 text-xs">Notes</th>
-                    <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                      <th className="px-2 py-3 w-1/7 text-xs">{""}</th>
-                    </RBACGuard>
-                  </tr>
-                </thead>
-
-                <tbody className="bg-white w-full h-full">
-                  {therapistNotes.map((value: IPatientFollowup, index: number) => {
-                    return (
-                      <tr
-                        key={index}
-                        className="hover:bg-[#F6F6F6C7] border-b text-xs border-[#DCDCDCE0]"
-                      >
-                        <td className="pl-7 py-7 w-1/7">
-                          <div className="flex flex-col justify-center">
-                            <p>{value.noteDateTime && formatDate(value.noteDateTime)}</p>
-                            <p className="text-gray-500 ">
-                              {value.noteDateTime && convertBackendDateToTime(value.noteDateTime)}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-2 py-7 w-1/7 ">
-                          {value.therapistId.firstName} {value.therapistId.lastName}
-                        </td>
-                        <td className="px-2 py-7 w-1/7 ">
-                          {`${value.sessionType.length > 0 ? value.sessionType : "--"}${
-                            value.subSessionType ? ` (${value.subSessionType})` : ""
-                          }`}
-                        </td>
-                        <td className="px-2 py-7 w-1/7 ">{value.score || "--"}</td>
-                        {value.file?.filePath ? (
-                          <td className="px-2 py-7 w-1/7 ">
-                            <div id="view" ref={viewref} className="text-nowrap whitespace-nowrap">
-                              <div
-                                onClick={handleState}
-                                className="border-dashed cursor-pointer relative border-[#CAD2AA] px-2 py-2 w-fit min-h-4 rounded-[7px] bg-[#FAFFE2] border-2  flex items-start justify-center gap-1"
-                              >
-                                <img src={pdfFile} className="w-4" />
-                                <p className="text-xs font-bold">View</p>
-                              </div>
-                              {value.file?.filePath && (
-                                <div
-                                  className={`bg-gray-100 border absolute z-20 border-gray-50 py-2 px-2 ${
-                                    open ? "flex" : "hidden"
-                                  } flex-col gap-2 w-fit rounded-xl  shadow-xl`}
-                                >
-                                  <div className="py-1  w-60 text-nowrap whitespace-normal pl-2 pr-10  flex gap-2 rounded-lg items-center  border-dashed border-[#A5A5A5] border-2 relative">
-                                    <a
-                                      target="_blank"
-                                      href={value.file.filePath}
-                                      className="flex gap-2 w-full items-center justify-center"
-                                    >
-                                      <div className=" w-[30px] h-[30px]  flex items-center overflow-hidden justify-center">
-                                        <img src={pdfFile} alt="file" className="w-full h-full" />
-                                      </div>
-                                      <div className="w-full truncate">
-                                        <p
-                                          title={value.file.fileName}
-                                          className="ml-5 w-[80%] truncate"
-                                        >
-                                          {value.file.fileName || ""}
-                                        </p>
-                                      </div>
-                                    </a>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        ) : (
-                          <td className="px-2 py-7 w-1/7 ">--</td>
-                        )}
-                        <td
-                          className="px-2 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
-                          dangerouslySetInnerHTML={{ __html: value?.note }}
-                        ></td>
-                        <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                          <td className="pr-10 py-7 w-1/7 text-xs">
-                            <div
-                              onClick={() => {
-                                if (!patient.loa.loa) {
-                                  toggleMenu(value?._id);
-                                }
-                              }}
-                              className="bg-[#E5EBCD] relative flex w-5 h-7 items-center justify-center rounded-md hover:bg-[#D4E299] cursor-pointer"
-                            >
-                              <img src={kabab} alt="icon" className="w-full h-full" />
-                              {dropDownsState.openMenuId === value._id && (
-                                <div
-                                  ref={menuRef}
-                                  className="absolute right-3 top-1 overflow-hidden shadow-[0px_0px_20px_#00000017] mt-2 w-fit bg-white border border-gray-300 rounded-lg z-10 flex items-center justify-center"
-                                >
-                                  <div className="p-1  text-nowrap whitespace-nowrap gap-0 flex-col flex justify-center bg-white shadow-lg rounded-lg w-fit">
-                                    <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
-                                      <div
-                                        onClick={() => {
-                                          toggleFunctionType(value, "edit");
-                                          window.scrollTo({ top: 0 });
-                                        }}
-                                        className="flex items-center  cursor-pointer"
-                                      >
-                                        <p>Edit</p>
-                                      </div>
-                                    </div>
-                                    <hr />
-                                    <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
-                                      <div
-                                        onClick={() => {
-                                          toggleFunctionType(value, "delete");
-                                        }}
-                                        className="flex text-red-600 items-center  cursor-pointer"
-                                      >
-                                        <p>Delete</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </RBACGuard>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <Pagination totalPages={state.totalPages} />
-            </div>
-          ) : (
-            <div className="flex justify-center items-center bg-white py-[33px] font-semibold text-xs h-full">
-              <EmptyRecord />
-            </div>
-          )}
         </div>
       </div>
       <DeleteConfirm
