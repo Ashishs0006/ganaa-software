@@ -176,6 +176,7 @@ const PatientFollowup = () => {
     // reviewWithGanaaDoctor: "",
     // feedbackFromFamily: ""
   });
+console.log('✌️state --->', state);
 
   const [familyDetails, setFamilyDetails] = useState<IFamilyData[]>([]);
 
@@ -204,7 +205,6 @@ const PatientFollowup = () => {
     currentStatus: ""
   });
 
-  // console.log("patientDetails: ", patientDetails);
   const [dropDownsState, setDropDownsState] = useState<IPatientFollowupDropDownsState>({
     displayAddForm: false,
     displayDropdown: false,
@@ -217,7 +217,7 @@ const PatientFollowup = () => {
   const [allTherapists, setAllTherapists] = useState([]);
 
   const patient = useSelector((store: RootState) => store.patient);
-  // console.log("patient: ", patient);
+  console.log("allTherapists: ", allTherapists);
 
   const fetchLoa = async () => {
     try {
@@ -409,7 +409,8 @@ const PatientFollowup = () => {
             roles: "therapist",
             centerId: latestFollowup?.resourceAllocation?.centerId?._id
           });
-
+          
+          console.log('✌️therapistsData --->', therapistsData);
           setAllTherapists(therapistsData?.data);
         }
       }
@@ -461,62 +462,121 @@ const PatientFollowup = () => {
   //   }
   // }, [data.noteDate]);
 
-  const resetState = () => {
-    dispatch(resetPatientFollowup());
-    setData((prev) => ({
-      ...prev,
-      id: "",
-      note: "",
-      file: null,
-      sessionType: [],
-      score: "",
-      subSessionType: [],
-      noteDate: moment().format("YYYY-MM-DD"),
-      noteTime: moment().format("HH:mm"),
-      therapistId: auth?.user?._id,
+  // const resetState = () => {
+  //   dispatch(resetPatientFollowup());
+  //   setData((prev) => ({
+  //     ...prev,
+  //     id: "",
+  //     note: "",
+  //     file: null,
+  //     sessionType: [],
+  //     score: "",
+  //     subSessionType: [],
+  //     noteDate: moment().format("YYYY-MM-DD"),
+  //     noteTime: moment().format("HH:mm"),
+  //     therapistId: auth?.user?._id,
 
-      // Add all the missing fields with proper default values
-      center: "",
-      patientName: "",
-      age: "",
-      contact: "",
-      address: "",
-      admissionType: "",
-      involuntaryAdmissionType: "",
-      doctor: "",
-      therapist: "",
-      dischargeDate: "",
-      dischargeStatus: "",
-      nominatedRepresentative: "",
-      currentStatus: "", // Set to empty string, not "Discharged"
-      stayDuration: "",
-      dischargePlan: "",
-      psychologist: "",
-      followupDate: "",
-      urge: "",
-      adherence: "",
-      prayer: "",
-      literature: "",
-      meeting: "",
-      daycareAtGanaa: "",
-      sponsor: "",
-      stepProgram: "",
-      reviewWithGanaaDoctor: "",
-      feedbackFromFamily: "",
-      UHID: "",
-      therapistName: "",
-      gender: ""
-    }));
-    setState((prev) => ({
-      ...prev,
-      therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
-      isTodayNoteExist:
-        totalTherapistNotes.filter((elem: IPatientFollowup) =>
-          elem.noteDateTime.startsWith(data.noteDate)
-        ).length > 0
-    }));
-    setSelectedSessions([]);
-  };
+  //     // Add all the missing fields with proper default values
+  //     center: "",
+  //     patientName: "",
+  //     age: "",
+  //     contact: "",
+  //     address: "",
+  //     admissionType: "",
+  //     involuntaryAdmissionType: "",
+  //     doctor: "",
+  //     therapist: "",
+  //     dischargeDate: "",
+  //     dischargeStatus: "",
+  //     nominatedRepresentative: "",
+  //     currentStatus: "", // Set to empty string, not "Discharged"
+  //     stayDuration: "",
+  //     dischargePlan: "",
+  //     psychologist: "",
+  //     followupDate: "",
+  //     urge: "",
+  //     adherence: "",
+  //     prayer: "",
+  //     literature: "",
+  //     meeting: "",
+  //     daycareAtGanaa: "",
+  //     sponsor: "",
+  //     stepProgram: "",
+  //     reviewWithGanaaDoctor: "",
+  //     feedbackFromFamily: "",
+  //     UHID: "",
+  //     therapistName: "",
+  //     gender: ""
+  //   }));
+  //   setState((prev) => ({
+  //     ...prev,
+  //     therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
+  //     isTodayNoteExist:
+  //       totalTherapistNotes.filter((elem: IPatientFollowup) =>
+  //         elem.noteDateTime.startsWith(data.noteDate)
+  //       ).length > 0
+  //   }));
+  //   setSelectedSessions([]);
+  // };
+
+  const resetState = () => {
+  dispatch(resetPatientFollowup());
+  setData((prev) => ({
+    ...prev,
+    id: "",
+    patientId: id || "",
+    patientAdmissionHistoryId: aId || "",
+    note: "",
+    file: null,
+    fileName: "",
+    therapistId: auth?.user?._id || "",
+    sessionType: [],
+    score: "",
+    subSessionType: [],
+    noteDate: moment().format("YYYY-MM-DD"),
+    noteTime: moment().format("HH:mm"),
+    
+    // Reset all the form fields
+    center: "",
+    patientName: "",
+    age: "",
+    contact: "",
+    address: "",
+    admissionType: "",
+    involuntaryAdmissionType: "",
+    doctor: "",
+    therapist: "",
+    dischargeDate: "",
+    dischargeStatus: "",
+    nominatedRepresentative: "",
+    currentStatus: "",
+    stayDuration: "",
+    dischargePlan: "",
+    psychologist: "",
+    followupDate: "",
+    urge: "",
+    adherence: "",
+    prayer: "",
+    literature: "",
+    meeting: "",
+    daycareAtGanaa: "",
+    sponsor: "",
+    stepProgram: "",
+    reviewWithGanaaDoctor: "",
+    feedbackFromFamily: "",
+    UHID: "",
+    therapistName: "",
+    gender: ""
+  }));
+  setState((prev) => ({
+    ...prev,
+    therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
+    isTodayNoteExist: totalTherapistNotes.filter((elem: IPatientFollowup) =>
+      elem.noteDateTime.startsWith(moment().format("YYYY-MM-DD"))
+    ).length > 0
+  }));
+  setSelectedSessions([]);
+};
 
   // const updateFunctionTtherapistNotes = (id: string) => {
   //   const updatedState = compareObjects(notes.therapistNote, data, true);
@@ -644,66 +704,126 @@ const PatientFollowup = () => {
     return updatePatientFollowup(id, formData);
   };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     if (!id) {
+  //       throw new Error("Patient not found");
+  //     }
+  //     if (!data.note.trim()) throw new Error("Note is required");
+  //     if (!data.therapistId) throw new Error("Therapist is required");
+  //     if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
+
+  //     if (data.id) {
+  //       // UPDATE EXISTING NOTE
+  //       const response = await updateFunctionTherapistNotes(data.id);
+  //       if (response && response.status == 200) {
+  //         fetchPatientFollowup();
+  //         toast.success("Therapist Notes Updated Successfully");
+  //         resetState();
+  //       }
+  //     } else {
+  //       // CREATE NEW NOTE (your existing create code)
+  //       const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
+  //       const body: Partial<typeof data> & { noteDateTime: string } = {
+  //         ...data,
+  //         noteDateTime: formattedDateTime
+  //       };
+
+  //       // Remove score if not assessment session
+  //       if (
+  //         (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
+  //         (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
+  //         !body.score?.trim()
+  //       ) {
+  //         delete body.score;
+  //       }
+
+  //       if (!body.sessionType) delete body.sessionType;
+  //       if (!body.subSessionType) delete body.subSessionType;
+
+  //       const formData = new FormData();
+  //       Object.entries(body).forEach(([key, value]) => {
+  //         if (Array.isArray(value)) {
+  //           value.forEach((v) => formData.append(key, v));
+  //         } else if (value instanceof File) {
+  //           formData.append(key, value);
+  //         } else if (value !== undefined && value !== null) {
+  //           formData.append(key, value.toString());
+  //         }
+  //       });
+
+  //       const response = await createPatientFollowup(formData);
+  //       if (response && response?.status === 201) {
+  //         toast.success("Note saved successfully");
+  //         fetchPatientFollowup();
+  //         resetState();
+  //       }
+  //     }
+  //   } catch (error) {
+  //     handleError(error);
+  //   }
+  // };
+
+
   const handleSubmit = async () => {
-    try {
-      if (!id) {
-        throw new Error("Patient not found");
-      }
-      if (!data.note.trim()) throw new Error("Note is required");
-      if (!data.therapistId) throw new Error("Therapist is required");
-      if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
-
-      if (data.id) {
-        // UPDATE EXISTING NOTE
-        const response = await updateFunctionTherapistNotes(data.id);
-        if (response && response.status == 200) {
-          fetchPatientFollowup();
-          toast.success("Therapist Notes Updated Successfully");
-          resetState();
-        }
-      } else {
-        // CREATE NEW NOTE (your existing create code)
-        const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
-        const body: Partial<typeof data> & { noteDateTime: string } = {
-          ...data,
-          noteDateTime: formattedDateTime
-        };
-
-        // Remove score if not assessment session
-        if (
-          (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
-          (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
-          !body.score?.trim()
-        ) {
-          delete body.score;
-        }
-
-        if (!body.sessionType) delete body.sessionType;
-        if (!body.subSessionType) delete body.subSessionType;
-
-        const formData = new FormData();
-        Object.entries(body).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            value.forEach((v) => formData.append(key, v));
-          } else if (value instanceof File) {
-            formData.append(key, value);
-          } else if (value !== undefined && value !== null) {
-            formData.append(key, value.toString());
-          }
-        });
-
-        const response = await createPatientFollowup(formData);
-        if (response && response?.status === 201) {
-          toast.success("Note saved successfully");
-          fetchPatientFollowup();
-          resetState();
-        }
-      }
-    } catch (error) {
-      handleError(error);
+  try {
+    if (!id) {
+      throw new Error("Patient not found");
     }
-  };
+    if (!data.note.trim()) throw new Error("Note is required");
+    if (!data.therapistId) throw new Error("Therapist is required");
+    if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
 
+    if (data.id) {
+      // UPDATE EXISTING NOTE
+      const response = await updateFunctionTherapistNotes(data.id);
+      if (response && response.status == 200) {
+        fetchPatientFollowup();
+        toast.success("Therapist Notes Updated Successfully");
+        resetState(); // Reset after successful update
+      }
+    } else {
+      // CREATE NEW NOTE
+      const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
+      const body: Partial<typeof data> & { noteDateTime: string } = {
+        ...data,
+        noteDateTime: formattedDateTime
+      };
+
+      // Remove score if not assessment session
+      if (
+        (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
+        (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
+        !body.score?.trim()
+      ) {
+        delete body.score;
+      }
+
+      if (!body.sessionType) delete body.sessionType;
+      if (!body.subSessionType) delete body.subSessionType;
+
+      const formData = new FormData();
+      Object.entries(body).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData.append(key, v));
+        } else if (value instanceof File) {
+          formData.append(key, value);
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      const response = await createPatientFollowup(formData);
+      if (response && response?.status === 201) {
+        toast.success("Note saved successfully");
+        fetchPatientFollowup();
+        resetState(); // Reset after successful creation
+      }
+    }
+  } catch (error) {
+    handleError(error);
+  }
+};
   const toggleTherapistsMenu = () => {
     setDropDownsState({ ...dropDownsState, displayDropdown: !dropDownsState.displayDropdown });
   };
@@ -722,92 +842,195 @@ const PatientFollowup = () => {
     }));
   };
 
+  // const toggleFunctionType = async (value: IPatientFollowup, type: string) => {
+  //   console.log("value: ", value);
+  //   if (type == "edit") {
+  //     const selected: { sessionType: string; subSessionType?: string }[] = [];
+
+  //     if (Array.isArray(value.sessionType)) {
+  //       value.sessionType.forEach((type) => {
+  //         if (type === "A - Assessment" && value.subSessionType) {
+  //           selected.push({ sessionType: type, subSessionType: value.subSessionType });
+  //         } else {
+  //           selected.push({ sessionType: type });
+  //         }
+  //       });
+  //     } else if (value.sessionType) {
+  //       if (value.sessionType === "A - Assessment" && value.subSessionType) {
+  //         selected.push({
+  //           sessionType: value.sessionType,
+  //           subSessionType: value.subSessionType
+  //         });
+  //       } else {
+  //         selected.push({ sessionType: value.sessionType });
+  //       }
+  //     }
+
+  //     setSelectedSessions(selected);
+
+  //     dispatch(
+  //       setPatientFollowup({
+  //         noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
+  //         noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
+  //         note: value.note,
+  //         therapistId: value.therapistId._id
+  //       })
+  //     );
+  //     setState((prev) => ({
+  //       ...prev,
+  //       therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
+  //       isTodayNoteExist: false
+  //     }));
+  //     setData((prev) => ({
+  //       ...prev,
+  //       id: value._id,
+  //       note: value.note,
+  //       sessionType: Array.isArray(value.sessionType)
+  //         ? value.sessionType
+  //         : value.sessionType
+  //         ? [value.sessionType]
+  //         : [],
+  //       score: value.score || "",
+  //       subSessionType: Array.isArray(value.subSessionType)
+  //         ? value.subSessionType
+  //         : value.subSessionType
+  //         ? [value.subSessionType]
+  //         : [],
+  //       therapistId: value.therapistId._id,
+  //       noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
+  //       noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
+  //       file: value?.file?.filePath || "",
+  //       fileName: value?.file?.fileName || "",
+  //       // Set the missing fields:
+  //       age: value?.age || "",
+  //       phoneNumber: `${value?.contact || ""}`,
+  //       // address: value?.fullAddress || "",
+  //       // admissionType: value?.admissionType || "",
+  //       // involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
+  //       // doctor: value?.resourceAllocation?.assignedDoctorId?.firstName
+  //       //   ? `${value?.resourceAllocation?.assignedDoctorId?.firstName} ${value?.resourceAllocation?.assignedDoctorId?.lastName}`
+  //       //   : "",
+  //       therapist: value?.therapistId?.firstName
+  //         ? `${value?.therapistId?.firstName} ${value?.therapistId?.lastName}`
+  //         : "",
+  //       dischargeDate: value?.dischargeDate || "",
+  //       // dischargeStatus: value?.dischargeStatus || "",
+  //       // nominatedRepresentative: "", // You'll need to set this from family details
+  //       currentStatus: value?.currentStatus || ""
+  //     }));
+  //   }
+  //   if (type == "delete") {
+  //     setData((prevState) => ({
+  //       ...prevState,
+  //       id: value._id
+  //     }));
+  //     toggleModal();
+  //   }
+  // };
+
+
   const toggleFunctionType = async (value: IPatientFollowup, type: string) => {
-    console.log("value: ", value);
-    if (type == "edit") {
-      const selected: { sessionType: string; subSessionType?: string }[] = [];
+  console.log("value: ", value);
+  if (type == "edit") {
+    const selected: { sessionType: string; subSessionType?: string }[] = [];
 
-      if (Array.isArray(value.sessionType)) {
-        value.sessionType.forEach((type) => {
-          if (type === "A - Assessment" && value.subSessionType) {
-            selected.push({ sessionType: type, subSessionType: value.subSessionType });
-          } else {
-            selected.push({ sessionType: type });
-          }
-        });
-      } else if (value.sessionType) {
-        if (value.sessionType === "A - Assessment" && value.subSessionType) {
-          selected.push({
-            sessionType: value.sessionType,
-            subSessionType: value.subSessionType
-          });
+    if (Array.isArray(value.sessionType)) {
+      value.sessionType.forEach((type) => {
+        if (type === "A - Assessment" && value.subSessionType) {
+          selected.push({ sessionType: type, subSessionType: value.subSessionType });
         } else {
-          selected.push({ sessionType: value.sessionType });
+          selected.push({ sessionType: type });
         }
+      });
+    } else if (value.sessionType) {
+      if (value.sessionType === "A - Assessment" && value.subSessionType) {
+        selected.push({
+          sessionType: value.sessionType,
+          subSessionType: value.subSessionType
+        });
+      } else {
+        selected.push({ sessionType: value.sessionType });
       }
+    }
 
-      setSelectedSessions(selected);
+    setSelectedSessions(selected);
 
-      dispatch(
-        setPatientFollowup({
-          noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
-          noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-          note: value.note,
-          therapistId: value.therapistId._id
-        })
-      );
-      setState((prev) => ({
-        ...prev,
-        therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
-        isTodayNoteExist: false
-      }));
-      setData((prev) => ({
-        ...prev,
-        id: value._id,
-        note: value.note,
-        sessionType: Array.isArray(value.sessionType)
-          ? value.sessionType
-          : value.sessionType
-          ? [value.sessionType]
-          : [],
-        score: value.score || "",
-        subSessionType: Array.isArray(value.subSessionType)
-          ? value.subSessionType
-          : value.subSessionType
-          ? [value.subSessionType]
-          : [],
-        therapistId: value.therapistId._id,
+    dispatch(
+      setPatientFollowup({
         noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
         noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-        file: value?.file?.filePath || "",
-        fileName: value?.file?.fileName || "",
-        // Set the missing fields:
-        age: value?.age || "",
-        phoneNumber: `${value?.contact || ""}`,
-        // address: value?.fullAddress || "",
-        // admissionType: value?.admissionType || "",
-        // involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
-        // doctor: value?.resourceAllocation?.assignedDoctorId?.firstName
-        //   ? `${value?.resourceAllocation?.assignedDoctorId?.firstName} ${value?.resourceAllocation?.assignedDoctorId?.lastName}`
-        //   : "",
-        therapist: value?.therapistId?.firstName
-          ? `${value?.therapistId?.firstName} ${value?.therapistId?.lastName}`
-          : "",
-        dischargeDate: value?.dischargeDate || "",
-        // dischargeStatus: value?.dischargeStatus || "",
-        // nominatedRepresentative: "", // You'll need to set this from family details
-        currentStatus: value?.currentStatus || ""
-      }));
-    }
-    if (type == "delete") {
-      setData((prevState) => ({
-        ...prevState,
-        id: value._id
-      }));
-      toggleModal();
-    }
-  };
-
+        note: value.note,
+        therapistId: value.therapistId._id
+      })
+    );
+    
+    setState((prev) => ({
+      ...prev,
+      therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
+      isTodayNoteExist: false
+    }));
+    
+    setData((prev) => ({
+      ...prev,
+      id: value._id,
+      note: value.note,
+      sessionType: Array.isArray(value.sessionType)
+        ? value.sessionType
+        : value.sessionType
+        ? [value.sessionType]
+        : [],
+      score: value.score || "",
+      subSessionType: Array.isArray(value.subSessionType)
+        ? value.subSessionType
+        : value.subSessionType
+        ? [value.subSessionType]
+        : [],
+      therapistId: value.therapistId._id,
+      noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
+      noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
+      file: value?.file?.filePath || "",
+      fileName: value?.file?.fileName || "",
+      
+      // Set all the form fields from the fetched data
+      center: value?.center || "",
+      patientName: value?.patientName || "",
+      UHID: value?.UHID || "",
+      age: value?.age || "",
+      gender: value?.gender || "",
+      contact: value?.contact || "",
+      address: value?.address || "",
+      admissionType: value?.admissionType || "",
+      involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
+      doctor: value?.doctor || "",
+      therapist: value?.therapist || "",
+      dischargeDate: value?.dischargeDate || "",
+      dischargeStatus: value?.dischargeStatus || "",
+      nominatedRepresentative: value?.nominatedRepresentative || "",
+      currentStatus: value?.currentStatus || "",
+      stayDuration: value?.stayDuration || "",
+      dischargePlan: value?.dischargePlan || "",
+      psychologist: value?.psychologist || "",
+      followupDate: value?.followupDate || "",
+      urge: value?.urge || "",
+      adherence: value?.adherence || "",
+      prayer: value?.prayer || "",
+      literature: value?.literature || "",
+      meeting: value?.meeting || "",
+      daycareAtGanaa: value?.daycareAtGanaa || "",
+      sponsor: value?.sponsor || "",
+      stepProgram: value?.stepProgram || "",
+      reviewWithGanaaDoctor: value?.reviewWithGanaaDoctor || "",
+      feedbackFromFamily: value?.feedbackFromFamily || ""
+    }));
+  }
+  if (type == "delete") {
+    setData((prevState) => ({
+      ...prevState,
+      id: value._id
+    }));
+    toggleModal();
+  }
+};
   const handleChangeQuill = useCallback((name: string, value: string) => {
     setData((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -1578,29 +1801,29 @@ const PatientFollowup = () => {
                       onChange={handleChange}
                     /> */}
 
-                      {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Current Status"
-                          options={[
-                            // { label: "Select", value: "" },
-                            { label: "Sober", value: "Sober" },
-                            { label: "Relapsed", value: "Relapsed" },
-                            { label: "Struggling", value: "Struggling" },
-                            { label: "Vanished", value: "Vanished" }
-                          ]}
-                          value={
-                            data?.currentStatus
-                              ? { label: data.currentStatus, value: data.currentStatus }
-                              : { label: "Select", value: "" }
-                          }
-                          name="currentStatus"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
                       {state.illnessType !== "Mental Disorder" && (
                         <>
-                          {/* <Select
+                        <Select
+                            disable={state.isTodayNoteExist}
+                            label="Current Status"
+                            options={[
+                              // { label: "Select", value: "" },
+                              { label: "Sober", value: "Sober" },
+                              { label: "Relapsed", value: "Relapsed" },
+                              { label: "Struggling", value: "Struggling" },
+                              { label: "Vanished", value: "Vanished" }
+                            ]}
+                            value={
+                              data?.currentStatus
+                                ? { label: data.currentStatus, value: data.currentStatus }
+                                : { label: "Select", value: "" }
+                            }
+                            name="currentStatus"
+                            onChange={(name, data) => {
+                              handleSelect(name, data);
+                            }}
+                          />
+                          <Select
                             disable={state.isTodayNoteExist}
                             label="Medication Adherence"
                             options={[
@@ -1617,9 +1840,9 @@ const PatientFollowup = () => {
                             onChange={(name, data) => {
                               handleSelect(name, data);
                             }}
-                          /> */}
+                          />
 
-                          {/* <Select
+                          <Select
                           disable={state.isTodayNoteExist}
                           label="Attending Meeting"
                           options={[
@@ -1638,7 +1861,7 @@ const PatientFollowup = () => {
                           onChange={(name, data) => {
                             handleSelect(name, data);
                           }}
-                        /> */}
+                        />
 
                           <Input
                             disabled={state.isTodayNoteExist}
@@ -2111,7 +2334,7 @@ const PatientFollowup = () => {
                             </div>
                           </div>
 
-                          {/* <Select
+                          <Select
                           disable={state.isTodayNoteExist}
                           label="Making a sponsor"
                           options={[
@@ -2127,13 +2350,12 @@ const PatientFollowup = () => {
                           onChange={(name, data) => {
                             handleSelect(name, data);
                           }}
-                        /> */}
+                        />
 
-                          <div className="flex gap-[10px] items-start justify-start flex-col">
+                          {/* <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-xs">Making a sponsor</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
-                              {/* Yes option */}
                               <div className="flex items-center">
                                 <input
                                   type="radio"
@@ -2176,7 +2398,6 @@ const PatientFollowup = () => {
                                 </label>
                               </div>
 
-                              {/* No option */}
                               <div className="flex items-center">
                                 <input
                                   type="radio"
@@ -2219,7 +2440,7 @@ const PatientFollowup = () => {
                                 </label>
                               </div>
                             </div>
-                          </div>
+                          </div> */}
 
                           {/* <Select
                           disable={state.isTodayNoteExist}
@@ -2529,13 +2750,22 @@ const PatientFollowup = () => {
                 <table className="w-full text-xs font-semibold text-left">
                   <thead className="bg-[#E9E8E5] w-full  top-0 sticky z-10 ">
                     <tr className="text-[#505050]  font-medium">
-                      <th className="pl-7 py-3 w-1/7 text-xs">Date & Time</th>
-                      <th className="px-2 py-3 w-1/7 text-xs">Therapist</th>
-                      <th className="px-2 py-3 w-1/7 text-xs">Score</th>
-                      <th className="px-2 py-3 w-1/7 text-xs">File</th>
-                      <th className="px-2 py-3 w-1/7 text-xs">Notes</th>
+                      <th className="pl-7 py-3 w-1/9 text-xs">Date & Time</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Therapist</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Current Status</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Medication Adherence</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Attending Meeting</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Making a sponsor</th>
+                      {/* <th className="px-2 py-3 w-1/9 text-xs">Urge</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Prayer</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Literature</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Daycare at Ganaa</th> */}
+
+                      <th className="px-2 py-3 w-1/9 text-xs">File</th>
+                      <th className="px-2 py-3 w-1/9 text-xs">Notes</th>
                       <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                        <th className="px-2 py-3 w-1/7 text-xs">{""}</th>
+                        <th className="px-2 py-3 w-1/9 text-xs">{""}</th>
                       </RBACGuard>
                     </tr>
                   </thead>
@@ -2547,7 +2777,7 @@ const PatientFollowup = () => {
                           key={index}
                           className="hover:bg-[#F6F6F6C7] border-b text-xs border-[#DCDCDCE0]"
                         >
-                          <td className="pl-7 py-7 w-1/7">
+                          <td className="pl-7 py-7 w-1/9">
                             <div className="flex flex-col justify-center">
                               <p>{value.noteDateTime && formatDate(value.noteDateTime)}</p>
                               <p className="text-gray-500 ">
@@ -2555,12 +2785,20 @@ const PatientFollowup = () => {
                               </p>
                             </div>
                           </td>
-                          <td className="px-2 py-7 w-1/7 ">
+                          <td className="px-2 py-7 w-1/9 ">
                             {value.therapistId.firstName} {value.therapistId.lastName}
                           </td>
-                          <td className="px-2 py-7 w-1/7 ">{value.score || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.currentStatus || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.adherence || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.meeting || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.sponsor || "--"}</td>
+                          {/* <td className="px-2 py-7 w-1/9 ">{value.urge || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.prayer || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.literature || "--"}</td>
+                          <td className="px-2 py-7 w-1/9 ">{value.daycareAtGanaa || "--"}</td> */}
                           {value.file?.filePath ? (
-                            <td className="px-2 py-7 w-1/7 ">
+                            <td className="px-2 py-7 w-1/9 ">
                               <div
                                 id="view"
                                 ref={viewref}
@@ -2603,7 +2841,7 @@ const PatientFollowup = () => {
                               </div>
                             </td>
                           ) : (
-                            <td className="px-2 py-7 w-1/7 ">--</td>
+                            <td className="px-2 py-7 w-1/9 ">--</td>
                           )}
                           <td
                             className="px-2 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"

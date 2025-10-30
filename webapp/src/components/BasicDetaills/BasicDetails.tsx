@@ -8,6 +8,7 @@ import { LuUserRound } from "react-icons/lu";
 import { RootState } from "@/redux/store/store";
 import { setPatientAdmission, setPatientDetails } from "@/redux/slice/patientSlice";
 import { setDiscardModal, setStepper } from "@/redux/slice/stepperSlice";
+import { updatePatient } from "@/apis";
 
 import {
   Button,
