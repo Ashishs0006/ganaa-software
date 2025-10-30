@@ -16,7 +16,7 @@ export const getAllGroupTab = catchAsync(
     if (!centerId) return next(new AppError('Center Id is Mandatory', 400));
 
     const data = await GroupTab.find({ activityDateTime: dt, centerId });
-console.log('✌️data --abcd->', data);
+
 
     res.status(200).json({
       status: 'success',
@@ -32,6 +32,7 @@ export const createNewGroupTab = catchAsync(
     if (!req.body.tabInfo) return next(new AppError('Tab Info is Mandatory', 400));
 
     req.body.createdBy = req.user?._id;
+    console.log("hii harshit ",req.body)
 
     const dt = new Date(req.body.activityDateTime);
     dt.setHours(13, 0, 0, 0);

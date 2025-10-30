@@ -1658,149 +1658,7 @@ console.log('✌️state --->', state);
                     } pb-5 grid-cols-1 px-5 py-1 items-center`}
                   >
                     <div className="grid lg:grid-cols-5 grid-cols-2 gap-y-4 p-2 gap-x-[52px]">
-                      {/* <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Center"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="center"
-                      value={data?.center}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Patient Name"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="patientName"
-                      value={data?.patientName}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="UHID"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="UHID"
-                      value={data?.UHID}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Age"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="age"
-                      value={data?.age}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Gender"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="gender"
-                      value={state?.gender}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Contact"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="contact"
-                      value={data?.contact}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      type="date"
-                      label="Discharge Date"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="dischargeDate"
-                      value={
-                        data?.dischargeDate ? moment(data.dischargeDate).format("YYYY-MM-DD") : ""
-                      }
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Stay Duration"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="stayDuration"
-                      value={data?.stayDuration}
-                      onChange={handleChange}
-                    />
-
-                    <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Psychologist (Follow Up)"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="psychologist"
-                      value={data?.psychologist}
-                      onChange={handleChange}
-                    />
-
-                    <Select
-                      disable={state.isTodayNoteExist}
-                      label="Discharge Plan"
-                      options={[
-                        { label: "Yes", value: "Yes" },
-                        { label: "No", value: "No" }
-                      ]}
-                      value={
-                        data?.dischargePlan
-                          ? { label: data.dischargePlan, value: data.dischargePlan }
-                          : { label: "Select", value: "" }
-                      }
-                      name="dischargePlan"
-                      onChange={handleSelect}
-                    /> */}
-                      {/* {data?.dischargePlan && (
-                      <Input
-                        disabled
-                        label="Discharge Plan Shared"
-                        labelClassName="text-black!"
-                        className="rounded-lg! font-bold placeholder:font-normal"
-                        placeholder="Enter"
-                        name="onsetOther"
-                        value={data?.dischargePlan}
-                      />
-                    )} */}
-
-                      {/* <Input
-                      disabled={state.isTodayNoteExist}
-                      type="date"
-                      label="Followup Date"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="followupDate"
-                      value={
-                        data?.followupDate ? moment(data.followupDate).format("YYYY-MM-DD") : ""
-                      }
-                      onChange={handleChange}
-                    /> */}
-
+             
                       {state.illnessType !== "Mental Disorder" && (
                         <>
                         <Select
@@ -1823,24 +1681,7 @@ console.log('✌️state --->', state);
                               handleSelect(name, data);
                             }}
                           />
-                          <Select
-                            disable={state.isTodayNoteExist}
-                            label="Medication Adherence"
-                            options={[
-                              { label: "No", value: "No" },
-                              { label: "Yes", value: "Yes" },
-                              { label: "Sometimes", value: "Sometimes" }
-                            ]}
-                            value={
-                              data?.adherence
-                                ? { label: data.adherence, value: data.adherence }
-                                : { label: "Select", value: "" }
-                            }
-                            name="adherence"
-                            onChange={(name, data) => {
-                              handleSelect(name, data);
-                            }}
-                          />
+                        
 
                           <Select
                           disable={state.isTodayNoteExist}
@@ -1862,48 +1703,46 @@ console.log('✌️state --->', state);
                             handleSelect(name, data);
                           }}
                         />
-
-                          <Input
-                            disabled={state.isTodayNoteExist}
-                            label="Feedback from family"
-                            labelClassName="text-black!"
-                            className="rounded-lg! font-bold placeholder:font-normal"
-                            placeholder="Enter"
-                            name="feedbackFromFamily"
-                            value={data.feedbackFromFamily}
-                            onChange={handleChange}
+  <Select
+                            disable={state.isTodayNoteExist}
+                            label="Medication Adherence"
+                            options={[
+                              { label: "No", value: "No" },
+                              { label: "Yes", value: "Yes" },
+                              { label: "Sometimes", value: "Sometimes" }
+                            ]}
+                            value={
+                              data?.adherence
+                                ? { label: data.adherence, value: data.adherence }
+                                : { label: "Select", value: "" }
+                            }
+                            name="adherence"
+                            onChange={(name, data) => {
+                              handleSelect(name, data);
+                            }}
                           />
-
-                          {/* <Input
-                      disabled={state.isTodayNoteExist}
-                      label="Therapist follow - up"
-                      labelClassName="text-black!"
-                      className="rounded-lg! font-bold placeholder:font-normal"
-                      placeholder="Enter"
-                      name="therapistFollowUp"
-                      value={data?.therapist}
-                      onChange={handleChange}
-                    /> */}
-
-                          {/* <Select
+                              <Select
                           disable={state.isTodayNoteExist}
-                          label="Urge"
+                          label="Making a sponsor"
                           options={[
                             { label: "Yes", value: "Yes" },
                             { label: "No", value: "No" }
                           ]}
                           value={
-                            data?.urge
-                              ? { label: data.urge, value: data.urge }
+                            data?.sponsor
+                              ? { label: data.sponsor, value: data.sponsor }
                               : { label: "Select", value: "" }
                           }
-                          name="urge"
+                          name="sponsor"
                           onChange={(name, data) => {
                             handleSelect(name, data);
                           }}
-                        /> */}
+                        />
+                       
+   
+                          
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">Urge</label>
+                            <label className="font-medium text-[14px]">Urge</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -1990,38 +1829,10 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                          {/* {data.urge && (
-                          <Input
-                            disabled
-                            label="Urge Other Detail"
-                            labelClassName="text-black!"
-                            className="rounded-lg! font-bold placeholder:font-normal"
-                            placeholder="Enter"
-                            name="urgeOther"
-                            value={data?.urge}
-                          />
-                        )} */}
-
-                          {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Doing Prayer"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.prayer
-                              ? { label: data.prayer, value: data.prayer }
-                              : { label: "Select", value: "" }
-                          }
-                          name="prayer"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
+                        
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">Doing Prayer</label>
+                            <label className="font-medium text-[14px]">Doing Prayer</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -2112,26 +1923,10 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                          {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Reading AA literature"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.literature
-                              ? { label: data.literature, value: data.literature }
-                              : { label: "Select", value: "" }
-                          }
-                          name="literature"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
+            
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">Reading AA literature</label>
+                            <label className="font-medium text-[14px]">Reading AA literature</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -2222,26 +2017,10 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                          {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Attending Daycare at Ganaa"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.daycareAtGanaa
-                              ? { label: data.daycareAtGanaa, value: data.daycareAtGanaa }
-                              : { label: "Select", value: "" }
-                          }
-                          name="daycareAtGanaa"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
+                     
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">
+                            <label className="font-medium text-[14px]">
                               Attending Daycare at Ganaa
                             </label>
 
@@ -2334,134 +2113,9 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                          <Select
-                          disable={state.isTodayNoteExist}
-                          label="Making a sponsor"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.sponsor
-                              ? { label: data.sponsor, value: data.sponsor }
-                              : { label: "Select", value: "" }
-                          }
-                          name="sponsor"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        />
-
-                          {/* <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">Making a sponsor</label>
-
-                            <div className="flex gap-5 items-center justify-center mb-3">
-                              <div className="flex items-center">
-                                <input
-                                  type="radio"
-                                  id="sponsor-yes"
-                                  name="sponsor"
-                                  value="Yes"
-                                  checked={data?.sponsor === "Yes"}
-                                  onChange={(e) =>
-                                    handleSelect("sponsor", {
-                                      label: e.target.value,
-                                      value: e.target.value
-                                    })
-                                  }
-                                  disabled={state.isTodayNoteExist}
-                                  className="hidden"
-                                />
-                                <label
-                                  htmlFor="sponsor-yes"
-                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                    data?.sponsor === "Yes"
-                                      ? " border-[#586B3A]!"
-                                      : "border-[#586B3A]"
-                                  } ${
-                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
-                                  }`}
-                                >
-                                  {data?.sponsor === "Yes" && (
-                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
-                                  )}
-                                </label>
-                                <label
-                                  htmlFor="sponsor-yes"
-                                  className={`ms-2 text-sm font-medium ${
-                                    state.isTodayNoteExist
-                                      ? "cursor-not-allowed opacity-50"
-                                      : "cursor-pointer"
-                                  }`}
-                                >
-                                  Yes
-                                </label>
-                              </div>
-
-                              <div className="flex items-center">
-                                <input
-                                  type="radio"
-                                  id="sponsor-no"
-                                  name="sponsor"
-                                  value="No"
-                                  checked={data?.sponsor === "No"}
-                                  onChange={(e) =>
-                                    handleSelect("sponsor", {
-                                      label: e.target.value,
-                                      value: e.target.value
-                                    })
-                                  }
-                                  disabled={state.isTodayNoteExist}
-                                  className="hidden"
-                                />
-                                <label
-                                  htmlFor="sponsor-no"
-                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-                                    data?.sponsor === "No"
-                                      ? " border-[#586B3A]!"
-                                      : "border-[#586B3A]"
-                                  } ${
-                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
-                                  }`}
-                                >
-                                  {data?.sponsor === "No" && (
-                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
-                                  )}
-                                </label>
-                                <label
-                                  htmlFor="sponsor-no"
-                                  className={`ms-2 text-sm font-medium ${
-                                    state.isTodayNoteExist
-                                      ? "cursor-not-allowed opacity-50"
-                                      : "cursor-pointer"
-                                  }`}
-                                >
-                                  No
-                                </label>
-                              </div>
-                            </div>
-                          </div> */}
-
-                          {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Doing 12-step program"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.stepProgram
-                              ? { label: data.stepProgram, value: data.stepProgram }
-                              : { label: "Select", value: "" }
-                          }
-                          name="stepProgram"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
-
+                   
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">Doing 12-step program</label>
+                            <label className="font-medium text-[14px]">Doing 12-step program</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -2552,30 +2206,10 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                          {/* <Select
-                          disable={state.isTodayNoteExist}
-                          label="Doing review with Ganaa docotor"
-                          options={[
-                            { label: "Select", value: "" },
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.reviewWithGanaaDoctor
-                              ? {
-                                  label: data.reviewWithGanaaDoctor,
-                                  value: data.reviewWithGanaaDoctor
-                                }
-                              : { label: "Select", value: "" }
-                          }
-                          name="reviewWithGanaaDoctor"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        /> */}
+                     
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-xs">
+                            <label className="font-medium text-[14px]">
                               Doing review with Ganaa docotor
                             </label>
 
@@ -2667,6 +2301,18 @@ console.log('✌️state --->', state);
                               </div>
                             </div>
                           </div>
+
+                          <Input
+  disabled={state.isTodayNoteExist}
+  label="Feedback from family"
+  labelClassName="text-black!"
+  className="w-full sm:w-[400px] md:w-[500px] rounded-lg! font-bold placeholder:font-normal"
+  placeholder="Enter"
+  name="feedbackFromFamily"
+  value={data.feedbackFromFamily}
+  onChange={handleChange}
+/>
+
                         </>
                       )}
                     </div>
