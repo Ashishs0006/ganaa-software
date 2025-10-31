@@ -568,9 +568,9 @@ const AllPatientData = () => {
                                               <LuFileText />
                                             </div>
                                             <div>
-                                              <p className="">Patient Followup</p>
+                                              <p className="">Patient Follow-up</p>
                                               <p className="text-xs text-[#636363]">
-                                                Patient Followup Report
+                                            Update Patient Detail
                                               </p>
                                             </div>
                                           </div>

@@ -1046,13 +1046,18 @@ const handleSubmit = async (id: string | undefined) => {
                         ) : (
                           <div className="relative w-fit gap-1 mx-auto flex items-center justify-center">
                             {/* ---- Checkbox ---- */}
-                        <Input
+ <Input
   type="checkbox"
   checked={cell?.isSelected}
-  disabled={selected === "All"}
-  onChange={() => handleCheckboxChange(index, colIdx, patient, cell)}
-  className={`accent-[#323E2A] h-4 cursor-pointer 
-    ${selected === "All" ? "opacity-100 pointer-events-none" : ""}`}
+  onChange={() => {
+    if (selected === "All") return; // stop interaction when "All"
+    handleCheckboxChange(index, colIdx, patient, cell);
+  }}
+  className={`accent-[#323E2A] h-4 cursor-pointer
+    ${selected === "All"
+      ? "cursor-not-allowed"
+      : "cursor-pointer"}
+    ${selected === "All" && !cell?.isSelected ? "opacity-60" : "opacity-100"}`}
 />
 
 

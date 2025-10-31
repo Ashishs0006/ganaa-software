@@ -97,19 +97,19 @@ const DoctorPrescription = () => {
     usages: [
       {
         frequency: "Morning",
-        quantity: 1,
+        quantity: .5,
         when: { label: "Select", value: "" },
         dosage: { label: "Select", value: "" }
       },
       {
         frequency: "Noon",
-        quantity: 1,
+        quantity: .5,
         when: { label: "Select", value: "" },
         dosage: { label: "Select", value: "" }
       },
       {
         frequency: "Night",
-        quantity: 1,
+        quantity: .5,
         when: { label: "Select", value: "" },
         dosage: { label: "Select", value: "" }
       }
@@ -377,7 +377,7 @@ const DoctorPrescription = () => {
             ...prev.usages,
             {
               frequency: name,
-              quantity: 1,
+              quantity: .5,
               when: { label: "Select", value: "" },
               dosage: { label: "Select", value: "" }
             }
@@ -391,10 +391,10 @@ const DoctorPrescription = () => {
     const updatedFrequencies = prescriptionState.usages;
 
     if (action === "increment") {
-      updatedFrequencies[index].quantity += 1;
+      updatedFrequencies[index].quantity += .5;
     } else if (action === "decrement") {
-      if (updatedFrequencies[index].quantity > 1) {
-        updatedFrequencies[index].quantity -= 1;
+      if (updatedFrequencies[index].quantity > .5) {
+        updatedFrequencies[index].quantity -= .5;
       }
     }
     setPrescriptionState({ ...prescriptionState, usages: updatedFrequencies });
@@ -427,19 +427,19 @@ const DoctorPrescription = () => {
           usages: [
             {
               frequency: "Morning",
-              quantity: 1,
+              quantity: .5,
               when: { label: "Select", value: "" },
               dosage: { label: "Select", value: "" }
             },
             {
               frequency: "Noon",
-              quantity: 1,
+              quantity: .5,
               when: { label: "Select", value: "" },
               dosage: { label: "Select", value: "" }
             },
             {
               frequency: "Night",
-              quantity: 1,
+              quantity: .5,
               when: { label: "Select", value: "" },
               dosage: { label: "Select", value: "" }
             }
@@ -513,19 +513,19 @@ const DoctorPrescription = () => {
         usages: [
           {
             frequency: "Morning",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           },
           {
             frequency: "Noon",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           },
           {
             frequency: "Night",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           }
@@ -622,19 +622,19 @@ const DoctorPrescription = () => {
         usages: [
           {
             frequency: "Morning",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           },
           {
             frequency: "Noon",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           },
           {
             frequency: "Night",
-            quantity: 1,
+            quantity: .5,
             when: { label: "Select", value: "" },
             dosage: { label: "Select", value: "" }
           }

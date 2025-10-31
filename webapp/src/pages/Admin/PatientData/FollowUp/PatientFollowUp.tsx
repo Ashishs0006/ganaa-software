@@ -98,16 +98,6 @@ console.log('✌️id, aId --->', id, aId);
     subSessionType: [],
     noteDate: moment().format("YYYY-MM-DD"),
     noteTime: moment().format("HH:mm"),
-    // Add these missing fields with default values:
-    // center: "",
-    // patientName: "",
-    // age: "",
-    // contact: "",
-    // address: "",
-    // admissionType: "",
-    // involuntaryAdmissionType: "",
-    // doctor: "",
-    // therapist: "",
     dischargeDate: "",
     dischargeStatus: "",
     nominatedRepresentative: "",
@@ -148,34 +138,7 @@ console.log('✌️id, aId --->', id, aId);
     therapistName: "",
     isTodayNoteExist: false,
     illnessType: ""
-    // Add these missing fields with default values:
-    // center: "",
-    // patientName: "",
-    // age: "",
-    // contact: "",
-    // address: "",
-    // admissionType: "",
-    // involuntaryAdmissionType: "",
-    // doctor: "",
-    // therapist: "",
-    // dischargeDate: "",
-    // dischargeStatus: "",
-    // nominatedRepresentative: "",
-    // currentStatus: "",
-    // stayDuration: "",
-    // dischargePlan: "",
-    // psychologist: "",
-    // followupDate: "",
-    // urge: "",
-    // adherence: "",
-    // prayer: "",
-    // literature: "",
-    // meeting: "",
-    // daycareAtGanaa: "",
-    // sponsor: "",
-    // stepProgram: "",
-    // reviewWithGanaaDoctor: "",
-    // feedbackFromFamily: ""
+    
   });
 
   const [familyDetails, setFamilyDetails] = useState<IFamilyData[]>([]);
@@ -266,6 +229,7 @@ console.log('✌️patientData --->', patientData);
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
 console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
+
         // Fetch the latest followup data to get the new fields
         const { data: latestFollowupData } = await getAllPatientFollowup({
           limit: 1,
@@ -295,7 +259,14 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
           dischargeDate: patientData?.data?.patientHistory?.dischargeId?.date || "",
           dischargeStatus: patientData?.data?.patientHistory?.dischargeId?.status || "",
           admissionDate: patientData?.data?.patientHistory?.dateOfAdmission || "",
-          // therapist: `${patientData?.data?.createdBy?.firstName || ""} ${patientData?.data?.createdBy?.lastName || ""}`
+          admissionType:patientData?.data?.patientHistory?.admissionType || "",
+         
+therapist: `${patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.firstName || ""} ${patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.lastName || ""}`.trim(),
+
+    doctor: `${patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.firstName || ""} ${patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.lastName || ""}`.trim(),
+
+
+        
         }));
 
         const { data: therapistNotesData } = await getAllPatientFollowup({
@@ -328,26 +299,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
           }`.trim(),
           therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
           illnessType: patientAdmissionHistory?.data?.illnessType || ""
-
-          // // Set the missing fields:
-          // age: patientData?.data?.age || "",
-          // phoneNumber: `${patientData?.data?.phoneNumberCountryCode || ""} ${
-          //   patientData?.data?.phoneNumber || ""
-          // }`.trim(),
-          // address: patientData?.data?.fullAddress || "",
-          // admissionType: patientAdmissionHistory?.data?.admissionType || "",
-          // involuntaryAdmissionType: patientAdmissionHistory?.data?.involuntaryAdmissionType || "",
-          // doctor: patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName
-          //   ? `${patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName} ${patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.lastName}`
-          //   : "",
-          // therapist: patientAdmissionHistory?.data?.resourceAllocation?.assignedTherapistId
-          //   ?.firstName
-          //   ? `${patientAdmissionHistory?.data?.resourceAllocation?.assignedTherapistId?.firstName} ${patientAdmissionHistory?.data?.resourceAllocation?.assignedTherapistId?.lastName}`
-          //   : "",
-          // dischargeDate: patientAdmissionHistory?.data?.dischargeDate || "",
-          // dischargeStatus: patientAdmissionHistory?.data?.dischargeStatus || "",
-          // nominatedRepresentative: "", // You'll need to set this from family details
-          // currentStatus: patientAdmissionHistory?.data?.currentStatus || ""
         }));
         let date = "";
         if (new Date(patientAdmissionHistory?.data?.dateOfAdmission) > new Date()) {
@@ -360,28 +311,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
           patientAdmissionHistoryId: aId,
           noteDate: date ? moment(date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
           noteTime: date ? moment(date).format("HH:mm") : moment().format("HH:mm"),
-
-          // Set the missing fields:
-          // center: latestFollowup?.center || "",
-          // patientName: latestFollowup?.patientName || "",
-          // UHID: latestFollowup?.UHID || "",
-          // contact: latestFollowup?.contact || "",
-          // stayDuration: latestFollowup?.stayDuration || "",
-          // psychologist: latestFollowup?.psychologist || "",
-          // dischargePlan: latestFollowup?.dischargePlan || "",
-          // urge: latestFollowup?.urge || "",
-          // feedbackFromFamily: latestFollowup?.feedbackFromFamily || "",
-          // adherence: latestFollowup?.adherence || "",
-          // therapist: latestFollowup?.therapist || "",
-          // prayer: latestFollowup?.prayer || "",
-          // daycareAtGanaa: latestFollowup?.daycareAtGanaa || "",
-          // meeting: latestFollowup?.meeting || "",
-          // sponsor: latestFollowup?.sponsor || "",
-          // stepProgram: latestFollowup?.stepProgram || "",
-          // reviewWithGanaaDoctor: latestFollowup?.reviewWithGanaaDoctor || "",
-          // literature: latestFollowup?.literature || "",
-          // followupDate: latestFollowup?.followupDate || "",
-
           age: latestFollowup?.age || "",
           phoneNumber: `${latestFollowup?.phoneNumberCountryCode || ""} ${
             latestFollowup?.phoneNumber || ""
@@ -392,26 +321,39 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
           doctor: latestFollowup?.resourceAllocation?.assignedDoctorId?.firstName
             ? `${latestFollowup?.resourceAllocation?.assignedDoctorId?.firstName} ${latestFollowup?.resourceAllocation?.assignedDoctorId?.lastName}`
             : ""
-          // therapist: latestFollowup?.resourceAllocation?.assignedTherapistId?.firstName
-          //   ? `${latestFollowup?.resourceAllocation?.assignedTherapistId?.firstName} ${latestFollowup?.resourceAllocation?.assignedTherapistId?.lastName}`
-          //   : "",
-          // dischargeDate: `${new Date(latestFollowup?.dischargeDate)}` || "",
-          // dischargeStatus: latestFollowup?.dischargeStatus || "",
-          // nominatedRepresentative: "", // You'll need to set this from family details
-          // currentStatus: latestFollowup?.currentStatus || ""
         }));
+const centerName =
+  patientAdmissionHistory?.data?.resourceAllocation?.centerId?.centerName ||
+  patientAdmissionHistory?.data?.resourceAllocation?.centerId?.name ||
+  "";
 
-        // if (latestFollowup?.resourceAllocation?.centerId?._id) {
-          const { data: therapistsData } = await getAllUser({
-            limit: 100,
-            page: 1,
-            sort: "-createdAt",
-            roles: "therapist",
-            // centerId: latestFollowup?.resourceAllocation?.centerId?._id
-          });
+console.log("✅ Patient Center Name:", centerName);
 
-          setAllTherapists(therapistsData?.data);
-        // }
+// ✅ Fetch all therapists
+const { data: therapistsData } = await getAllUser({
+  limit: 100,
+  page: 1,
+  sort: "-createdAt",
+  roles: "therapist",
+});
+
+console.log("hiii the therapist data is :", therapistsData?.data);
+
+// ✅ Filter therapists who belong to same center
+const filteredTherapists = therapistsData?.data?.filter((therapist: any) => {
+  // since centerId is an array, check inside
+  return Array.isArray(therapist.centerId) && therapist.centerId.some(
+    (c: any) =>
+      c?.centerName?.toLowerCase() === centerName?.toLowerCase() ||
+      c?.name?.toLowerCase() === centerName?.toLowerCase()
+  );
+});
+
+console.log("✅ Filtered Therapists:", filteredTherapists);
+
+// ✅ Save filtered therapists
+setAllTherapists(filteredTherapists);
+     
       }
     } catch (error) {
       console.error("Error fetching therapist notes or patient data:", error);
@@ -420,7 +362,7 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
   useEffect(() => {
     fetchPatientFollowup();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
   }, [searchParams]);
 
   const fetchAllNotesToCheck = async (date?: string) => {
@@ -440,84 +382,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
       console.error("Error fetching therapists:", error);
     }
   };
-
-  // Every Time Note Date Change to Disable/enable Quill
-  // useEffect(() => {
-  //   if (totalTherapistNotes.length > 0) {
-  //     const exist =
-  //       totalTherapistNotes.filter(
-  //         (elem: IPatientFollowup) =>
-  //           elem.noteDateTime.startsWith(data.noteDate) && elem._id != data.id
-  //       ).length > 0;
-  //     setState((prev) => ({
-  //       ...prev,
-  //       isTodayNoteExist: exist
-  //     }));
-  //     if (exist) {
-  //       toast.error(`Note already exists On ${formateNormalDate(data.noteDate)}`);
-  //     }
-  //   } else {
-  //     fetchAllNotesToCheck();
-  //   }
-  // }, [data.noteDate]);
-
-  // const resetState = () => {
-  //   dispatch(resetPatientFollowup());
-  //   setData((prev) => ({
-  //     ...prev,
-  //     id: "",
-  //     note: "",
-  //     file: null,
-  //     sessionType: [],
-  //     score: "",
-  //     subSessionType: [],
-  //     noteDate: moment().format("YYYY-MM-DD"),
-  //     noteTime: moment().format("HH:mm"),
-  //     therapistId: auth?.user?._id,
-
-  //     // Add all the missing fields with proper default values
-  //     center: "",
-  //     patientName: "",
-  //     age: "",
-  //     contact: "",
-  //     address: "",
-  //     admissionType: "",
-  //     involuntaryAdmissionType: "",
-  //     doctor: "",
-  //     therapist: "",
-  //     dischargeDate: "",
-  //     dischargeStatus: "",
-  //     nominatedRepresentative: "",
-  //     currentStatus: "", // Set to empty string, not "Discharged"
-  //     stayDuration: "",
-  //     dischargePlan: "",
-  //     psychologist: "",
-  //     followupDate: "",
-  //     urge: "",
-  //     adherence: "",
-  //     prayer: "",
-  //     literature: "",
-  //     meeting: "",
-  //     daycareAtGanaa: "",
-  //     sponsor: "",
-  //     stepProgram: "",
-  //     reviewWithGanaaDoctor: "",
-  //     feedbackFromFamily: "",
-  //     UHID: "",
-  //     therapistName: "",
-  //     gender: ""
-  //   }));
-  //   setState((prev) => ({
-  //     ...prev,
-  //     therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
-  //     isTodayNoteExist:
-  //       totalTherapistNotes.filter((elem: IPatientFollowup) =>
-  //         elem.noteDateTime.startsWith(data.noteDate)
-  //       ).length > 0
-  //   }));
-  //   setSelectedSessions([]);
-  // };
-
   const resetState = () => {
     dispatch(resetPatientFollowup());
     setData((prev) => ({
@@ -577,32 +441,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
     }));
     setSelectedSessions([]);
   };
-
-  // const updateFunctionTtherapistNotes = (id: string) => {
-  //   const updatedState = compareObjects(notes.therapistNote, data, true);
-  //   const payload: { [key: string]: unknown } = {};
-  //   if (updatedState.note !== undefined) payload.note = updatedState.note;
-  //   if (updatedState.therapistId !== undefined)
-  //     payload.therapistId = updatedState.therapistId;
-  //   if (updatedState.noteTime !== undefined || updatedState.noteDate !== undefined) {
-  //     const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
-  //     payload.noteDateTime = formattedDateTime;
-  //   }
-  //   if (updatedState.file != null) {
-  //     payload.file = updatedState.file;
-  //   }
-  //   if (updatedState.sessionType) {
-  //     payload.sessionType = updatedState.sessionType;
-  //   }
-  //   if (updatedState.subSessionType) {
-  //     payload.subSessionType = updatedState.subSessionType;
-  //   }
-  //   if (!Object.entries(payload).length) {
-  //     return;
-  //   }
-
-  //   return updatePatientFollowup(id, payload);
-  // };
 
   const updateFunctionTherapistNotes = (id: string) => {
     const updatedState = compareObjects(notes.therapistNote, data, true);
@@ -702,67 +540,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
     return updatePatientFollowup(id, formData);
   };
-
-  // const handleSubmit = async () => {
-  //   try {
-  //     if (!id) {
-  //       throw new Error("Patient not found");
-  //     }
-  //     if (!data.note.trim()) throw new Error("Note is required");
-  //     if (!data.therapistId) throw new Error("Therapist is required");
-  //     if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
-
-  //     if (data.id) {
-  //       // UPDATE EXISTING NOTE
-  //       const response = await updateFunctionTherapistNotes(data.id);
-  //       if (response && response.status == 200) {
-  //         fetchPatientFollowup();
-  //         toast.success("Therapist Notes Updated Successfully");
-  //         resetState();
-  //       }
-  //     } else {
-  //       // CREATE NEW NOTE (your existing create code)
-  //       const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
-  //       const body: Partial<typeof data> & { noteDateTime: string } = {
-  //         ...data,
-  //         noteDateTime: formattedDateTime
-  //       };
-
-  //       // Remove score if not assessment session
-  //       if (
-  //         (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
-  //         (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
-  //         !body.score?.trim()
-  //       ) {
-  //         delete body.score;
-  //       }
-
-  //       if (!body.sessionType) delete body.sessionType;
-  //       if (!body.subSessionType) delete body.subSessionType;
-
-  //       const formData = new FormData();
-  //       Object.entries(body).forEach(([key, value]) => {
-  //         if (Array.isArray(value)) {
-  //           value.forEach((v) => formData.append(key, v));
-  //         } else if (value instanceof File) {
-  //           formData.append(key, value);
-  //         } else if (value !== undefined && value !== null) {
-  //           formData.append(key, value.toString());
-  //         }
-  //       });
-
-  //       const response = await createPatientFollowup(formData);
-  //       if (response && response?.status === 201) {
-  //         toast.success("Note saved successfully");
-  //         fetchPatientFollowup();
-  //         resetState();
-  //       }
-  //     }
-  //   } catch (error) {
-  //     handleError(error);
-  //   }
-  // };
-
   const handleSubmit = async () => {
     try {
       if (!id) {
@@ -839,92 +616,6 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
       openMenuId: dropDownsState.openMenuId === id ? null : id
     }));
   };
-
-  // const toggleFunctionType = async (value: IPatientFollowup, type: string) => {
-  //   console.log("value: ", value);
-  //   if (type == "edit") {
-  //     const selected: { sessionType: string; subSessionType?: string }[] = [];
-
-  //     if (Array.isArray(value.sessionType)) {
-  //       value.sessionType.forEach((type) => {
-  //         if (type === "A - Assessment" && value.subSessionType) {
-  //           selected.push({ sessionType: type, subSessionType: value.subSessionType });
-  //         } else {
-  //           selected.push({ sessionType: type });
-  //         }
-  //       });
-  //     } else if (value.sessionType) {
-  //       if (value.sessionType === "A - Assessment" && value.subSessionType) {
-  //         selected.push({
-  //           sessionType: value.sessionType,
-  //           subSessionType: value.subSessionType
-  //         });
-  //       } else {
-  //         selected.push({ sessionType: value.sessionType });
-  //       }
-  //     }
-
-  //     setSelectedSessions(selected);
-
-  //     dispatch(
-  //       setPatientFollowup({
-  //         noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
-  //         noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-  //         note: value.note,
-  //         therapistId: value.therapistId._id
-  //       })
-  //     );
-  //     setState((prev) => ({
-  //       ...prev,
-  //       therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
-  //       isTodayNoteExist: false
-  //     }));
-  //     setData((prev) => ({
-  //       ...prev,
-  //       id: value._id,
-  //       note: value.note,
-  //       sessionType: Array.isArray(value.sessionType)
-  //         ? value.sessionType
-  //         : value.sessionType
-  //         ? [value.sessionType]
-  //         : [],
-  //       score: value.score || "",
-  //       subSessionType: Array.isArray(value.subSessionType)
-  //         ? value.subSessionType
-  //         : value.subSessionType
-  //         ? [value.subSessionType]
-  //         : [],
-  //       therapistId: value.therapistId._id,
-  //       noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
-  //       noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-  //       file: value?.file?.filePath || "",
-  //       fileName: value?.file?.fileName || "",
-  //       // Set the missing fields:
-  //       age: value?.age || "",
-  //       phoneNumber: `${value?.contact || ""}`,
-  //       // address: value?.fullAddress || "",
-  //       // admissionType: value?.admissionType || "",
-  //       // involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
-  //       // doctor: value?.resourceAllocation?.assignedDoctorId?.firstName
-  //       //   ? `${value?.resourceAllocation?.assignedDoctorId?.firstName} ${value?.resourceAllocation?.assignedDoctorId?.lastName}`
-  //       //   : "",
-  //       therapist: value?.therapistId?.firstName
-  //         ? `${value?.therapistId?.firstName} ${value?.therapistId?.lastName}`
-  //         : "",
-  //       dischargeDate: value?.dischargeDate || "",
-  //       // dischargeStatus: value?.dischargeStatus || "",
-  //       // nominatedRepresentative: "", // You'll need to set this from family details
-  //       currentStatus: value?.currentStatus || ""
-  //     }));
-  //   }
-  //   if (type == "delete") {
-  //     setData((prevState) => ({
-  //       ...prevState,
-  //       id: value._id
-  //     }));
-  //     toggleModal();
-  //   }
-  // };
 
   const toggleFunctionType = async (value: IPatientFollowup, type: string) => {
     if (type == "edit") {
@@ -1066,32 +757,88 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
     return false;
   };
 
-  const handleDateTimeChange = (datas: string, type: string) => {
-    let value = moment().format("YYYY-MM-DD");
-    if (datas) {
-      value = moment(datas).format("YYYY-MM-DD");
-    }
-    if (type == "date") {
-      setData((prev) => ({ ...prev, noteDate: value }));
-    } else if (type == "time") {
-      setData((prev) => ({ ...prev, noteTime: datas }));
-    }
-    if (totalTherapistNotes.length > 0) {
-      const exist =
-        totalTherapistNotes.filter(
-          (elem: IPatientFollowup) => elem.noteDateTime.startsWith(value) && elem._id != data.id
-        ).length > 0;
-      setState((prev) => ({
-        ...prev,
-        isTodayNoteExist: exist
-      }));
-      if (exist) {
-        toast.error(`Note already exists On ${formateNormalDate(value)}`);
+  // const handleDateTimeChange = (datas: string, type: string) => {
+  //   let value = moment().format("YYYY-MM-DD");
+  //   if (datas) {
+  //     value = moment(datas).format("YYYY-MM-DD");
+  //   }
+  //   if (type == "date") {
+  //     setData((prev) => ({ ...prev, noteDate: value }));
+  //   } else if (type == "time") {
+  //     setData((prev) => ({ ...prev, noteTime: datas }));
+  //   }
+  //   if (totalTherapistNotes.length > 0) {
+  //     const exist =
+  //       totalTherapistNotes.filter(
+  //         (elem: IPatientFollowup) => elem.noteDateTime.startsWith(value) && elem._id != data.id
+  //       ).length > 0;
+  //     setState((prev) => ({
+  //       ...prev,
+  //       isTodayNoteExist: exist
+  //     }));
+  //     if (exist) {
+  //       toast.error(`Note already exists On ${formateNormalDate(value)}`);
+  //     }
+  //   } else {
+  //     fetchAllNotesToCheck();
+  //   }
+  // };
+const handleDateTimeChange = (datas: string, type: string) => {
+  let value = moment().format("YYYY-MM-DD");
+  if (datas) {
+    value = moment(datas).format("YYYY-MM-DD");
+  }
+
+  if (type === "date") {
+    // 🧠 Get last follow-up if available
+    const previousFollowup = totalTherapistNotes?.length
+      ? totalTherapistNotes[totalTherapistNotes.length - 1]
+      : null;
+
+    if (previousFollowup?.noteDateTime) {
+      const prevDate = moment(previousFollowup.noteDateTime.split("T")[0]);
+      const selectedDate = moment(value);
+      const dayDiff = selectedDate.diff(prevDate, "days");
+
+      // 🔒 Only show toast once — on invalid selection
+      if (![15, 16, 17].includes(dayDiff)) {
+        toast.error(
+          `Follow-up must be 15–17 days after the last note (${prevDate.format(
+            "DD MMM YYYY"
+          )}). Selected gap: ${dayDiff} days`
+        );
+        return; // ❌ Stop further execution
       }
-    } else {
-      fetchAllNotesToCheck();
     }
-  };
+
+    // ✅ Set noteDate if valid
+    setData((prev) => ({ ...prev, noteDate: value }));
+  } 
+  else if (type === "time") {
+    setData((prev) => ({ ...prev, noteTime: datas }));
+  }
+
+  // ✅ Check duplicate notes only when date changes (not time)
+  if (type === "date" && totalTherapistNotes.length > 0) {
+    const exist =
+      totalTherapistNotes.filter(
+        (elem: IPatientFollowup) =>
+          elem.noteDateTime.startsWith(value) && elem._id != data.id
+      ).length > 0;
+
+    setState((prev) => ({
+      ...prev,
+      isTodayNoteExist: exist,
+    }));
+
+    if (exist) {
+      toast.error(`Note already exists on ${formateNormalDate(value)}`);
+    }
+  } 
+  else if (totalTherapistNotes.length === 0) {
+    fetchAllNotesToCheck();
+  }
+};
 
   const [open, setOpen] = useState(false);
 
@@ -1167,11 +914,7 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
       [name]: selectedOption.value as string
     }));
 
-    // If you need to update data state for some fields, do it here
-    // For example, if some select fields belong to data state:
-    // if (name === "someDataField") {
-    //   setData((prev) => ({ ...prev, [name]: selectedOption }));
-    // }
+
   };
 
   const handleDeleteFile = () => {
@@ -1200,14 +943,14 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
       <div className=" container">
         <div className="flex lg:px-8 sm:px-2  bg-[#ffffff] justify-between md:flex-row flex-col md:items-center">
           <div className="flex items-center gap-3">
-            <div
-              className="p-3 w-fit bg-white rounded-full cursor-pointer"
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              <FaArrowLeft />
-            </div>
+          
+             <div
+  className="p-4 w-fit bg-white rounded-full shadow-md cursor-pointer hover:shadow-lg transition"
+  onClick={() => navigate(-1)}
+>
+  <FaArrowLeft className="text-gray-700" />
+</div>
+
             <div className="my-5 flex flex-col items-start" aria-label="Breadcrumb">
               <BreadCrumb
                 name={`${capitalizeFirstLetter(
@@ -1226,7 +969,7 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
                 id={id}
                 aId={aId}
               />
-              <div className=" text-[18px] font-bold">Patient Followup</div>
+              <div className=" text-[18px] font-bold">Patient Follow-up</div>
             </div>
           </div>
           <div className="h-fit max-w-xl rounded-xl ">
@@ -2224,7 +1967,7 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
-                              Doing review with Ganaa docotor
+                              Doing review with Ganaa doctor
                             </label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
