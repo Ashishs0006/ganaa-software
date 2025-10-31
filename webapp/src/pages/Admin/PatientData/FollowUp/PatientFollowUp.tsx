@@ -75,6 +75,7 @@ import { ISelectOption } from "@/components/Select/types";
 
 const PatientFollowup = () => {
   const { id, aId } = useParams();
+console.log('✌️id, aId --->', id, aId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -176,7 +177,6 @@ const PatientFollowup = () => {
     // reviewWithGanaaDoctor: "",
     // feedbackFromFamily: ""
   });
-console.log('✌️state --->', state);
 
   const [familyDetails, setFamilyDetails] = useState<IFamilyData[]>([]);
 
@@ -217,7 +217,6 @@ console.log('✌️state --->', state);
   const [allTherapists, setAllTherapists] = useState([]);
 
   const patient = useSelector((store: RootState) => store.patient);
-  console.log("allTherapists: ", allTherapists);
 
   const fetchLoa = async () => {
     try {
@@ -263,7 +262,9 @@ console.log('✌️state --->', state);
 
       if (id && aId) {
         const { data: patientData } = await getSinglePatient(id);
+console.log('✌️patientData --->', patientData);
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
+console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
         // Fetch the latest followup data to get the new fields
         const { data: latestFollowupData } = await getAllPatientFollowup({
@@ -275,9 +276,6 @@ console.log('✌️state --->', state);
 
         const latestFollowup = latestFollowupData?.data?.[0];
 
-        console.log("patientData=====: ", patientData);
-        console.log("patientAdmissionHistory: ", patientAdmissionHistory);
-        console.log("latestFollowup: ", latestFollowup);
         const familyDetailsResponse = await getPatientFamily(id);
 
         setFamilyDetails(familyDetailsResponse.data.data);
@@ -294,8 +292,10 @@ console.log('✌️state --->', state);
             patientData?.data?.phoneNumber || ""
           }`.trim(),
           address: patientData?.data?.fullAddress,
-          dischargeDate: "",
-          dischargeStatus: ""
+          dischargeDate: patientData?.data?.patientHistory?.dischargeId?.date || "",
+          dischargeStatus: patientData?.data?.patientHistory?.dischargeId?.status || "",
+          admissionDate: patientData?.data?.patientHistory?.dateOfAdmission || "",
+          // therapist: `${patientData?.data?.createdBy?.firstName || ""} ${patientData?.data?.createdBy?.lastName || ""}`
         }));
 
         const { data: therapistNotesData } = await getAllPatientFollowup({
@@ -362,25 +362,25 @@ console.log('✌️state --->', state);
           noteTime: date ? moment(date).format("HH:mm") : moment().format("HH:mm"),
 
           // Set the missing fields:
-          center: latestFollowup?.center || "",
-          patientName: latestFollowup?.patientName || "",
-          UHID: latestFollowup?.UHID || "",
-          contact: latestFollowup?.contact || "",
-          stayDuration: latestFollowup?.stayDuration || "",
-          psychologist: latestFollowup?.psychologist || "",
-          dischargePlan: latestFollowup?.dischargePlan || "",
-          urge: latestFollowup?.urge || "",
-          feedbackFromFamily: latestFollowup?.feedbackFromFamily || "",
-          adherence: latestFollowup?.adherence || "",
-          therapist: latestFollowup?.therapist || "",
-          prayer: latestFollowup?.prayer || "",
-          daycareAtGanaa: latestFollowup?.daycareAtGanaa || "",
-          meeting: latestFollowup?.meeting || "",
-          sponsor: latestFollowup?.sponsor || "",
-          stepProgram: latestFollowup?.stepProgram || "",
-          reviewWithGanaaDoctor: latestFollowup?.reviewWithGanaaDoctor || "",
-          literature: latestFollowup?.literature || "",
-          followupDate: latestFollowup?.followupDate || "",
+          // center: latestFollowup?.center || "",
+          // patientName: latestFollowup?.patientName || "",
+          // UHID: latestFollowup?.UHID || "",
+          // contact: latestFollowup?.contact || "",
+          // stayDuration: latestFollowup?.stayDuration || "",
+          // psychologist: latestFollowup?.psychologist || "",
+          // dischargePlan: latestFollowup?.dischargePlan || "",
+          // urge: latestFollowup?.urge || "",
+          // feedbackFromFamily: latestFollowup?.feedbackFromFamily || "",
+          // adherence: latestFollowup?.adherence || "",
+          // therapist: latestFollowup?.therapist || "",
+          // prayer: latestFollowup?.prayer || "",
+          // daycareAtGanaa: latestFollowup?.daycareAtGanaa || "",
+          // meeting: latestFollowup?.meeting || "",
+          // sponsor: latestFollowup?.sponsor || "",
+          // stepProgram: latestFollowup?.stepProgram || "",
+          // reviewWithGanaaDoctor: latestFollowup?.reviewWithGanaaDoctor || "",
+          // literature: latestFollowup?.literature || "",
+          // followupDate: latestFollowup?.followupDate || "",
 
           age: latestFollowup?.age || "",
           phoneNumber: `${latestFollowup?.phoneNumberCountryCode || ""} ${
@@ -391,28 +391,27 @@ console.log('✌️state --->', state);
           involuntaryAdmissionType: latestFollowup?.involuntaryAdmissionType || "",
           doctor: latestFollowup?.resourceAllocation?.assignedDoctorId?.firstName
             ? `${latestFollowup?.resourceAllocation?.assignedDoctorId?.firstName} ${latestFollowup?.resourceAllocation?.assignedDoctorId?.lastName}`
-            : "",
+            : ""
           // therapist: latestFollowup?.resourceAllocation?.assignedTherapistId?.firstName
           //   ? `${latestFollowup?.resourceAllocation?.assignedTherapistId?.firstName} ${latestFollowup?.resourceAllocation?.assignedTherapistId?.lastName}`
           //   : "",
-          dischargeDate: `${new Date(latestFollowup?.dischargeDate)}` || "",
-          dischargeStatus: latestFollowup?.dischargeStatus || "",
-          nominatedRepresentative: "", // You'll need to set this from family details
-          currentStatus: latestFollowup?.currentStatus || ""
+          // dischargeDate: `${new Date(latestFollowup?.dischargeDate)}` || "",
+          // dischargeStatus: latestFollowup?.dischargeStatus || "",
+          // nominatedRepresentative: "", // You'll need to set this from family details
+          // currentStatus: latestFollowup?.currentStatus || ""
         }));
 
-        if (latestFollowup?.resourceAllocation?.centerId?._id) {
+        // if (latestFollowup?.resourceAllocation?.centerId?._id) {
           const { data: therapistsData } = await getAllUser({
             limit: 100,
             page: 1,
             sort: "-createdAt",
             roles: "therapist",
-            centerId: latestFollowup?.resourceAllocation?.centerId?._id
+            // centerId: latestFollowup?.resourceAllocation?.centerId?._id
           });
-          
-          console.log('✌️therapistsData --->', therapistsData);
+
           setAllTherapists(therapistsData?.data);
-        }
+        // }
       }
     } catch (error) {
       console.error("Error fetching therapist notes or patient data:", error);
@@ -520,63 +519,64 @@ console.log('✌️state --->', state);
   // };
 
   const resetState = () => {
-  dispatch(resetPatientFollowup());
-  setData((prev) => ({
-    ...prev,
-    id: "",
-    patientId: id || "",
-    patientAdmissionHistoryId: aId || "",
-    note: "",
-    file: null,
-    fileName: "",
-    therapistId: auth?.user?._id || "",
-    sessionType: [],
-    score: "",
-    subSessionType: [],
-    noteDate: moment().format("YYYY-MM-DD"),
-    noteTime: moment().format("HH:mm"),
-    
-    // Reset all the form fields
-    center: "",
-    patientName: "",
-    age: "",
-    contact: "",
-    address: "",
-    admissionType: "",
-    involuntaryAdmissionType: "",
-    doctor: "",
-    therapist: "",
-    dischargeDate: "",
-    dischargeStatus: "",
-    nominatedRepresentative: "",
-    currentStatus: "",
-    stayDuration: "",
-    dischargePlan: "",
-    psychologist: "",
-    followupDate: "",
-    urge: "",
-    adherence: "",
-    prayer: "",
-    literature: "",
-    meeting: "",
-    daycareAtGanaa: "",
-    sponsor: "",
-    stepProgram: "",
-    reviewWithGanaaDoctor: "",
-    feedbackFromFamily: "",
-    UHID: "",
-    therapistName: "",
-    gender: ""
-  }));
-  setState((prev) => ({
-    ...prev,
-    therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
-    isTodayNoteExist: totalTherapistNotes.filter((elem: IPatientFollowup) =>
-      elem.noteDateTime.startsWith(moment().format("YYYY-MM-DD"))
-    ).length > 0
-  }));
-  setSelectedSessions([]);
-};
+    dispatch(resetPatientFollowup());
+    setData((prev) => ({
+      ...prev,
+      id: "",
+      patientId: id || "",
+      patientAdmissionHistoryId: aId || "",
+      note: "",
+      file: null,
+      fileName: "",
+      therapistId: auth?.user?._id || "",
+      sessionType: [],
+      score: "",
+      subSessionType: [],
+      noteDate: moment().format("YYYY-MM-DD"),
+      noteTime: moment().format("HH:mm"),
+
+      // Reset all the form fields
+      center: "",
+      patientName: "",
+      age: "",
+      contact: "",
+      address: "",
+      admissionType: "",
+      involuntaryAdmissionType: "",
+      doctor: "",
+      therapist: "",
+      dischargeDate: "",
+      dischargeStatus: "",
+      nominatedRepresentative: "",
+      currentStatus: "",
+      stayDuration: "",
+      dischargePlan: "",
+      psychologist: "",
+      followupDate: "",
+      urge: "",
+      adherence: "",
+      prayer: "",
+      literature: "",
+      meeting: "",
+      daycareAtGanaa: "",
+      sponsor: "",
+      stepProgram: "",
+      reviewWithGanaaDoctor: "",
+      feedbackFromFamily: "",
+      UHID: "",
+      therapistName: "",
+      gender: ""
+    }));
+    setState((prev) => ({
+      ...prev,
+      therapistName: `${auth?.user?.firstName} ${auth?.user?.lastName}`,
+      isTodayNoteExist:
+        totalTherapistNotes.filter((elem: IPatientFollowup) =>
+          elem.noteDateTime.startsWith(moment().format("YYYY-MM-DD"))
+        ).length > 0
+    }));
+    setSelectedSessions([]);
+  };
 
   // const updateFunctionTtherapistNotes = (id: string) => {
   //   const updatedState = compareObjects(notes.therapistNote, data, true);
@@ -696,7 +696,6 @@ console.log('✌️state --->', state);
     }
 
     // Log form data for debugging
-    console.log("FormData entries:");
     for (let pair of formData.entries()) {
       console.log(pair[0] + ": ", pair[1]);
     }
@@ -764,66 +763,65 @@ console.log('✌️state --->', state);
   //   }
   // };
 
-
   const handleSubmit = async () => {
-  try {
-    if (!id) {
-      throw new Error("Patient not found");
-    }
-    if (!data.note.trim()) throw new Error("Note is required");
-    if (!data.therapistId) throw new Error("Therapist is required");
-    if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
-
-    if (data.id) {
-      // UPDATE EXISTING NOTE
-      const response = await updateFunctionTherapistNotes(data.id);
-      if (response && response.status == 200) {
-        fetchPatientFollowup();
-        toast.success("Therapist Notes Updated Successfully");
-        resetState(); // Reset after successful update
+    try {
+      if (!id) {
+        throw new Error("Patient not found");
       }
-    } else {
-      // CREATE NEW NOTE
-      const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
-      const body: Partial<typeof data> & { noteDateTime: string } = {
-        ...data,
-        noteDateTime: formattedDateTime
-      };
+      if (!data.note.trim()) throw new Error("Note is required");
+      if (!data.therapistId) throw new Error("Therapist is required");
+      if (!data.noteDate || !data.noteTime) throw new Error("Both note date and time are required");
 
-      // Remove score if not assessment session
-      if (
-        (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
-        (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
-        !body.score?.trim()
-      ) {
-        delete body.score;
-      }
-
-      if (!body.sessionType) delete body.sessionType;
-      if (!body.subSessionType) delete body.subSessionType;
-
-      const formData = new FormData();
-      Object.entries(body).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((v) => formData.append(key, v));
-        } else if (value instanceof File) {
-          formData.append(key, value);
-        } else if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
+      if (data.id) {
+        // UPDATE EXISTING NOTE
+        const response = await updateFunctionTherapistNotes(data.id);
+        if (response && response.status == 200) {
+          fetchPatientFollowup();
+          toast.success("Therapist Notes Updated Successfully");
+          resetState(); // Reset after successful update
         }
-      });
+      } else {
+        // CREATE NEW NOTE
+        const formattedDateTime = new Date(`${data.noteDate} ${data.noteTime}`).toISOString();
+        const body: Partial<typeof data> & { noteDateTime: string } = {
+          ...data,
+          noteDateTime: formattedDateTime
+        };
 
-      const response = await createPatientFollowup(formData);
-      if (response && response?.status === 201) {
-        toast.success("Note saved successfully");
-        fetchPatientFollowup();
-        resetState(); // Reset after successful creation
+        // Remove score if not assessment session
+        if (
+          (Array.isArray(body.sessionType) && !body.sessionType.includes("A - Assessment")) ||
+          (!Array.isArray(body.sessionType) && body.sessionType !== "A - Assessment") ||
+          !body.score?.trim()
+        ) {
+          delete body.score;
+        }
+
+        if (!body.sessionType) delete body.sessionType;
+        if (!body.subSessionType) delete body.subSessionType;
+
+        const formData = new FormData();
+        Object.entries(body).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            value.forEach((v) => formData.append(key, v));
+          } else if (value instanceof File) {
+            formData.append(key, value);
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+          }
+        });
+
+        const response = await createPatientFollowup(formData);
+        if (response && response?.status === 201) {
+          toast.success("Note saved successfully");
+          fetchPatientFollowup();
+          resetState(); // Reset after successful creation
+        }
       }
+    } catch (error) {
+      handleError(error);
     }
-  } catch (error) {
-    handleError(error);
-  }
-};
+  };
   const toggleTherapistsMenu = () => {
     setDropDownsState({ ...dropDownsState, displayDropdown: !dropDownsState.displayDropdown });
   };
@@ -928,109 +926,107 @@ console.log('✌️state --->', state);
   //   }
   // };
 
-
   const toggleFunctionType = async (value: IPatientFollowup, type: string) => {
-  console.log("value: ", value);
-  if (type == "edit") {
-    const selected: { sessionType: string; subSessionType?: string }[] = [];
+    if (type == "edit") {
+      const selected: { sessionType: string; subSessionType?: string }[] = [];
 
-    if (Array.isArray(value.sessionType)) {
-      value.sessionType.forEach((type) => {
-        if (type === "A - Assessment" && value.subSessionType) {
-          selected.push({ sessionType: type, subSessionType: value.subSessionType });
-        } else {
-          selected.push({ sessionType: type });
-        }
-      });
-    } else if (value.sessionType) {
-      if (value.sessionType === "A - Assessment" && value.subSessionType) {
-        selected.push({
-          sessionType: value.sessionType,
-          subSessionType: value.subSessionType
+      if (Array.isArray(value.sessionType)) {
+        value.sessionType.forEach((type) => {
+          if (type === "A - Assessment" && value.subSessionType) {
+            selected.push({ sessionType: type, subSessionType: value.subSessionType });
+          } else {
+            selected.push({ sessionType: type });
+          }
         });
-      } else {
-        selected.push({ sessionType: value.sessionType });
+      } else if (value.sessionType) {
+        if (value.sessionType === "A - Assessment" && value.subSessionType) {
+          selected.push({
+            sessionType: value.sessionType,
+            subSessionType: value.subSessionType
+          });
+        } else {
+          selected.push({ sessionType: value.sessionType });
+        }
       }
-    }
 
-    setSelectedSessions(selected);
+      setSelectedSessions(selected);
 
-    dispatch(
-      setPatientFollowup({
+      dispatch(
+        setPatientFollowup({
+          noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
+          noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
+          note: value.note,
+          therapistId: value.therapistId._id
+        })
+      );
+
+      setState((prev) => ({
+        ...prev,
+        therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
+        isTodayNoteExist: false
+      }));
+
+      setData((prev) => ({
+        ...prev,
+        id: value._id,
+        note: value.note,
+        sessionType: Array.isArray(value.sessionType)
+          ? value.sessionType
+          : value.sessionType
+          ? [value.sessionType]
+          : [],
+        score: value.score || "",
+        subSessionType: Array.isArray(value.subSessionType)
+          ? value.subSessionType
+          : value.subSessionType
+          ? [value.subSessionType]
+          : [],
+        therapistId: value.therapistId._id,
         noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
         noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-        note: value.note,
-        therapistId: value.therapistId._id
-      })
-    );
-    
-    setState((prev) => ({
-      ...prev,
-      therapistName: value.therapistId.firstName + " " + value.therapistId.lastName,
-      isTodayNoteExist: false
-    }));
-    
-    setData((prev) => ({
-      ...prev,
-      id: value._id,
-      note: value.note,
-      sessionType: Array.isArray(value.sessionType)
-        ? value.sessionType
-        : value.sessionType
-        ? [value.sessionType]
-        : [],
-      score: value.score || "",
-      subSessionType: Array.isArray(value.subSessionType)
-        ? value.subSessionType
-        : value.subSessionType
-        ? [value.subSessionType]
-        : [],
-      therapistId: value.therapistId._id,
-      noteDate: value?.noteDateTime && moment(value.noteDateTime).format("YYYY-MM-DD"),
-      noteTime: value?.noteDateTime && moment(value?.noteDateTime).format("HH:mm"),
-      file: value?.file?.filePath || "",
-      fileName: value?.file?.fileName || "",
-      
-      // Set all the form fields from the fetched data
-      center: value?.center || "",
-      patientName: value?.patientName || "",
-      UHID: value?.UHID || "",
-      age: value?.age || "",
-      gender: value?.gender || "",
-      contact: value?.contact || "",
-      address: value?.address || "",
-      admissionType: value?.admissionType || "",
-      involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
-      doctor: value?.doctor || "",
-      therapist: value?.therapist || "",
-      dischargeDate: value?.dischargeDate || "",
-      dischargeStatus: value?.dischargeStatus || "",
-      nominatedRepresentative: value?.nominatedRepresentative || "",
-      currentStatus: value?.currentStatus || "",
-      stayDuration: value?.stayDuration || "",
-      dischargePlan: value?.dischargePlan || "",
-      psychologist: value?.psychologist || "",
-      followupDate: value?.followupDate || "",
-      urge: value?.urge || "",
-      adherence: value?.adherence || "",
-      prayer: value?.prayer || "",
-      literature: value?.literature || "",
-      meeting: value?.meeting || "",
-      daycareAtGanaa: value?.daycareAtGanaa || "",
-      sponsor: value?.sponsor || "",
-      stepProgram: value?.stepProgram || "",
-      reviewWithGanaaDoctor: value?.reviewWithGanaaDoctor || "",
-      feedbackFromFamily: value?.feedbackFromFamily || ""
-    }));
-  }
-  if (type == "delete") {
-    setData((prevState) => ({
-      ...prevState,
-      id: value._id
-    }));
-    toggleModal();
-  }
-};
+        file: value?.file?.filePath || "",
+        fileName: value?.file?.fileName || "",
+
+        // Set all the form fields from the fetched data
+        center: value?.center || "",
+        patientName: value?.patientName || "",
+        UHID: value?.UHID || "",
+        age: value?.age || "",
+        gender: value?.gender || "",
+        contact: value?.contact || "",
+        address: value?.address || "",
+        admissionType: value?.admissionType || "",
+        involuntaryAdmissionType: value?.involuntaryAdmissionType || "",
+        doctor: value?.doctor || "",
+        therapist: value?.therapist || "",
+        dischargeDate: value?.dischargeDate || "",
+        dischargeStatus: value?.dischargeStatus || "",
+        nominatedRepresentative: value?.nominatedRepresentative || "",
+        currentStatus: value?.currentStatus || "",
+        stayDuration: value?.stayDuration || "",
+        dischargePlan: value?.dischargePlan || "",
+        psychologist: value?.psychologist || "",
+        followupDate: value?.followupDate || "",
+        urge: value?.urge || "",
+        adherence: value?.adherence || "",
+        prayer: value?.prayer || "",
+        literature: value?.literature || "",
+        meeting: value?.meeting || "",
+        daycareAtGanaa: value?.daycareAtGanaa || "",
+        sponsor: value?.sponsor || "",
+        stepProgram: value?.stepProgram || "",
+        reviewWithGanaaDoctor: value?.reviewWithGanaaDoctor || "",
+        feedbackFromFamily: value?.feedbackFromFamily || ""
+      }));
+    }
+    if (type == "delete") {
+      setData((prevState) => ({
+        ...prevState,
+        id: value._id
+      }));
+      toggleModal();
+    }
+  };
   const handleChangeQuill = useCallback((name: string, value: string) => {
     setData((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -1380,9 +1376,8 @@ console.log('✌️state --->', state);
               <div className="text-xs font-semibold">
                 <p className="text-[#636363] font-medium">Admission Date & Time</p>
                 <p>
-                  {patientDetails.admissionDate && formatDate(patientDetails.admissionDate)} @
-                  {patientDetails.admissionDate &&
-                    convertBackendDateToTime(patientDetails.admissionDate)}
+                  {patientDetails?.admissionDate && formatDate(patientDetails?.admissionDate)} @
+                  {patientDetails?.admissionDate && convertBackendDateToTime(patientDetails?.admissionDate)}
                 </p>
               </div>
             </div>
@@ -1470,7 +1465,7 @@ console.log('✌️state --->', state);
                       {!dropDownsState.displayAddForm && (
                         <div className="flex text-nowrap text-xs whitespace-nowrap">
                           <div className="ml-4 flex  items-center text-gray-500">
-                            <CustomCalendar
+                            {/* <CustomCalendar
                               value={data.noteDate}
                               disabledDate={(current) => {
                                 if (!current) return false;
@@ -1482,6 +1477,38 @@ console.log('✌️state --->', state);
                                 currentDate.setHours(0, 0, 0, 0); // normalize
 
                                 return currentDate < minDate;
+                              }}
+                              onChange={(date) => {
+                                handleDateTimeChange(date, "date");
+                              }}
+                            >
+                              <div className="flex items-center">
+                                {data?.noteDate && formateNormalDate(data.noteDate)}
+
+                                <div className="flex items-center justify-center w-5 mx-1 h-5">
+                                  <img
+                                    alt="calender"
+                                    src={calendar}
+                                    className="w-full h-full cursor-pointer"
+                                  />
+                                </div>
+                              </div>
+                            </CustomCalendar> */}
+
+                            <CustomCalendar
+                              value={data.noteDate}
+                              disabledDate={(current) => {
+                                if (!current) return false;
+
+                                const yesterday = new Date();
+                                yesterday.setDate(yesterday.getDate() - 1); // Set to yesterday
+                                yesterday.setHours(23, 59, 59, 999); // End of yesterday
+
+                                const currentDate = current.toDate(); // Convert from Moment to JS Date
+                                currentDate.setHours(0, 0, 0, 0); // normalize
+
+                                // Disable if current date is before today (i.e., yesterday or earlier)
+                                return currentDate < yesterday;
                               }}
                               onChange={(date) => {
                                 handleDateTimeChange(date, "date");
@@ -1658,10 +1685,9 @@ console.log('✌️state --->', state);
                     } pb-5 grid-cols-1 px-5 py-1 items-center`}
                   >
                     <div className="grid lg:grid-cols-5 grid-cols-2 gap-y-4 p-2 gap-x-[52px]">
-             
                       {state.illnessType !== "Mental Disorder" && (
                         <>
-                        <Select
+                          <Select
                             disable={state.isTodayNoteExist}
                             label="Current Status"
                             options={[
@@ -1681,29 +1707,28 @@ console.log('✌️state --->', state);
                               handleSelect(name, data);
                             }}
                           />
-                        
 
                           <Select
-                          disable={state.isTodayNoteExist}
-                          label="Attending Meeting"
-                          options={[
-                            { label: "Select", value: "" },
-                            { label: "No", value: "No" },
-                            { label: "At Ganaa", value: "At Ganaa" },
-                            { label: "Outside Ganaa", value: "Outside Ganaa" },
-                            { label: "At Ganaa & Outside", value: "At Ganaa & Outside" }
-                          ]}
-                          value={
-                            data?.meeting
-                              ? { label: data?.meeting, value: data?.meeting }
-                              : { label: "Select", value: "" }
-                          }
-                          name="meeting"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        />
-  <Select
+                            disable={state.isTodayNoteExist}
+                            label="Attending Meeting"
+                            options={[
+                              { label: "Select", value: "" },
+                              { label: "No", value: "No" },
+                              { label: "At Ganaa", value: "At Ganaa" },
+                              { label: "Outside Ganaa", value: "Outside Ganaa" },
+                              { label: "At Ganaa & Outside", value: "At Ganaa & Outside" }
+                            ]}
+                            value={
+                              data?.meeting
+                                ? { label: data?.meeting, value: data?.meeting }
+                                : { label: "Select", value: "" }
+                            }
+                            name="meeting"
+                            onChange={(name, data) => {
+                              handleSelect(name, data);
+                            }}
+                          />
+                          <Select
                             disable={state.isTodayNoteExist}
                             label="Medication Adherence"
                             options={[
@@ -1721,26 +1746,24 @@ console.log('✌️state --->', state);
                               handleSelect(name, data);
                             }}
                           />
-                              <Select
-                          disable={state.isTodayNoteExist}
-                          label="Making a sponsor"
-                          options={[
-                            { label: "Yes", value: "Yes" },
-                            { label: "No", value: "No" }
-                          ]}
-                          value={
-                            data?.sponsor
-                              ? { label: data.sponsor, value: data.sponsor }
-                              : { label: "Select", value: "" }
-                          }
-                          name="sponsor"
-                          onChange={(name, data) => {
-                            handleSelect(name, data);
-                          }}
-                        />
-                       
-   
-                          
+                          <Select
+                            disable={state.isTodayNoteExist}
+                            label="Making a sponsor"
+                            options={[
+                              { label: "Yes", value: "Yes" },
+                              { label: "No", value: "No" }
+                            ]}
+                            value={
+                              data?.sponsor
+                                ? { label: data.sponsor, value: data.sponsor }
+                                : { label: "Select", value: "" }
+                            }
+                            name="sponsor"
+                            onChange={(name, data) => {
+                              handleSelect(name, data);
+                            }}
+                          />
+
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Urge</label>
 
@@ -1828,8 +1851,6 @@ console.log('✌️state --->', state);
                               </div>
                             </div>
                           </div>
-
-                        
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Doing Prayer</label>
@@ -1923,8 +1944,6 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-            
-
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Reading AA literature</label>
 
@@ -2016,8 +2035,6 @@ console.log('✌️state --->', state);
                               </div>
                             </div>
                           </div>
-
-                     
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
@@ -2113,7 +2130,6 @@ console.log('✌️state --->', state);
                             </div>
                           </div>
 
-                   
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Doing 12-step program</label>
 
@@ -2205,8 +2221,6 @@ console.log('✌️state --->', state);
                               </div>
                             </div>
                           </div>
-
-                     
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
@@ -2303,16 +2317,15 @@ console.log('✌️state --->', state);
                           </div>
 
                           <Input
-  disabled={state.isTodayNoteExist}
-  label="Feedback from family"
-  labelClassName="text-black!"
-  className="w-full sm:w-[400px] md:w-[500px] rounded-lg! font-bold placeholder:font-normal"
-  placeholder="Enter"
-  name="feedbackFromFamily"
-  value={data.feedbackFromFamily}
-  onChange={handleChange}
-/>
-
+                            disabled={state.isTodayNoteExist}
+                            label="Feedback from family"
+                            labelClassName="text-black!"
+                            className="w-full sm:w-[400px] md:w-[500px] rounded-lg! font-bold placeholder:font-normal"
+                            placeholder="Enter"
+                            name="feedbackFromFamily"
+                            value={data.feedbackFromFamily}
+                            onChange={handleChange}
+                          />
                         </>
                       )}
                     </div>

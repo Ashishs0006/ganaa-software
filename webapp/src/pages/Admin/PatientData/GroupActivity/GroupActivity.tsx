@@ -216,17 +216,36 @@ const GroupActivity = () => {
             const existing =
               (mergedGroupMap.get(key) as IData & { activity: IActivity[] }) ||
               ({ ...p, activity: [] } as IData & { activity: IActivity[] });
-            p.activity?.forEach((act: IActivity) => {
-              const existingAct = existing.activity.find((a: IActivity) => a.name === act.name);
-              const notePrefix = act.note ? `${centerName}: ${act.note}` : "";
-              if (existingAct) {
-                // append notes if both exist
-                existingAct.note = [existingAct.note, notePrefix].filter(Boolean).join("\n");
-                existingAct.isSelected = existingAct.isSelected || !!act.note;
-              } else {
-                existing.activity.push({ ...act, note: notePrefix, isSelected: !!act.note });
-              }
-            });
+            // p.activity?.forEach((act: IActivity) => {
+            //   const existingAct = existing.activity.find((a: IActivity) => a.name === act.name);
+            //   const notePrefix = act.note ? `${centerName}: ${act.note}` : "";
+            //   if (existingAct) {
+            //     // append notes if both exist
+            //     existingAct.note = [existingAct.note, notePrefix].filter(Boolean).join("\n");
+            //     existingAct.isSelected = existingAct.isSelected || !!act.note;
+            //   } else {
+            //     existing.activity.push({ ...act, note: notePrefix, isSelected: !!act.note });
+            //   }
+            // });
+           p.activity?.forEach((act: IActivity) => {
+  const existingAct = existing.activity.find((a: IActivity) => a.name === act.name);
+  const notePrefix = act.note ? `${centerName}: ${act.note}` : "";
+
+  if (existingAct) {
+    // append notes if both exist
+    existingAct.note = [existingAct.note, notePrefix].filter(Boolean).join("\n");
+    // ✅ FIX: use isSelected from backend instead of note existence
+    existingAct.isSelected = existingAct.isSelected || Boolean(act.isSelected);
+  } else {
+    // ✅ FIX: preserve checkbox even if note is empty
+    existing.activity.push({
+      ...act,
+      note: notePrefix,
+      isSelected: Boolean(act.isSelected),
+    });
+  }
+});
+
             mergedGroupMap.set(key, existing as IData);
           });
         });
@@ -298,44 +317,81 @@ const GroupActivity = () => {
   const [horizontalPosition, setHorizontalPosition] = useState<"left" | "right">("right");
   const [position, setPosition] = useState<"top" | "bottom">("bottom");
 
-  const handleCheckboxChange = async (
-    rowIdx: number,
-    colIdx: number,
-    patient: IData,
-    cell: IActivity
-  ) => {
-    setRememberstring(cell.note || "");
-    const updatedData = [...data];
-    const current = updatedData[rowIdx];
+  // const handleCheckboxChange = async (
+  //   rowIdx: number,
+  //   colIdx: number,
+  //   patient: IData,
+  //   cell: IActivity
+  // ) => {
+  //   setRememberstring(cell.note || "");
+  //   const updatedData = [...data];
+  //   const current = updatedData[rowIdx];
 
-    if (!current.activity || !current.activity[colIdx]) return;
+  //   if (!current.activity || !current.activity[colIdx]) return;
 
-    const activityItem = current.activity[colIdx];
-    const wasSelected = activityItem.isSelected;
+  //   const activityItem = current.activity[colIdx];
+  //   const wasSelected = activityItem.isSelected;
 
-    // Toggle selection
-    activityItem.isSelected = !wasSelected;
-    const test = activityItem.note;
-    if (!activityItem.isSelected) {
-      // Case: Unchecked
-      activityItem.note = "";
+  //   // Toggle selection
+  //   activityItem.isSelected = !wasSelected;
+  //   const test = activityItem.note;
+  //   if (!activityItem.isSelected) {
+  //     // Case: Unchecked
+  //     activityItem.note = "";
 
-      setData(updatedData); // Update UI
-      if (test) {
-        await handleSubmit(patient?.patientId); // Submit changes
-      } else {
-        setHoveredIndex(null);
-      }
-    } else {
-      // Case: Checked
-      setData(updatedData); // Update UI
-      setHoveredIndex({
-        row: patient.patientId || "",
-        col: cell.name || "",
-        state: ""
-      }); // Open note popup
-    }
-  };
+  //     setData(updatedData); // Update UI
+  //     if (test) {
+  //       await handleSubmit(patient?.patientId); // Submit changes
+  //     } else {
+  //       setHoveredIndex(null);
+  //     }
+  //   } else {
+  //     // Case: Checked
+  //     setData(updatedData); // Update UI
+  //     setHoveredIndex({
+  //       row: patient.patientId || "",
+  //       col: cell.name || "",
+  //       state: ""
+  //     }); // Open note popup
+  //   }
+  // };
+const handleCheckboxChange = async (
+  rowIdx: number,
+  colIdx: number,
+  patient: IData,
+  cell: IActivity
+) => {
+  const updatedData = [...data];
+  const current = updatedData[rowIdx];
+  if (!current.activity || !current.activity[colIdx]) return;
+
+  const activityItem = current.activity[colIdx];
+  const wasSelected = activityItem.isSelected;
+
+  // Toggle selection
+  activityItem.isSelected = !wasSelected;
+
+  // If unchecked → clear note
+  if (!activityItem.isSelected) {
+    activityItem.note = "";
+  }
+
+  setData(updatedData);
+
+  // ✅ Always submit updated state
+  await handleSubmit(patient?.patientId);
+
+  // ✅ Don't open popup anymore
+  // ❌ remove or comment out this part:
+  // setHoveredIndex({
+  //   row: patient.patientId || "",
+  //   col: cell.name || "",
+  //   state: ""
+  // });
+
+  // Just ensure popup closes if it was open
+  setHoveredIndex(null);
+};
 
   const handleDelete = async (rowIdx: number, colIdx: number, patient: IData) => {
     const updatedData = [...data];
@@ -423,70 +479,65 @@ const GroupActivity = () => {
       })
     }));
   };
+const handleSubmit = async (id: string | undefined) => {
+  if (id === undefined) return;
+  try {
+    const filterData = data?.filter((value) => value.patientId === id);
 
-  const handleSubmit = async (id: string | undefined) => {
-    if (id === undefined) return;
-    try {
-      const filterData = data?.filter((value) => value.patientId === id);
+    if (filterData[0]._id) {
+      const payload = filterData.map((value) => ({
+        patientId: value?.patientId,
+        activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
+        _id: value._id,
+        activity: value?.activity
+          ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
+          .map((item) => ({
+            name: item.name,
+            note: item.note,
+            isSelected: item.isSelected,
+          })),
+      }));
 
-      if (filterData[0]._id) {
-        const payload = filterData.map((value) => ({
-          patientId: value?.patientId,
-          activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
-          _id: value._id,
-          activity: value?.activity
-            ?.filter((value) => value.note?.trim())
-            .map((data) => ({
-              name: data.name,
-              note: data.note,
-              isSelected: true
-            }))
-        }));
-        const response = await updateNewGroupActivity(filterData[0]._id, payload[0]);
+      const response = await updateNewGroupActivity(filterData[0]._id, payload[0]);
 
-        // setData((prevData) => ({ ...prevData, _id: response?.data?.data?._id }));
-
-        if (response.data.status === "success") {
-          const incomingObj = response?.data?.data;
-          // setData((prevData) => ({ ...prevData, _id: response?.data?.data?._id }));
-          const updated = data.map((item) =>
-            item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
-          );
-
-          setData(updated);
-          toast.success("Group activity added successfully");
-        }
-      } else {
-        const payload = filterData?.map((value) => ({
-          patientId: value?.patientId,
-          activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
-          activity: value?.activity
-            ?.filter((value) => value.note?.trim())
-            .map((data) => ({
-              name: data.name,
-              note: data.note,
-              isSelected: true
-            }))
-        }));
-        const response = await createNewGroupActivity(payload[0]);
-        setData((prevData) => ({ ...prevData, _id: response?.data?.data?._id }));
-        if (response.data.status === "success") {
-          const incomingObj = response?.data?.data;
-          // setData((prevData) => ({ ...prevData, _id: response?.data?.data?._id }));
-          const updated = data.map((item) =>
-            item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
-          );
-
-          setData(updated);
-          toast.success("Group activity added successfully");
-        }
+      if (response.data.status === "success") {
+        const incomingObj = response?.data?.data;
+        const updated = data.map((item) =>
+          item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
+        );
+        setData(updated);
+        toast.success("Group activity updated successfully");
       }
-      // fetchAllPatient();
-      setHoveredIndex(null);
-    } catch (error) {
-      handleError(error);
+    } else {
+      const payload = filterData?.map((value) => ({
+        patientId: value?.patientId,
+        activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
+        activity: value?.activity
+          ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
+          .map((item) => ({
+            name: item.name,
+            note: item.note,
+            isSelected: item.isSelected,
+          })),
+      }));
+
+      const response = await createNewGroupActivity(payload[0]);
+      if (response.data.status === "success") {
+        const incomingObj = response?.data?.data;
+        const updated = data.map((item) =>
+          item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
+        );
+        setData(updated);
+        toast.success("Group activity added successfully");
+      }
     }
-  };
+
+    setHoveredIndex(null);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 
   const handleSubmitTab = async () => {
     try {
@@ -773,8 +824,9 @@ const GroupActivity = () => {
                               }}
                               src={messageIcon}
                               className={`w-4 h-4 text-[#505050] ${
-                                
-                                   "cursor-pointer"
+                                selected === "All"
+                                  ? "cursor-not-allowed opacity-60"
+                                  : "cursor-pointer"
                               }`}
                             />
                             {data.note && (
@@ -997,10 +1049,8 @@ const GroupActivity = () => {
                         <Input
   type="checkbox"
   checked={cell?.isSelected}
-  disabled={selected === "All"} // disable logic same
-  onChange={() =>
-    handleCheckboxChange(index, colIdx, patient, cell)
-  }
+  disabled={selected === "All"}
+  onChange={() => handleCheckboxChange(index, colIdx, patient, cell)}
   className={`accent-[#323E2A] h-4 cursor-pointer 
     ${selected === "All" ? "opacity-100 pointer-events-none" : ""}`}
 />
@@ -1012,16 +1062,23 @@ const GroupActivity = () => {
                                 <img
                                   onClick={() => {
                                     if (selected === "All") return; // disable click
-                                    if (cell.note) {
-                                      setRememberstring(cell?.note);
-                                      setHoveredIndex({
-                                        row: patient?.patientId || "",
-                                        col: cell?.name || "",
-                                        state: "hey"
-                                      });
-                                    }
-                                  }}
-                                  src={messageIcon}
+                                  if (cell.note) {
+        // If note exists → open in view mode
+        setRememberstring(cell?.note);
+        setHoveredIndex({
+          row: patient?.patientId || "",
+          col: cell?.name || "",
+          state: "hey",
+        });
+      } else {
+        // If no note → open editable popup
+        setHoveredIndex({
+          row: patient?.patientId || "",
+          col: cell?.name || "",
+          state: "",
+        });
+      }
+                        }}                    src={messageIcon}
                                   className={`w-8 h-8 ${
                                     selected === "All"
                                       ? "cursor-not-allowed opacity-60"
@@ -1032,6 +1089,15 @@ const GroupActivity = () => {
                                   <div className="absolute p-1 top-[15%] right-0 rounded-full bg-red-500"></div>
                                 )}
                               </div>
+
+
+
+
+
+
+
+
+
 
                               {/* ---- POPUP ---- */}
                               {hoveredIndex?.row === patient.patientId &&
