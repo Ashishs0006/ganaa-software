@@ -48,7 +48,7 @@ import {
 } from "@/pages";
 import { RouteItem } from "@/router/type";
 import { RESOURCES, ROUTES } from "@/constants/resources";
-import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/PatientFollowUp";
+import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/FollowUp/PatientFollowUp";
 
 export const routes: RouteItem[] = [
   {

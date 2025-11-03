@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { BsFiletypePdf } from "react-icons/bs";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -34,7 +35,8 @@ import {
   DeleteConfirm,
   Input,
   CheckBox,
-  Select
+  Select,
+  Modal
 } from "@/components";
 
 import clock from "@/assets/images/clock.svg";
@@ -72,10 +74,12 @@ import { RESOURCES } from "@/constants/resources";
 import { IFamilyData } from "@/components/ProfileContacts/types";
 import { PatientDetails } from "../Discharge/types";
 import { ISelectOption } from "@/components/Select/types";
+import DataDownload from "../Doctor/DataDownload/DataDownload";
+import DownloadFollowup from "./PatientFollowup/DownloadFollowup";
 
 const PatientFollowup = () => {
   const { id, aId } = useParams();
-console.log('✌️id, aId --->', id, aId);
+  console.log("✌️id, aId --->", id, aId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -84,6 +88,11 @@ console.log('✌️id, aId --->', id, aId);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const sessionMenuRef = useRef<HTMLDivElement>(null);
   const therapistMenuRef = useRef<HTMLDivElement>(null);
+
+  // Add state for the followup restriction modal
+  const [showFollowupRestrictionModal, setShowFollowupRestrictionModal] = useState(false);
+  const [lastFollowupDate, setLastFollowupDate] = useState<string | null>(null);
+  const [daysSinceLastFollowup, setDaysSinceLastFollowup] = useState<number | null>(null);
 
   const [data, setData] = useState<IPatientFollowupState>({
     id: "",
@@ -138,7 +147,6 @@ console.log('✌️id, aId --->', id, aId);
     therapistName: "",
     isTodayNoteExist: false,
     illnessType: ""
-    
   });
 
   const [familyDetails, setFamilyDetails] = useState<IFamilyData[]>([]);
@@ -225,10 +233,9 @@ console.log('✌️id, aId --->', id, aId);
 
       if (id && aId) {
         const { data: patientData } = await getSinglePatient(id);
-console.log('✌️patientData --->', patientData);
+        console.log("✌️patientData --->", patientData);
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
-console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
-
+        console.log("✌️patientAdmissionHistory --->", patientAdmissionHistory);
 
         // Fetch the latest followup data to get the new fields
         const { data: latestFollowupData } = await getAllPatientFollowup({
@@ -259,14 +266,21 @@ console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
           dischargeDate: patientData?.data?.patientHistory?.dischargeId?.date || "",
           dischargeStatus: patientData?.data?.patientHistory?.dischargeId?.status || "",
           admissionDate: patientData?.data?.patientHistory?.dateOfAdmission || "",
-          admissionType:patientData?.data?.patientHistory?.admissionType || "",
-         
-therapist: `${patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.firstName || ""} ${patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.lastName || ""}`.trim(),
+          admissionType: patientData?.data?.patientHistory?.admissionType || "",
 
-    doctor: `${patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.firstName || ""} ${patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.lastName || ""}`.trim(),
+          therapist: `${
+            patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.firstName ||
+            ""
+          } ${
+            patientData?.data?.patientHistory?.resourceAllocation?.assignedTherapistId?.lastName ||
+            ""
+          }`.trim(),
 
-
-        
+          doctor: `${
+            patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.firstName || ""
+          } ${
+            patientData?.data?.patientHistory?.resourceAllocation?.assignedDoctorId?.lastName || ""
+          }`.trim()
         }));
 
         const { data: therapistNotesData } = await getAllPatientFollowup({
@@ -322,38 +336,40 @@ therapist: `${patientData?.data?.patientHistory?.resourceAllocation?.assignedThe
             ? `${latestFollowup?.resourceAllocation?.assignedDoctorId?.firstName} ${latestFollowup?.resourceAllocation?.assignedDoctorId?.lastName}`
             : ""
         }));
-const centerName =
-  patientAdmissionHistory?.data?.resourceAllocation?.centerId?.centerName ||
-  patientAdmissionHistory?.data?.resourceAllocation?.centerId?.name ||
-  "";
+        const centerName =
+          patientAdmissionHistory?.data?.resourceAllocation?.centerId?.centerName ||
+          patientAdmissionHistory?.data?.resourceAllocation?.centerId?.name ||
+          "";
 
-console.log("✅ Patient Center Name:", centerName);
+        console.log("✅ Patient Center Name:", centerName);
 
-// ✅ Fetch all therapists
-const { data: therapistsData } = await getAllUser({
-  limit: 100,
-  page: 1,
-  sort: "-createdAt",
-  roles: "therapist",
-});
+        // ✅ Fetch all therapists
+        const { data: therapistsData } = await getAllUser({
+          limit: 100,
+          page: 1,
+          sort: "-createdAt",
+          roles: "therapist"
+        });
 
-console.log("hiii the therapist data is :", therapistsData?.data);
+        console.log("hiii the therapist data is :", therapistsData?.data);
 
-// ✅ Filter therapists who belong to same center
-const filteredTherapists = therapistsData?.data?.filter((therapist: any) => {
-  // since centerId is an array, check inside
-  return Array.isArray(therapist.centerId) && therapist.centerId.some(
-    (c: any) =>
-      c?.centerName?.toLowerCase() === centerName?.toLowerCase() ||
-      c?.name?.toLowerCase() === centerName?.toLowerCase()
-  );
-});
+        // ✅ Filter therapists who belong to same center
+        const filteredTherapists = therapistsData?.data?.filter((therapist: any) => {
+          // since centerId is an array, check inside
+          return (
+            Array.isArray(therapist.centerId) &&
+            therapist.centerId.some(
+              (c: any) =>
+                c?.centerName?.toLowerCase() === centerName?.toLowerCase() ||
+                c?.name?.toLowerCase() === centerName?.toLowerCase()
+            )
+          );
+        });
 
-console.log("✅ Filtered Therapists:", filteredTherapists);
+        console.log("✅ Filtered Therapists:", filteredTherapists);
 
-// ✅ Save filtered therapists
-setAllTherapists(filteredTherapists);
-     
+        // ✅ Save filtered therapists
+        setAllTherapists(filteredTherapists);
       }
     } catch (error) {
       console.error("Error fetching therapist notes or patient data:", error);
@@ -362,7 +378,6 @@ setAllTherapists(filteredTherapists);
 
   useEffect(() => {
     fetchPatientFollowup();
- 
   }, [searchParams]);
 
   const fetchAllNotesToCheck = async (date?: string) => {
@@ -542,6 +557,12 @@ setAllTherapists(filteredTherapists);
   };
   const handleSubmit = async () => {
     try {
+      // Check if new followup creation is restricted
+      if (!data.id && !checkFollowupRestriction()) {
+        setShowFollowupRestrictionModal(true);
+        return;
+      }
+
       if (!id) {
         throw new Error("Patient not found");
       }
@@ -750,10 +771,43 @@ setAllTherapists(filteredTherapists);
     setDropDownsState({ ...dropDownsState, isModalOpen: !dropDownsState.isModalOpen });
   };
 
+  // const handleDisabled = () => {
+  //   if ((!data?.note.trim() && state.isTodayNoteExist) || !data?.note.trim()) {
+  //     return true;
+  //   }
+  //   return false;
+  // };
+
   const handleDisabled = () => {
+    // Check if note is empty
     if ((!data?.note.trim() && state.isTodayNoteExist) || !data?.note.trim()) {
       return true;
     }
+
+    // Check if date is not today, tomorrow, or day after tomorrow for new followups
+    if (!data.id && totalTherapistNotes.length > 0) {
+      const selectedDate = new Date(data.noteDate);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const dayAfterTomorrow = new Date(today);
+      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+      // Disable if selected date is NOT today, tomorrow, or day after tomorrow
+      if (
+        selectedDate.getTime() !== today.getTime() &&
+        selectedDate.getTime() !== tomorrow.getTime() &&
+        selectedDate.getTime() !== dayAfterTomorrow.getTime()
+      ) {
+        return true;
+      }
+    }
+
     return false;
   };
 
@@ -783,62 +837,59 @@ setAllTherapists(filteredTherapists);
   //     fetchAllNotesToCheck();
   //   }
   // };
-const handleDateTimeChange = (datas: string, type: string) => {
-  let value = moment().format("YYYY-MM-DD");
-  if (datas) {
-    value = moment(datas).format("YYYY-MM-DD");
-  }
 
-  if (type === "date") {
-    // 🧠 Get last follow-up if available
-    const previousFollowup = totalTherapistNotes?.length
-      ? totalTherapistNotes[totalTherapistNotes.length - 1]
-      : null;
+  const handleDateTimeChange = (datas: string, type: string) => {
+    let value = moment().format("YYYY-MM-DD");
+    if (datas) {
+      value = moment(datas).format("YYYY-MM-DD");
+    }
 
-    if (previousFollowup?.noteDateTime) {
-      const prevDate = moment(previousFollowup.noteDateTime.split("T")[0]);
-      const selectedDate = moment(value);
-      const dayDiff = selectedDate.diff(prevDate, "days");
+    if (type == "date") {
+      setData((prev) => ({ ...prev, noteDate: value }));
 
-      // 🔒 Only show toast once — on invalid selection
-      if (![15, 16, 17].includes(dayDiff)) {
-        toast.error(
-          `Follow-up must be 15–17 days after the last note (${prevDate.format(
-            "DD MMM YYYY"
-          )}). Selected gap: ${dayDiff} days`
-        );
-        return; // ❌ Stop further execution
+      // Check if the selected date is today, tomorrow, or day after tomorrow
+      if (totalTherapistNotes.length > 0 && !data.id) {
+        const selectedDate = new Date(value);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dayAfterTomorrow = new Date(today);
+        dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+        // Check if selected date is NOT today, tomorrow, or day after tomorrow
+        if (
+          selectedDate.getTime() !== today.getTime() &&
+          selectedDate.getTime() !== tomorrow.getTime() &&
+          selectedDate.getTime() !== dayAfterTomorrow.getTime()
+        ) {
+          setShowFollowupRestrictionModal(true);
+        }
       }
+    } else if (type == "time") {
+      setData((prev) => ({ ...prev, noteTime: datas }));
     }
 
-    // ✅ Set noteDate if valid
-    setData((prev) => ({ ...prev, noteDate: value }));
-  } 
-  else if (type === "time") {
-    setData((prev) => ({ ...prev, noteTime: datas }));
-  }
-
-  // ✅ Check duplicate notes only when date changes (not time)
-  if (type === "date" && totalTherapistNotes.length > 0) {
-    const exist =
-      totalTherapistNotes.filter(
-        (elem: IPatientFollowup) =>
-          elem.noteDateTime.startsWith(value) && elem._id != data.id
-      ).length > 0;
-
-    setState((prev) => ({
-      ...prev,
-      isTodayNoteExist: exist,
-    }));
-
-    if (exist) {
-      toast.error(`Note already exists on ${formateNormalDate(value)}`);
+    if (totalTherapistNotes.length > 0) {
+      const exist =
+        totalTherapistNotes.filter(
+          (elem: IPatientFollowup) => elem.noteDateTime.startsWith(value) && elem._id != data.id
+        ).length > 0;
+      setState((prev) => ({
+        ...prev,
+        isTodayNoteExist: exist
+      }));
+      if (exist) {
+        toast.error(`Note already exists On ${formateNormalDate(value)}`);
+      }
+    } else {
+      fetchAllNotesToCheck();
     }
-  } 
-  else if (totalTherapistNotes.length === 0) {
-    fetchAllNotesToCheck();
-  }
-};
+  };
 
   const [open, setOpen] = useState(false);
 
@@ -913,8 +964,6 @@ const handleDateTimeChange = (datas: string, type: string) => {
       ...prev,
       [name]: selectedOption.value as string
     }));
-
-
   };
 
   const handleDeleteFile = () => {
@@ -938,18 +987,68 @@ const handleDateTimeChange = (datas: string, type: string) => {
     };
   }, []);
 
+  // Function to check if new followup is allowed (only on 15th, 16th, or 17th day)
+  const checkFollowupRestriction = (): boolean => {
+    if (totalTherapistNotes.length === 0) return true; // No previous followups, allow creation
+
+    // Get the latest followup date
+    const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
+      const currentDate = new Date(current.noteDateTime);
+      const latestDate = new Date(latest.noteDateTime);
+      return currentDate > latestDate ? current : latest;
+    });
+
+    const latestDate = new Date(latestFollowup.noteDateTime);
+    const currentDate = new Date();
+
+    // Calculate days difference
+    const timeDiff = currentDate.getTime() - latestDate.getTime();
+    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+    setLastFollowupDate(latestFollowup.noteDateTime);
+    setDaysSinceLastFollowup(daysDiff);
+
+    // Allow followup only on 15th, 16th, or 17th day after last followup
+    return daysDiff >= 15 && daysDiff <= 17;
+  };
+
+  // Add this function to calculate the next allowed date range
+  const getNextAllowedDateRange = () => {
+    if (totalTherapistNotes.length === 0) return { minDate: null, maxDate: null };
+
+    // Get the latest followup date
+    const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
+      const currentDate = new Date(current.noteDateTime);
+      const latestDate = new Date(latest.noteDateTime);
+      return currentDate > latestDate ? current : latest;
+    });
+
+    const latestDate = new Date(latestFollowup.noteDateTime);
+
+    // Calculate min date (15 days after latest followup)
+    const minDate = new Date(latestDate);
+    minDate.setDate(minDate.getDate() + 15);
+    minDate.setHours(0, 0, 0, 0);
+
+    // Calculate max date (17 days after latest followup)
+    const maxDate = new Date(latestDate);
+    maxDate.setDate(maxDate.getDate() + 17);
+    maxDate.setHours(23, 59, 59, 999);
+
+    return { minDate, maxDate, latestDate };
+  };
+
   return (
     <div className="bg-[#ffffff]  min-h-[calc(100vh-64px)]">
       <div className=" container">
         <div className="flex lg:px-8 sm:px-2  bg-[#ffffff] justify-between md:flex-row flex-col md:items-center">
           <div className="flex items-center gap-3">
-          
-             <div
-  className="p-4 w-fit bg-white rounded-full shadow-md cursor-pointer hover:shadow-lg transition"
-  onClick={() => navigate(-1)}
->
-  <FaArrowLeft className="text-gray-700" />
-</div>
+            <div
+              className="p-4 w-fit bg-white rounded-full shadow-md cursor-pointer hover:shadow-lg transition"
+              onClick={() => navigate(-1)}
+            >
+              <FaArrowLeft className="text-gray-700" />
+            </div>
 
             <div className="my-5 flex flex-col items-start" aria-label="Breadcrumb">
               <BreadCrumb
@@ -1120,7 +1219,8 @@ const handleDateTimeChange = (datas: string, type: string) => {
                 <p className="text-[#636363] font-medium">Admission Date & Time</p>
                 <p>
                   {patientDetails?.admissionDate && formatDate(patientDetails?.admissionDate)} @
-                  {patientDetails?.admissionDate && convertBackendDateToTime(patientDetails?.admissionDate)}
+                  {patientDetails?.admissionDate &&
+                    convertBackendDateToTime(patientDetails?.admissionDate)}
                 </p>
               </div>
             </div>
@@ -1243,15 +1343,32 @@ const handleDateTimeChange = (datas: string, type: string) => {
                               disabledDate={(current) => {
                                 if (!current) return false;
 
+                                const currentDate = current.toDate();
+                                currentDate.setHours(0, 0, 0, 0);
+
                                 const yesterday = new Date();
-                                yesterday.setDate(yesterday.getDate() - 1); // Set to yesterday
-                                yesterday.setHours(23, 59, 59, 999); // End of yesterday
+                                yesterday.setDate(yesterday.getDate() - 1);
+                                yesterday.setHours(23, 59, 59, 999);
 
-                                const currentDate = current.toDate(); // Convert from Moment to JS Date
-                                currentDate.setHours(0, 0, 0, 0); // normalize
+                                // Disable dates before yesterday
+                                if (currentDate < yesterday) {
+                                  return true;
+                                }
 
-                                // Disable if current date is before today (i.e., yesterday or earlier)
-                                return currentDate < yesterday;
+                                // If there are existing followups and this is a new entry (not editing)
+                                if (totalTherapistNotes.length > 0 && !data.id) {
+                                  const { minDate, maxDate } = getNextAllowedDateRange();
+
+                                  if (minDate && maxDate) {
+                                    // Enable only dates between minDate (15th day) and maxDate (17th day)
+                                    // Disable all other dates
+                                    return currentDate < minDate || currentDate > maxDate;
+                                  }
+                                }
+
+                                // If no existing followups, allow all future dates
+                                // Or if editing existing entry, allow the date
+                                return false;
                               }}
                               onChange={(date) => {
                                 handleDateTimeChange(date, "date");
@@ -1259,7 +1376,6 @@ const handleDateTimeChange = (datas: string, type: string) => {
                             >
                               <div className="flex items-center">
                                 {data?.noteDate && formateNormalDate(data.noteDate)}
-
                                 <div className="flex items-center justify-center w-5 mx-1 h-5">
                                   <img
                                     alt="calender"
@@ -2129,6 +2245,22 @@ const handleDateTimeChange = (datas: string, type: string) => {
                   <p className="text-[14px] font-semibold ml-3">All Records</p>
 
                   <div className="flex items-center justify-center gap-2">
+                    <DownloadFollowup
+                      patientDetails={state}
+                      aid={aId}
+                      id={id}
+                      button={
+                        <Button
+                          type="submit"
+                          variant="outlined"
+                          size="base"
+                          className="flex text-xs! py-2! border-[#D4D4D4]! border! rounded-lg! text-[#505050]"
+                        >
+                          <BsFiletypePdf className="mr-2" size={18} />
+                          Download
+                        </Button>
+                      }
+                    />
                     <DateRange>
                       <Button
                         variant="outlined"
@@ -2154,11 +2286,15 @@ const handleDateTimeChange = (datas: string, type: string) => {
                     <tr className="text-[#505050]  font-medium">
                       <th className="pl-7 py-3 w-1/9 text-xs">Date & Time</th>
                       <th className="px-2 py-3 w-1/9 text-xs">Therapist</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Current Status</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Medication Adherence</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Attending Meeting</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Making a sponsor</th>
+                      {state.illnessType !== "Mental Disorder" && (
+                        <>
+                          <th className="px-2 py-3 w-1/9 text-xs">Current Status</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Medication Adherence</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Attending Meeting</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Making a sponsor</th>
+                        </>
+                      )}
                       {/* <th className="px-2 py-3 w-1/9 text-xs">Urge</th>
                       <th className="px-2 py-3 w-1/9 text-xs">Prayer</th>
                       <th className="px-2 py-3 w-1/9 text-xs">Literature</th>
@@ -2190,11 +2326,16 @@ const handleDateTimeChange = (datas: string, type: string) => {
                           <td className="px-2 py-7 w-1/9 ">
                             {value.therapistId.firstName} {value.therapistId.lastName}
                           </td>
-                          <td className="px-2 py-7 w-1/9 ">{value.currentStatus || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.adherence || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.meeting || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.sponsor || "--"}</td>
+                          {state.illnessType !== "Mental Disorder" && (
+                            <>
+                              <td className="px-2 py-7 w-1/9 ">{value.adherence || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">
+                                {value.feedbackFromFamily || "--"}
+                              </td>
+                              <td className="px-2 py-7 w-1/9 ">{value.meeting || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">{value.sponsor || "--"}</td>
+                            </>
+                          )}
                           {/* <td className="px-2 py-7 w-1/9 ">{value.urge || "--"}</td>
                           <td className="px-2 py-7 w-1/9 ">{value.prayer || "--"}</td>
                           <td className="px-2 py-7 w-1/9 ">{value.literature || "--"}</td>
@@ -2279,6 +2420,18 @@ const handleDateTimeChange = (datas: string, type: string) => {
                                       </div>
                                       <hr />
                                       <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
+                                        <DownloadFollowup
+                                          patientDetails={state}
+                                          singleFollowup={value} // Pass the single followup record
+                                          button={
+                                            <div className="flex items-center cursor-pointer">
+                                              <p>Download</p>
+                                            </div>
+                                          }
+                                        />
+                                      </div>
+                                      <hr />
+                                      <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
                                         <div
                                           onClick={() => {
                                             toggleFunctionType(value, "delete");
@@ -2309,6 +2462,47 @@ const handleDateTimeChange = (datas: string, type: string) => {
           </div>
         </div>
       </div>
+
+      {/* Followup Restriction Modal */}
+      <Modal
+        isOpen={showFollowupRestrictionModal}
+        onClose={() => setShowFollowupRestrictionModal(false)}
+        title="Follow-up Date Not Allowed"
+        className="max-w-md"
+      >
+        <div className="p-4">
+          <div className="text-center mb-4">
+            <div className="w-16 h-16 mx-auto mb-3 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Selected Date Not Allowed</h3>
+            <p className="text-xs text-gray-500">
+              Selected date: {data.noteDate && formateNormalDate(data.noteDate)}
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setShowFollowupRestrictionModal(false)}
+              className="bg-[#575F4A] text-white px-6 py-2 rounded-lg"
+            >
+              OK
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       <DeleteConfirm
         toggleModal={toggleModal}
         isModalOpen={dropDownsState.isModalOpen}
