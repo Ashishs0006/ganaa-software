@@ -29,7 +29,7 @@ import {
   Input,
   Loader,
   RichTextEditor,
-  Select
+  Select,DropDown
 } from "@/components";
 import kabab from "@/assets/images/kebab-menu.svg";
 
@@ -155,6 +155,7 @@ const Discharge = () => {
   const [data, setData] = useState({
     chiefComplaints: "",
     historyOfPresentIllness: "",
+     diagnosticFormulation:"",
     physicalExaminationAtAdmission: "",
     mentalStatusExamination: "",
     hospitalisationSummary: "",
@@ -162,7 +163,11 @@ const Discharge = () => {
     prescriptionMedicine: [],
     referBackTo: "",
     conditionAtTheTimeOfDischarge: { label: "Select", value: "" },
-    adviseAndPlan: ""
+    adviseAndPlan: "",
+    PsychologistNotes:"",
+    PsychiatricNotes:"",
+    mentalStatusExaminationatDischarge:""
+
   });
 
   const [prescriptionDateTime, setPrescriptionDateTime] = useState<string>();
@@ -170,6 +175,7 @@ const Discharge = () => {
   const [data1, setData1] = useState({
     chiefComplaints: "",
     historyOfPresentIllness: "",
+     diagnosticFormulation:"",
     physicalExaminationAtAdmission: "",
     mentalStatusExamination: "",
     hospitalisationSummary: "",
@@ -177,7 +183,10 @@ const Discharge = () => {
     prescriptionMedicine: [],
     referBackTo: "",
     conditionAtTheTimeOfDischarge: { label: "", value: "" },
-    adviseAndPlan: ""
+    adviseAndPlan: "",
+     PsychologistNotes:"",
+    PsychiatricNotes:"",
+    mentalStatusExaminationatDischarge:""
   });
 
   const [deleteModal, setDeleteModal] = useState<{ isModal: boolean; id?: number }>({
@@ -200,10 +209,11 @@ const Discharge = () => {
     if (id && aId) {
       try {
         const familyDetailsResponse = await getPatientFamily(id);
-
+      
         setFamilyDetails(familyDetailsResponse.data.data);
 
         const { data: patientData } = await getSinglePatient(id);
+        console.log("patient data is :", patientData)
         setPatientDetails((prevData) => ({
           ...prevData,
           gender: patientData?.data?.gender,
@@ -221,12 +231,14 @@ const Discharge = () => {
         }));
 
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
+        console.log("patient admission histoy",patientAdmissionHistory)
 
         if (patientAdmissionHistory?.data?._id && patientData?.data?._id) {
           const { data: dischargeData } = await getDischarge(
             patientData.data?._id,
             patientAdmissionHistory.data?._id
           );
+          console.log("dicharge Data is :",dischargeData)
           setPatientDetails((prevData) => ({
             ...prevData,
             shouldSendfeedbackNotification: dischargeData?.data?.shouldSendfeedbackNotification,
@@ -237,6 +249,9 @@ const Discharge = () => {
               : "",
             dischargeStatus: dischargeData?.data?.status,
             admissionType: patientAdmissionHistory?.data?.admissionType,
+            PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
+  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+  mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
             involuntaryAdmissionType: patientAdmissionHistory?.data?.involuntaryAdmissionType,
             doctor: `${
               patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName || ""
@@ -289,9 +304,10 @@ const Discharge = () => {
             ...prevData,
             chiefComplaints: dischargeData?.data?.chiefComplaints || "",
             historyOfPresentIllness: dischargeData?.data?.historyOfPresentIllness || "",
+            diagnosticFormulation:dischargeData?.data.diagnosticFormulation || "",
             physicalExaminationAtAdmission:
               dischargeData?.data?.physicalExaminationAtAdmission || "",
-            mentalStatusExamination: dischargeData?.data?.mentalStatusExamination || "",
+         
             hospitalisationSummary: dischargeData?.data?.hospitalisationSummary || "",
             investigation: dischargeData?.data?.investigation || "",
             referBackTo: dischargeData?.data?.referBackTo || "",
@@ -299,7 +315,10 @@ const Discharge = () => {
               label: dischargeData?.data?.conditionAtTheTimeOfDischarge || "",
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
-            adviseAndPlan: dischargeData?.data?.adviseAndPlan || ""
+            adviseAndPlan: dischargeData?.data?.adviseAndPlan || "",
+            PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
+  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+    mentalStatusExaminationatDischarge:dischargeData?.data?.    mentalStatusExaminationatDischarge || "",
           }));
           setPrescriptionDateTime(dischargeData?.data?.prescriptionDateTime || "");
           const prescriptionMedicineUpdate =
@@ -328,7 +347,8 @@ const Discharge = () => {
             historyOfPresentIllness: dischargeData?.data?.historyOfPresentIllness || "",
             physicalExaminationAtAdmission:
               dischargeData?.data?.physicalExaminationAtAdmission || "",
-            mentalStatusExamination: dischargeData?.data?.mentalStatusExamination || "",
+                  diagnosticFormulation:dischargeData?.data.diagnosticFormulation || "",
+        
             hospitalisationSummary: dischargeData?.data?.hospitalisationSummary || "",
             investigation: dischargeData?.data?.investigation || "",
             referBackTo: dischargeData?.data?.referBackTo || "",
@@ -337,7 +357,10 @@ const Discharge = () => {
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
             adviseAndPlan: dischargeData?.data?.adviseAndPlan || "",
-            prescriptionMedicine: prescriptionMedicineUpdate
+            prescriptionMedicine: prescriptionMedicineUpdate,
+            PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
+  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+    mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
           }));
         }
         setLoading(false);
@@ -382,8 +405,13 @@ const Discharge = () => {
       ...updateData,
       prescriptionDateTime: prescriptionDateTime,
       conditionAtTheTimeOfDischarge: data.conditionAtTheTimeOfDischarge.value,
-      prescriptionMedicine: formatPrescription
+      prescriptionMedicine: formatPrescription,
+      PsychologistNotes: data.PsychologistNotes,
+    PsychiatricNotes: data.PsychiatricNotes,
+        mentalStatusExaminationatDischarge:data.mentalStatusExaminationatDischarge
+    
     };
+    console.log("hii the update payload is :", payload)
 
     if (Object.keys(payload).length === 0) return;
     return updateDischarge(
@@ -773,23 +801,35 @@ const Discharge = () => {
               label="Chief complaints"
             />
             <RichTextEditor
-              name="historyOfPresentIllness"
-              value={data.historyOfPresentIllness}
+              name="diagnosticformulation"
+              value={data.diagnosticFormulation}
               onChange={handleChangeQuill}
-              label="History of presenting illness"
+              label="Diagnostic Formulation"
             />
+          
             <RichTextEditor
-              name="physicalExaminationAtAdmission"
-              value={data.physicalExaminationAtAdmission}
+              name="mentalStatusExaminationatdisharge"
+              value={data.mentalStatusExaminationatDischarge}
               onChange={handleChangeQuill}
-              label="Physical Examination at admission"
+              label="Mental Status Examination at Discharge"
             />
-            <RichTextEditor
-              name="mentalStatusExamination"
-              value={data.mentalStatusExamination}
-              onChange={handleChangeQuill}
-              label="Mental Status Examination"
-            />
+            <DropDown heading="Hospitalization summary">
+  <div className="flex flex-col gap-4">
+    <RichTextEditor
+      name="psychologistnotes"
+      value={data.PsychologistNotes}
+      onChange={handleChangeQuill}
+      label="Psychologist Notes"
+    />
+    <RichTextEditor
+      name="psychiatricnotes"
+      value={data.PsychiatricNotes}
+      onChange={handleChangeQuill}
+      label="Psychiatric Notes"
+    />
+  </div>
+</DropDown>
+
             <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
               <div className="flex-1 w-1/2">
                 <div className="mb-4 flex flex-col space-x-2">

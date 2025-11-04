@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Collections from '../../constant/collections';
 import { IPatientDischarge } from '../../interfaces/model/patient/i.patient.discharge';
+import PatientCaseHistory from '../patient/patient.case.history.model'; // 👈 added
 
 const patientDischargeSchema = new mongoose.Schema<IPatientDischarge>({
   patientId: {
@@ -25,16 +26,21 @@ const patientDischargeSchema = new mongoose.Schema<IPatientDischarge>({
   reason: String,
   conditionAtTheTimeOfDischarge: {
     type: String,
-    enum: ['Status Quo', 'Partially Improved', 'Improved', ''],
+    enum: ['Minimal imporved', 'Partially Improved', 'Improved', ''],
   },
   shouldSendfeedbackNotification: Boolean,
 
   chiefComplaints: String,
+
   historyOfPresentIllness: String,
+  diagnosticFormulation: String, 
   physicalExaminationAtAdmission: String,
   mentalStatusExamination: String,
   hospitalisationSummary: String,
   investigation: String,
+  PsychologistNotes: String,
+    PsychiatricNotes:String,
+mentalStatusExaminationatDischarge: String,
 
   prescriptionDateTime: {
     type: Date,
@@ -68,13 +74,17 @@ const patientDischargeSchema = new mongoose.Schema<IPatientDischarge>({
   },
 });
 
+// ----------------------
+// Pre Middlewares
+// ----------------------
+
 patientDischargeSchema.pre('findOne', async function (next) {
   const skipMedicine = this.getOptions().skipMedicine ?? false;
   const skipUserInfo = this.getOptions().skipUserInfo ?? false;
 
   if (!skipMedicine) this.populate('prescriptionMedicine.medicine');
-
   if (!skipUserInfo) this.populate('createdBy', '_id roleId firstName lastName');
+
   next();
 });
 
@@ -83,8 +93,8 @@ patientDischargeSchema.pre('find', async function (next) {
   const skipUserInfo = this.getOptions().skipUserInfo ?? false;
 
   if (!skipMedicine) this.populate('prescriptionMedicine.medicine');
-
   if (!skipUserInfo) this.populate('createdBy', '_id roleId firstName lastName');
+
   next();
 });
 
@@ -93,11 +103,36 @@ patientDischargeSchema.pre('findOneAndUpdate', async function (next) {
   const skipUserInfo = this.getOptions().skipUserInfo ?? false;
 
   if (!skipMedicine) this.populate('prescriptionMedicine.medicine');
-
   if (!skipUserInfo) this.populate('createdBy', '_id roleId firstName lastName');
+
   next();
 });
 
+// ----------------------
+// Post Middleware — Attach DiagnosticFormulation
+// ----------------------
+patientDischargeSchema.post('findOne', async function (doc) {
+  if (!doc) return;
+
+  try {
+    const caseHistory = await PatientCaseHistory.findOne({
+      patientAdmissionHistoryId: doc.patientAdmissionHistoryId,
+    }).lean();
+
+ if (!doc.diagnosticFormulation && caseHistory?.diagnosticFormulation) {
+  const diag = caseHistory.diagnosticFormulation;
+
+  doc.diagnosticFormulation = `
+    ${diag.description || ''}
+  `.replace(/\s+/g, ' ').trim();
+}
+
+  } catch (err) {
+    console.error('Error attaching diagnosticFormulation:', err);
+  }
+});
+
+// ----------------------
 const PatientDischarge = mongoose.model<IPatientDischarge>(
   Collections.patientDischarge.name,
   patientDischargeSchema

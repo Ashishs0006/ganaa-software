@@ -863,7 +863,7 @@ const InpatientData = () => {
                   { label: "Select", value: "" },
                   { label: "Improved", value: "Improved" },
                   { label: "Partially Improved", value: "Partially Improved" },
-                  { label: "Status Quo", value: "Status Quo" }
+                  { label: "Minimal Improved", value: "Minimal imporved" }
                 ]}
                 onChange={(name, value) => {
                   setDischargeState((prev) => ({ ...prev, [name]: value }));

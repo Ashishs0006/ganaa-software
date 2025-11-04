@@ -47,6 +47,7 @@ export const getSinglePatientDischarge = catchAsync(
       .lean();
 
     const data = await PatientDischarge.findOne({ _id: admissionHistory.dischargeId }).lean();
+    
 
     res.status(200).json({
       status: 'success',
@@ -96,6 +97,8 @@ export const createNewPatientDischarge = catchAsync(
       investigation: caseHistory?.diagnosticFormulation?.investigations,
       prescriptionDateTime: prescription?.noteDateTime,
       prescriptionMedicine: prescription?.medicinesInfo,
+        PsychologistNotes: req.body.PsychologistNotes || "",
+  PsychiatricNotes: req.body.PsychiatricNotes || "",
     });
     const populatedData = await PatientDischarge.findById(data._id).lean();
 
@@ -124,7 +127,8 @@ export const createNewPatientDischarge = catchAsync(
 
 export const updateSinglePatientDischarge = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    if (!req.params.patientId) return next(new AppError('Patient in Params is Mandatory', 400));
+    if (!req.params.patientId)
+      return next(new AppError('Patient in Params is Mandatory', 400));
     if (!req.params.admissionHistoryId)
       return next(new AppError('Patient Admission History in Params is Mandatory', 400));
 
@@ -132,24 +136,46 @@ export const updateSinglePatientDischarge = catchAsync(
       _id: req.params.admissionHistoryId,
       patientId: req.params.patientId,
     })
-      .setOptions({
-        skipUrlGeneration: true,
-        shouldSkip: true,
-      })
+      .setOptions({ skipUrlGeneration: true, shouldSkip: true })
       .lean();
+
     if (!admissionHistory)
       return next(new AppError('Invalid Patient ID or Admission History ID', 400));
     if (!admissionHistory?.dischargeId)
       return next(new AppError("Discharge hasn't been created yet", 400));
-    
-    // if (admissionHistory?.currentStatus === 'Discharged')
-    //   return next(new AppError('Cannot update, patient is already discharged', 400));
 
-    if (req.body.createdBy) delete req.body.createdBy;
-    if (req.body.patientId) delete req.body.patientId;
-    if (req.body.patientAdmissionHistoryId) delete req.body.patientAdmissionHistoryId;
+ 
+    // prevent unwanted fields
+    delete req.body.createdBy;
+    delete req.body.patientId;
+    delete req.body.patientAdmissionHistoryId;
 
-    await PatientDischarge.findByIdAndUpdate(admissionHistory?.dischargeId, req.body);
+    // ✅ fix diagnostic field name mismatch
+    if (req.body.diagnosticformulation) {
+      req.body.diagnosticFormulation = req.body.diagnosticformulation;
+      delete req.body.diagnosticformulation;
+    }
+    if (req.body.psychologistnotes) {
+  req.body.PsychologistNotes = req.body.psychologistnotes;
+  delete req.body.psychologistnotes;
+}
+
+if (req.body.psychiatricnotes) {
+  req.body.PsychiatricNotes = req.body.psychiatricnotes;
+  delete req.body.psychiatricnotes;
+}
+if (req.body.mentalStatusExaminationatdisharge) {
+  req.body.mentalStatusExaminationatDischarge = req.body.mentalStatusExaminationatdisharge;
+  delete req.body.mentalStatusExaminationatdisharge;
+}
+    console.log("req body is :", req.body)
+
+    const updatedata = await PatientDischarge.findByIdAndUpdate(
+      admissionHistory?.dischargeId,
+      req.body,
+      { new: true }
+    );
+console.log("updatedata is:", updatedata)
     const populatedData = await PatientDischarge.findById(admissionHistory?.dischargeId).lean();
 
     res.status(200).json({
@@ -158,6 +184,7 @@ export const updateSinglePatientDischarge = catchAsync(
     });
   }
 );
+
 
 export const dischargePatient = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {

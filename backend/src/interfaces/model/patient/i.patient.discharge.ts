@@ -18,10 +18,14 @@ export interface IPatientDischarge extends mongoose.Document {
 
   chiefComplaints?: string;
   historyOfPresentIllness?: string;
+  diagnosticFormulation?: String,
   physicalExaminationAtAdmission?: string;
   mentalStatusExamination?: string;
   hospitalisationSummary?: string;
   investigation?: string;
+   PsychologistNotes?: String,
+    PsychiatricNotes?:String,
+   mentalStatusExaminationatDischarge?: String,
 
   prescriptionDateTime?: Date;
   prescriptionMedicine?: IPrescriptionMedicine[];
