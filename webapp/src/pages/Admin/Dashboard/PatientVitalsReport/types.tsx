@@ -37,7 +37,7 @@ interface ITherapistNotes {
   patientAdmissionHistoryId: string;
   noteDateTime: string;
   note: string;
-  therapistId: string | IUser;
+  therapistId: IUser;
   sessionType: string;
   score: string;
   subSessionType: string;

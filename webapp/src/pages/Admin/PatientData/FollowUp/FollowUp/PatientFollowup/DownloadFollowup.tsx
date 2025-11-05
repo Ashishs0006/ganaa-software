@@ -7,7 +7,7 @@ import { Loader } from "@/components";
 import moment from "moment";
 import pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
-import { IPatientState, IPatientFollowup } from "@/pages/Admin/PatientData/FollowUp/types";
+import { IPatientState, IPatientFollowup } from "@/pages/Admin/PatientData/FollowUp/FollowUp/types";
 import { getAllPatientFollowup } from "@/apis";
 import handleError from "@/utils/handleError";
 

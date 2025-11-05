@@ -75,7 +75,7 @@ const DailyReport = () => {
 
       // If a valid centerId is found, filter centerData to match that centerId
       if (centerIdWithDischarges) {
-        const currentCenter = centerData.data.filter((cen) => cen._id === centerIdWithDischarges);
+        const currentCenter = centerData.data.filter((cen:any) => cen._id === centerIdWithDischarges);
         setCenter(currentCenter);
       }
     } catch (err) {

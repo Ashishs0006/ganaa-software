@@ -19,7 +19,6 @@ import { capitalizeFirstLetter, formatDate, formatId } from "@/utils/formater";
 // TODO: for now
 import { checkRegPending } from "@/utils/checkRegPending";
 import { IPatient, IState } from "@/pages/Admin/PatientData/AllPatientData/types";
-import toast from "react-hot-toast";
 import { TableShimmer } from "@/components/Shimmer/Shimmer";
 import Search from "@/components/Search/Search";
 import Filter from "@/components/Filter/Filter";

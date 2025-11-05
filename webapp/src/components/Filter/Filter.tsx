@@ -51,8 +51,8 @@ const Filter = ({
   selected = "All",
   setSelected
 }: {
-  selected: string;
-  setSelected: (_values: string) => void;
+  selected?: string;
+  setSelected?: (_values: string) => void;
 }) => {
   const { auth } = useAuth();
 
@@ -77,11 +77,11 @@ const Filter = ({
       <SingleSelect
         options={centerDropdown}
         selectedValue={selected}
-        onChange={setSelected}
+        onChange={setSelected ?? (() => {})}
         placeholder={centerDropdown?.length > 1 ? "All" : centerDropdown[0]?.label}
       />
     </>
   );
 };
 
-export default Filter;
+export default Filter;

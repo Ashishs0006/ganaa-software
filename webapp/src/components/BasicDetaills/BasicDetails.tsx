@@ -6,9 +6,13 @@ import toast from "react-hot-toast";
 import { LuUserRound } from "react-icons/lu";
 
 import { RootState } from "@/redux/store/store";
-import { setPatientAdmission, setPatientDetails } from "@/redux/slice/patientSlice";
+import {
+  IPatientDetails,
+  setPatientAdmission,
+  setPatientDetails
+} from "@/redux/slice/patientSlice";
 import { setDiscardModal, setStepper } from "@/redux/slice/stepperSlice";
-import { updatePatient } from "@/apis";
+import { updatePatient, updateSinglePatinetAdmissionHistory } from "@/apis";
 
 import {
   Button,
@@ -28,11 +32,7 @@ import clock from "@/assets/images/clock.svg";
 
 import { BasicDetailsState } from "@/components/BasicDetaills/types";
 import { ISelectOption } from "@/components/Select/types";
-import {
-  createSinglePatientResources,
-  existPatient,
-  getSinglePatient,
-} from "@/apis";
+import { createSinglePatientResources, existPatient, getSinglePatient } from "@/apis";
 import handleError from "@/utils/handleError";
 import compareObjects from "@/utils/compareObjects";
 
@@ -51,9 +51,9 @@ import {
 } from "@/validations/Yup/BasicDetailValidation";
 import { useAuth } from "@/providers/AuthProvider";
 
-const isFile = (item: any): item is File => {
-  return item instanceof File;
-};
+// const isFile = (item: any): item is File => {
+//   return item instanceof File;
+// };
 
 const BasicDetails = () => {
   const { auth } = useAuth();
@@ -62,11 +62,10 @@ const BasicDetails = () => {
   const [uhid, setUhid] = useState<string>();
 
   const [idProofFiles, setIdProofFiles] = useState<File[]>([]);
-  const [patientIdProofUrls, setIdProofUrls] = useState<string[]>([]); // uploaded or fetched URLs
+  // const [patientIdProofUrls, setIdProofUrls] = useState<string[]>([]); // uploaded or fetched URLs
   const [idProofError, setIdProofError] = useState<string>("");
 
   const patientData = useSelector((store: RootState) => store.patient);
-  console.log("patientData: ", patientData);
   const stepperData = useSelector((store: RootState) => store.stepper);
   const dropdownData = useSelector((store: RootState) => store.dropdown);
 
@@ -118,7 +117,7 @@ const BasicDetails = () => {
       setState((prev) => {
         return {
           ...prev,
-          ...patientData.patientDetails
+          ...(patientData.patientDetails as Partial<BasicDetailsState>)
         };
       });
     }
@@ -161,7 +160,7 @@ const BasicDetails = () => {
       idProof: [...(prev.idProof || []), ...validFiles]
     }));
     setIdProofError("");
-    setIdProofUrls([]); // reset URLs if uploading new ones
+    // setIdProofUrls([]); // reset URLs if uploading new ones
   };
 
   const handleDeleteIdProof = (index: number) => {
@@ -174,7 +173,8 @@ const BasicDetails = () => {
     } else {
       // Delete from stored URLs (adjust index for URL array)
       const urlIndex = index - idProofFiles.length;
-      setIdProofUrls((prev) => prev.filter((_, i) => i !== urlIndex));
+      console.log("urlIndex", urlIndex);
+      // setIdProofUrls((prev) => prev.filter((_, i) => i !== urlIndex));
     }
 
     // Update the state.idProof array
@@ -186,40 +186,40 @@ const BasicDetails = () => {
     }));
   };
 
-useEffect(() => {
-  const id = patientData.patientDetails._id;
-  if (typeof id === "string" && id.trim() !== "") {
-    (async () => {
-      try {
-        const response = await getSinglePatient(id);
-        const patient = response.data.data;
+  useEffect(() => {
+    const id = patientData.patientDetails._id;
+    if (typeof id === "string" && id.trim() !== "") {
+      (async () => {
+        try {
+          const response = await getSinglePatient(id);
+          const patient = response.data.data;
 
-        // Only update ID proof related data, not the entire form state
-        if (patient.idProof || patient.patientIdProofUrls) {
-          const idProofUrls = Array.isArray(patient.idProof)
-            ? patient.idProof
-            : Array.isArray(patient.patientIdProofUrls)
-            ? patient.patientIdProofUrls
-            : [];
+          // Only update ID proof related data, not the entire form state
+          if (patient.idProof || patient.patientIdProofUrls) {
+            const idProofUrls = Array.isArray(patient.idProof)
+              ? patient.idProof
+              : Array.isArray(patient.patientIdProofUrls)
+              ? patient.patientIdProofUrls
+              : [];
 
-          setIdProofUrls(idProofUrls);
-          
-          // Update only ID proof in the state without affecting other fields
-          setState((prev) => ({
-            ...prev,
-            idProof: idProofUrls
-          }));
+            // setIdProofUrls(idProofUrls);
+
+            // Update only ID proof in the state without affecting other fields
+            setState((prev) => ({
+              ...prev,
+              idProof: idProofUrls
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching patient:", error);
         }
-      } catch (error) {
-        console.error("Error fetching patient:", error);
-      }
-    })();
-  }
-}, [patientData.patientDetails._id]);
+      })();
+    }
+  }, [patientData.patientDetails._id]);
 
   useEffect(() => {
     if (patientData.patientDetails.idProof) {
-      setIdProofUrls(patientData.patientDetails.idProof);
+      // setIdProofUrls(patientData.patientDetails.idProof);
     }
   }, [patientData.patientDetails.idProof]);
 
@@ -332,15 +332,25 @@ useEffect(() => {
 
   const updatePateintData = (pid: string) => {
     const formData = new FormData();
-    const states = compareObjects(
-      patientData?.patientDetails,
+    // const states = compareObjects(
+    //   patientData?.patientDetails,
+    //   {
+    //     ...state,
+    //     patientPic: "",
+    //     idProof: undefined
+    //   },
+    //   true
+    // );
+    const states = compareObjects<Partial<IPatientDetails>>(
+      patientData?.patientDetails as Partial<IPatientDetails>,
       {
         ...state,
         patientPic: "",
         idProof: undefined
-      },
+      } as unknown as Partial<IPatientDetails>,
       true
     );
+
     if (states.firstName !== undefined)
       formData.append(
         "firstName",
@@ -572,7 +582,7 @@ useEffect(() => {
                 patientId: patientResponse?.data?.data?._id,
                 dateOfAdmission,
                 time,
-              involuntaryAdmissionType:
+                involuntaryAdmissionType:
                   admissionType === "Involuntary"
                     ? involuntaryAdmissionType
                     : { value: "", label: "" },
@@ -661,7 +671,7 @@ useEffect(() => {
                 patientId: patientResponse?.data?.data?._id,
                 dateOfAdmission,
                 time,
-               involuntaryAdmissionType:
+                involuntaryAdmissionType:
                   admissionType === "Involuntary"
                     ? involuntaryAdmissionType
                     : { value: "", label: "" },
@@ -840,7 +850,7 @@ useEffect(() => {
                 ...patientData.patientAdmission,
                 _id: admissionReponse?.data?.data?._id,
                 dateOfAdmission,
-                 involuntaryAdmissionType:
+                involuntaryAdmissionType:
                   admissionType === "Involuntary"
                     ? involuntaryAdmissionType
                     : { value: "", label: "" },
@@ -869,7 +879,7 @@ useEffect(() => {
                 patientId: patientResponse?.data?.data?._id,
                 dateOfAdmission,
                 time,
-                 involuntaryAdmissionType:
+                involuntaryAdmissionType:
                   admissionType === "Involuntary"
                     ? involuntaryAdmissionType
                     : { value: "", label: "" },

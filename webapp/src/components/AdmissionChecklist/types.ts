@@ -19,7 +19,7 @@ export interface IisAdmissionChecklist {
   iscapacityAssessment: boolean;
   ishospitalGuidelineForm: boolean;
   isfinacialCounselling: boolean;
-  isadmissionAssessment: boolean;
+  isadmissionAssessment?: boolean;
 }
 
 export interface IAdmissionChecklistArray {

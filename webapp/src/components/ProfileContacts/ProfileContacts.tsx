@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { MdDelete } from "react-icons/md";
 import { RootState } from "@/redux/store/store";
-import { setPatientDetails } from "@/redux/slice/patientSlice";
+import { IPatientDetails, setPatientDetails } from "@/redux/slice/patientSlice";
 import { setDiscardModal, setStepper } from "@/redux/slice/stepperSlice";
 import {
   updatePatient,
@@ -203,7 +203,7 @@ const ProfileContacts = () => {
       patientData.patientDetails,
       {
         ...state
-      },
+      } as unknown as Partial<IPatientDetails>,
       true
     );
 

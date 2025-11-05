@@ -212,12 +212,12 @@ const AdmissionChecklist = () => {
           patientData.patientAdmission.isinVoluntaryAdmissionForm || false,
         isminorAdmissionForm: patientData.patientAdmission.isminorAdmissionForm || false,
         isform90: patientData.patientAdmission.isform90 ?? false,
-        isfamilyDeclaration: patientData.patientAdmission.isfamilyDeclaration || false,
+        // isfamilyDeclaration: patientData.patientAdmission.isfamilyDeclaration || false,
         issection94: patientData.patientAdmission.issection94 || false,
         iscapacityAssessment: patientData.patientAdmission.iscapacityAssessment || false,
         isfamilyDeclaration: patientData.patientAdmission.isfamilyDeclaration || false,
-        issection94: patientData.patientAdmission.issection94 || false,
-        iscapacityAssessment: patientData.patientAdmission.iscapacityAssessment || false,
+        // issection94: patientData.patientAdmission.issection94 || false,
+        // iscapacityAssessment: patientData.patientAdmission.iscapacityAssessment || false,
         // FIX: Set based on actual files
         isadmissionAssessment: admissionAssessmentFiles.length > 0,
         ishospitalGuidelineForm: patientData.patientAdmission.ishospitalGuidelineForm || false,
@@ -596,9 +596,9 @@ const AdmissionChecklist = () => {
             familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
             section94Link: delteData?.data?.data?.admissionChecklist?.section94,
             capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
-            familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
-            section94Link: delteData?.data?.data?.admissionChecklist?.section94,
-            capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
+            // familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
+            // section94Link: delteData?.data?.data?.admissionChecklist?.section94,
+            // capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
             admissionAssessmentLink: delteData?.data?.data?.admissionChecklist?.admissionAssessment,
             hospitalGuidelineFormLink:
               delteData?.data?.data?.admissionChecklist?.hospitalGuidelineForm,
@@ -715,9 +715,9 @@ const AdmissionChecklist = () => {
               familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
               section94Link: delteData?.data?.data?.admissionChecklist?.section94,
               capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
-              familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
-              section94Link: delteData?.data?.data?.admissionChecklist?.section94,
-              capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
+              // familyDeclarationLink: delteData?.data?.data?.admissionChecklist?.familyDeclaration,
+              // section94Link: delteData?.data?.data?.admissionChecklist?.section94,
+              // capacityAssessmentLink: delteData?.data?.data?.admissionChecklist?.capacityAssessment,
               admissionAssessmentLink:
                 delteData?.data?.data?.admissionChecklist?.admissionAssessment,
               hospitalGuidelineFormLink:
@@ -887,7 +887,7 @@ const AdmissionChecklist = () => {
             {checklist.map((data: { title: string; name: string }) => (
               <CheckBox
                 handleDeletes={handleDelete}
-                checked={isAdmissionChecklist[`is${data?.name}` as keyof IisAdmissionChecklist]}
+                checked={isAdmissionChecklist[`is${data?.name}` as keyof IisAdmissionChecklist] ?? false}
                 files={admissionChecklist[data?.name as keyof typeof admissionChecklist]}
                 filesString={
                   admissionChecklistLink[`${data?.name}Link` as keyof typeof admissionChecklistLink]
@@ -905,7 +905,7 @@ const AdmissionChecklist = () => {
             {list.map((data: { title: string; name: string }) => (
               <CheckBox
                 handleDeletes={handleDelete}
-                checked={isAdmissionChecklist[`is${data?.name}` as keyof IisAdmissionChecklist]}
+                checked={isAdmissionChecklist[`is${data?.name}` as keyof IisAdmissionChecklist] ?? false}
                 filesString={
                   admissionChecklistLink[`${data?.name}Link` as keyof typeof admissionChecklistLink]
                 }

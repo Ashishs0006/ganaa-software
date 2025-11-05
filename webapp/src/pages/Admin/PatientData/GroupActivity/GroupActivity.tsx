@@ -17,7 +17,7 @@ import { capitalizeFirstLetter, formatId } from "@/utils/formater";
 import toast from "react-hot-toast";
 import handleError from "@/utils/handleError";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TableShimmer } from "@/components/Shimmer/Shimmer";
 import messageIcon from "@/assets/images/messageIcon.svg";
 import messageIcondisbale from "@/assets/images/messageIconDisable.svg";
@@ -33,7 +33,6 @@ const GroupActivity = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selected, setSelected] = useState("All");
-  console.log("✌️selected --->", selected);
   const { auth } = useAuth();
 
   const [loaData, setLoaData] = useState<string[]>([]);
@@ -314,8 +313,8 @@ const GroupActivity = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dropdownData, state.activityDateTime, selected]);
 
-  const [horizontalPosition, setHorizontalPosition] = useState<"left" | "right">("right");
-  const [position, setPosition] = useState<"top" | "bottom">("bottom");
+  // const [horizontalPosition, setHorizontalPosition] = useState<"left" | "right">("right");
+  // const [position, setPosition] = useState<"top" | "bottom">("bottom");
 
   // const handleCheckboxChange = async (
   //   rowIdx: number,
@@ -361,6 +360,7 @@ const handleCheckboxChange = async (
   patient: IData,
   cell: IActivity
 ) => {
+  console.log('cell', cell);
   const updatedData = [...data];
   const current = updatedData[rowIdx];
   if (!current.activity || !current.activity[colIdx]) return;
@@ -445,25 +445,25 @@ const handleCheckboxChange = async (
 
   useEffect(() => {
     if (inputBoxRef.current) {
-      const rect = inputBoxRef.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      const spaceRight = window.innerWidth - rect.left;
-      const spaceLeft = rect.right;
+      // const rect = inputBoxRef.current.getBoundingClientRect();
+      // const spaceBelow = window.innerHeight - rect.bottom;
+      // const spaceAbove = rect.top;
+      // const spaceRight = window.innerWidth - rect.left;
+      // const spaceLeft = rect.right;
 
       // Vertical position
-      if (spaceBelow < 500 && spaceAbove > spaceBelow) {
-        setPosition("top");
-      } else {
-        setPosition("bottom");
-      }
+      // if (spaceBelow < 500 && spaceAbove > spaceBelow) {
+      //   setPosition("top");
+      // } else {
+      //   setPosition("bottom");
+      // }
 
       // Horizontal position
-      if (spaceRight < 550 && spaceLeft > spaceRight) {
-        setHorizontalPosition("right");
-      } else {
-        setHorizontalPosition("left");
-      }
+      // if (spaceRight < 550 && spaceLeft > spaceRight) {
+      //   setHorizontalPosition("right");
+      // } else {
+      //   setHorizontalPosition("left");
+      // }
     }
   }, [hoveredIndex, hoveredIndexTab]);
 

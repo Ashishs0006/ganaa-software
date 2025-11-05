@@ -33,33 +33,33 @@ export interface IPatientState {
   illnessType?: string;
 
   // Add these missing fields:
-  // center?: string;
-  // patientName: string;
-  // age?: string;
-  // contact?: string;
-  // address?: string;
-  // admissionType?: string;
-  // involuntaryAdmissionType?: string;
-  // doctor?: string;
-  // therapist?: string;
-  // dischargeDate?: string;
-  // dischargeStatus?: string;
-  // nominatedRepresentative?: string;
-  // currentStatus?: string;
-  // stayDuration?: string;
-  // dischargePlan?:string;
-  // psychologist?:string;
-  // followupDate?:string;
-  // urge?:string;
-  // adherence?:string;
-  // prayer?:string;
-  // literature?:string;
-  // meeting?:string;
-  // daycareAtGanaa?:string;
-  // sponsor?:string;
-  // stepProgram?:string;
-  // reviewWithGanaaDoctor?:string;
-  // feedbackFromFamily?:string;
+  center?: string;
+  patientName?: string;
+  age?: string;
+  contact?: string;
+  address?: string;
+  admissionType?: string;
+  involuntaryAdmissionType?: string;
+  doctor?: string;
+  therapist?: string;
+  dischargeDate?: string;
+  dischargeStatus?: string;
+  nominatedRepresentative?: string;
+  currentStatus?: string;
+  stayDuration?: string;
+  dischargePlan?:string;
+  psychologist?:string;
+  followupDate?:string;
+  urge?:string;
+  adherence?:string;
+  prayer?:string;
+  literature?:string;
+  meeting?:string;
+  daycareAtGanaa?:string;
+  sponsor?:string;
+  stepProgram?:string;
+  reviewWithGanaaDoctor?:string;
+  feedbackFromFamily?:string;
 }
 
 export interface IPatientFollowup {
@@ -93,6 +93,29 @@ export interface IPatientFollowup {
   dischargeDate?: string;
   dischargeStatus?: string;
   currentStatus?: string;
+  adherence?: string;
+  prayer?: string;
+  literature?: string;
+  meeting?: string;
+  daycareAtGanaa?: string;
+  sponsor?: string;
+  stepProgram?: string;
+  reviewWithGanaaDoctor?: string;
+  feedbackFromFamily?: string;
+  UHID?: string;
+  therapistName?: string;
+  urge?: string;
+  center?: string;
+  patientName?: string;
+  gender?: string;
+  address?: string;
+  doctor?: string;
+  therapist?: string;
+  nominatedRepresentative?: string;
+  stayDuration?: string;
+  dischargePlan?: string;
+  psychologist?: string;
+  followupDate?: string;
 }
 
 export interface IPatientFollowupState {

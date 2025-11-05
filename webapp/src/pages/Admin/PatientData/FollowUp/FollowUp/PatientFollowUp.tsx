@@ -59,7 +59,7 @@ import {
   IPatientFollowupState,
   IPatientState,
   IUser
-} from "@/pages/Admin/PatientData/FollowUp/types";
+} from "@/pages/Admin/PatientData/FollowUp/FollowUp/types";
 import moment from "moment";
 // import { ISessionType } from "@/redux/slice/dropDown";
 
@@ -67,19 +67,19 @@ import pdfFile from "@/assets/images/pdfIcon.svg";
 import { isNumeric } from "@/components/BasicDetaills/utils";
 import { setloa } from "@/redux/slice/patientSlice";
 import LoaBlankScreen from "@/components/LoaBlankScreen/LoaBlankScreen";
-import MultiSelectDropdown from "@/components/MultiSelectDropdown/MultiSelectDropdown";
+// import MultiSelectDropdown from "@/components/MultiSelectDropdown/MultiSelectDropdown";
 import { useAuth } from "@/providers/AuthProvider";
 import { RBACGuard } from "@/components/RBACGuard/RBACGuard";
 import { RESOURCES } from "@/constants/resources";
 import { IFamilyData } from "@/components/ProfileContacts/types";
-import { PatientDetails } from "../Discharge/types";
+import { PatientDetails } from "../../Discharge/types";
 import { ISelectOption } from "@/components/Select/types";
-import DataDownload from "../Doctor/DataDownload/DataDownload";
+// import DataDownload from "../../Doctor/DataDownload/DataDownload";
 import DownloadFollowup from "./PatientFollowup/DownloadFollowup";
 
 const PatientFollowup = () => {
   const { id, aId } = useParams();
-  console.log("✌️id, aId --->", id, aId);
+  // console.log("✌️id, aId --->", id, aId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -90,9 +90,9 @@ const PatientFollowup = () => {
   const therapistMenuRef = useRef<HTMLDivElement>(null);
 
   // Add state for the followup restriction modal
-  const [showFollowupRestrictionModal, setShowFollowupRestrictionModal] = useState(false);
-  const [lastFollowupDate, setLastFollowupDate] = useState<string | null>(null);
-  const [daysSinceLastFollowup, setDaysSinceLastFollowup] = useState<number | null>(null);
+  const [showFollowupRestrictionModal, setShowFollowupRestrictionModal] = useState<boolean>(false);
+  // const [lastFollowupDate, setLastFollowupDate] = useState<string | null>(null);
+  // const [daysSinceLastFollowup, setDaysSinceLastFollowup] = useState<number | null>(null);
 
   const [data, setData] = useState<IPatientFollowupState>({
     id: "",
@@ -129,9 +129,9 @@ const PatientFollowup = () => {
     therapistName: "",
     gender: ""
   });
-  const [selectedSessions, setSelectedSessions] = useState<
-    { sessionType: string; subSessionType?: string }[]
-  >([]);
+  // const [selectedSessions, setSelectedSessions] = useState<
+  //   { sessionType: string; subSessionType?: string }[]
+  // >([]);
 
   const [state, setState] = useState<IPatientState>({
     totalPages: "",
@@ -183,9 +183,9 @@ const PatientFollowup = () => {
     openMenuId: null,
     displaySessionTypeDropdown: false
   });
-  const [therapistNotes, setTherapistNotes] = useState([]);
-  const [totalTherapistNotes, setTotalTherapistNotes] = useState([]);
-  const [allTherapists, setAllTherapists] = useState([]);
+  const [therapistNotes, setTherapistNotes] = useState<IPatientFollowup[]>([]);
+  const [totalTherapistNotes, setTotalTherapistNotes] = useState<IPatientFollowup[]>([]);
+  const [allTherapists, setAllTherapists] = useState<IUser[]>([]);
 
   const patient = useSelector((store: RootState) => store.patient);
 
@@ -224,7 +224,7 @@ const PatientFollowup = () => {
   }, [id, aId]);
 
   const notes = useSelector((store: RootState) => store.notes);
-  const dropdown = useSelector((store: RootState) => store.dropdown);
+  // const dropdown = useSelector((store: RootState) => store.dropdown);
 
   const fetchPatientFollowup = async () => {
     try {
@@ -341,8 +341,6 @@ const PatientFollowup = () => {
           patientAdmissionHistory?.data?.resourceAllocation?.centerId?.name ||
           "";
 
-        console.log("✅ Patient Center Name:", centerName);
-
         // ✅ Fetch all therapists
         const { data: therapistsData } = await getAllUser({
           limit: 100,
@@ -350,8 +348,6 @@ const PatientFollowup = () => {
           sort: "-createdAt",
           roles: "therapist"
         });
-
-        console.log("hiii the therapist data is :", therapistsData?.data);
 
         // ✅ Filter therapists who belong to same center
         const filteredTherapists = therapistsData?.data?.filter((therapist: any) => {
@@ -454,7 +450,7 @@ const PatientFollowup = () => {
           elem.noteDateTime.startsWith(moment().format("YYYY-MM-DD"))
         ).length > 0
     }));
-    setSelectedSessions([]);
+    // setSelectedSessions([]);
   };
 
   const updateFunctionTherapistNotes = (id: string) => {
@@ -661,7 +657,7 @@ const PatientFollowup = () => {
         }
       }
 
-      setSelectedSessions(selected);
+      // setSelectedSessions(selected);
 
       dispatch(
         setPatientFollowup({
@@ -1005,8 +1001,8 @@ const PatientFollowup = () => {
     const timeDiff = currentDate.getTime() - latestDate.getTime();
     const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
 
-    setLastFollowupDate(latestFollowup.noteDateTime);
-    setDaysSinceLastFollowup(daysDiff);
+    // setLastFollowupDate(latestFollowup.noteDateTime);
+    // setDaysSinceLastFollowup(daysDiff);
 
     // Allow followup only on 15th, 16th, or 17th day after last followup
     return daysDiff >= 15 && daysDiff <= 17;
@@ -2466,9 +2462,9 @@ const PatientFollowup = () => {
       {/* Followup Restriction Modal */}
       <Modal
         isOpen={showFollowupRestrictionModal}
-        onClose={() => setShowFollowupRestrictionModal(false)}
-        title="Follow-up Date Not Allowed"
-        className="max-w-md"
+        toggleModal={() => setShowFollowupRestrictionModal(false)}
+        // title="Follow-up Date Not Allowed"
+        // className="max-w-md"
       >
         <div className="p-4">
           <div className="text-center mb-4">
