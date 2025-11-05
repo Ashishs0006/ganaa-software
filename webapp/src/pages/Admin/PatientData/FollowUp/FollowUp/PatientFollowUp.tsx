@@ -2289,12 +2289,12 @@ const PatientFollowup = () => {
                           <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
                           <th className="px-2 py-3 w-1/9 text-xs">Attending Meeting</th>
                           <th className="px-2 py-3 w-1/9 text-xs">Making a sponsor</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Urge</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Prayer</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Literature</th>
+                          <th className="px-2 py-3 w-1/9 text-xs">Daycare</th>
                         </>
                       )}
-                      {/* <th className="px-2 py-3 w-1/9 text-xs">Urge</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Prayer</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Literature</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Daycare at Ganaa</th> */}
 
                       <th className="px-2 py-3 w-1/9 text-xs">File</th>
                       <th className="px-2 py-3 w-1/9 text-xs">Notes</th>
@@ -2324,18 +2324,19 @@ const PatientFollowup = () => {
                           </td>
                           {state.illnessType !== "Mental Disorder" && (
                             <>
+                              <td className="px-2 py-7 w-1/9 ">{value.currentStatus || "--"}</td>
                               <td className="px-2 py-7 w-1/9 ">{value.adherence || "--"}</td>
                               <td className="px-2 py-7 w-1/9 ">
                                 {value.feedbackFromFamily || "--"}
                               </td>
                               <td className="px-2 py-7 w-1/9 ">{value.meeting || "--"}</td>
                               <td className="px-2 py-7 w-1/9 ">{value.sponsor || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">{value.urge || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">{value.prayer || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">{value.literature || "--"}</td>
+                              <td className="px-2 py-7 w-1/9 ">{value.daycareAtGanaa || "--"}</td>
                             </>
                           )}
-                          {/* <td className="px-2 py-7 w-1/9 ">{value.urge || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.prayer || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.literature || "--"}</td>
-                          <td className="px-2 py-7 w-1/9 ">{value.daycareAtGanaa || "--"}</td> */}
                           {value.file?.filePath ? (
                             <td className="px-2 py-7 w-1/9 ">
                               <div
@@ -2383,11 +2384,11 @@ const PatientFollowup = () => {
                             <td className="px-2 py-7 w-1/9 ">--</td>
                           )}
                           <td
-                            className="px-2 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
+                            className="px-0 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
                             dangerouslySetInnerHTML={{ __html: value?.note }}
                           ></td>
                           <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                            <td className="pr-10 py-7 w-1/7 text-xs">
+                            <td className="pr-2 py-7 w-1/7 text-xs">
                               <div
                                 onClick={() => {
                                   if (!patient.loa.loa) {

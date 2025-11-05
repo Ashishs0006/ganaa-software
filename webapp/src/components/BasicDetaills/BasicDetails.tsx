@@ -62,10 +62,12 @@ const BasicDetails = () => {
   const [uhid, setUhid] = useState<string>();
 
   const [idProofFiles, setIdProofFiles] = useState<File[]>([]);
+console.log('✌️idProofFiles --->', idProofFiles);
   // const [patientIdProofUrls, setIdProofUrls] = useState<string[]>([]); // uploaded or fetched URLs
   const [idProofError, setIdProofError] = useState<string>("");
 
   const patientData = useSelector((store: RootState) => store.patient);
+// console.log('✌️patientData --->', patientData);
   const stepperData = useSelector((store: RootState) => store.stepper);
   const dropdownData = useSelector((store: RootState) => store.dropdown);
 
@@ -105,7 +107,7 @@ const BasicDetails = () => {
     involuntaryAdmissionType: { label: "", value: "" }
   });
 
-  console.log("state: ", state);
+  console.log("state====: ", state);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -147,8 +149,8 @@ const BasicDetails = () => {
         setIdProofError("Only PDF files are allowed.");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setIdProofError("File size should be less than 5MB.");
+      if (file.size > 10 * 1024 * 1024) {
+        setIdProofError("File size should be less than 10MB.");
         return;
       }
       validFiles.push(file);
@@ -163,28 +165,27 @@ const BasicDetails = () => {
     // setIdProofUrls([]); // reset URLs if uploading new ones
   };
 
-  const handleDeleteIdProof = (index: number) => {
-    // Check if we're deleting a locally uploaded file or a stored URL
-    const isDeletingLocalFile = index < idProofFiles.length;
+const handleDeleteIdProof = (index: number) => {
+  // Simply remove from state.idProof
+  setState((prev) => ({
+    ...prev,
+    idProof: Array.isArray(prev.idProof)
+      ? prev.idProof.filter((_, i) => i !== index)
+      : []
+  }));
 
-    if (isDeletingLocalFile) {
-      // Delete from local files
-      setIdProofFiles((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      // Delete from stored URLs (adjust index for URL array)
-      const urlIndex = index - idProofFiles.length;
-      console.log("urlIndex", urlIndex);
-      // setIdProofUrls((prev) => prev.filter((_, i) => i !== urlIndex));
-    }
+  // Rebuild idProofFiles from state.idProof
+  // This ensures they stay in sync
+  const updatedIdProof = Array.isArray(state.idProof) 
+    ? state.idProof.filter((_, i) => i !== index)
+    : [];
+  
+  const filesOnly = updatedIdProof.filter(item => item instanceof File) as File[];
+console.log('✌️filesOnly --->', filesOnly);
+  setIdProofFiles(filesOnly);
 
-    // Update the state.idProof array
-    setState((prev) => ({
-      ...prev,
-      idProof: Array.isArray(prev.idProof)
-        ? prev.idProof.filter((_: any, i: number) => i !== index)
-        : []
-    }));
-  };
+  setIdProofError("");
+};
 
   useEffect(() => {
     const id = patientData.patientDetails._id;
@@ -1604,7 +1605,7 @@ const BasicDetails = () => {
                 handleDrop={handleDropIdProof}
                 handleCheck={() => {}}
               />
-              <span className="text-[11px] text-gray-500">Format: PDF, Max size: 5MB each</span>
+              {/* <span className="text-[11px] text-gray-500">Format: PDF, Max size: 5MB each</span> */}
               {idProofError && <span className="text-xs text-red-500">{idProofError}</span>}
             </div>
           </div>
