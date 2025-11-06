@@ -29,7 +29,7 @@ import {
   Input,
   Loader,
   RichTextEditor,
-  Select,DropDown
+  Select
 } from "@/components";
 import kabab from "@/assets/images/kebab-menu.svg";
 
