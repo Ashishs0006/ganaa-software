@@ -813,22 +813,29 @@ const Discharge = () => {
               onChange={handleChangeQuill}
               label="Mental Status Examination at Discharge"
             />
-            <DropDown heading="Hospitalization summary">
-  <div className="flex flex-col gap-4">
-    <RichTextEditor
-      name="psychologistnotes"
-      value={data.PsychologistNotes}
-      onChange={handleChangeQuill}
-      label="Psychologist Notes"
-    />
+ <div className="flex flex-col gap-4">
+ <p className="text-sm font-semibold text-gray-800">Hospitalization Summary</p>
+
+
+  <div className="border border-gray-300 rounded-xl p-4 bg-white flex flex-col gap-4">
     <RichTextEditor
       name="psychiatricnotes"
       value={data.PsychiatricNotes}
       onChange={handleChangeQuill}
       label="Psychiatric Notes"
     />
+  
+    <RichTextEditor
+      name="psychologistnotes"
+      value={data.PsychologistNotes}
+      onChange={handleChangeQuill}
+      label="Psychologist Notes"
+    />
+
+  
   </div>
-</DropDown>
+</div>
+
 
             <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
               <div className="flex-1 w-1/2">
