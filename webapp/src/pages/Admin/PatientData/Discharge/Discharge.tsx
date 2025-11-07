@@ -822,14 +822,14 @@ const Discharge = () => {
       name="psychiatricnotes"
       value={data.PsychiatricNotes}
       onChange={handleChangeQuill}
-      label="Psychiatric Notes"
+      label="Psychiatrist’s Notes"
     />
   
     <RichTextEditor
       name="psychologistnotes"
       value={data.PsychologistNotes}
       onChange={handleChangeQuill}
-      label="Psychologist Notes"
+      label="Psychologist’s Notes"
     />
 
   
@@ -837,43 +837,36 @@ const Discharge = () => {
 </div>
 
 
-            <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
-              <div className="flex-1 w-1/2">
-                <div className="mb-4 flex flex-col space-x-2">
-                  <h2 className="text-sm mb-2 leading-5 font-semibold">Assessment Scores</h2>
-                  <div className=" flex gap-8 space-x-4">
-                    {Object.entries(
-                      groupBy(patientDetails.therapistNotes, (el) => el.subSessionType)
-                    ).map(([key, _items], index) => (
-                      <div key={key} className="flex gap-1 items-center space-x-1">
-                        <div
-                          className="h-3 w-3 rounded-sm"
-                          style={{ backgroundColor: colors[index % colors.length] }}
-                        ></div>
-                        <span className="legend-label font-semibold text-xs">{key}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="relative h-[280px] w-full ">
-                  <LineChart labels={chartLabels} datasets={chartData} />
-                </div>
-                <div className="mt-2 flex max-w-[600px] justify-between text-xs font-semibold">
-                  <span> At the time of admission </span>
-                  <span> At the time of Discharge </span>
-                </div>
-              </div>
-              <div className="mt-6 w-1/2 flex-1 md:mt-0  ">
-                <RichTextEditor
-                  className="bg-white!"
-                  height="h-44"
-                  name="hospitalisationSummary"
-                  value={data.hospitalisationSummary}
-                  onChange={handleChangeQuill}
-                  label="Hospitalisation Summary"
-                />
-              </div>
-            </div>
+          <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
+  <div className="flex-1 w-1/2">
+    <div className="mb-4 flex flex-col space-x-2">
+      <h2 className="text-sm mb-2 leading-5 font-semibold">Assessment Scores</h2>
+      <div className="flex gap-8 space-x-4">
+        {Object.entries(
+          groupBy(patientDetails.therapistNotes, (el) => el.subSessionType)
+        ).map(([key, _items], index) => (
+          <div key={key} className="flex gap-1 items-center space-x-1">
+            <div
+              className="h-3 w-3 rounded-sm"
+              style={{ backgroundColor: colors[index % colors.length] }}
+            ></div>
+            <span className="legend-label font-semibold text-xs">{key}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="relative h-[280px] w-full">
+      <LineChart labels={chartLabels} datasets={chartData} />
+    </div>
+
+    <div className="mt-2 flex max-w-[600px] justify-between text-xs font-semibold">
+      <span>At the time of admission</span>
+      <span>At the time of Discharge</span>
+    </div>
+  </div>
+</div>
+
 
             <div className="grid gap-[88px]">
               <RichTextEditor
