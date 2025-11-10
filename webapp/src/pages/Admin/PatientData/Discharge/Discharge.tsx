@@ -70,6 +70,16 @@ function groupBy<T>(array: T[], keySelector: (_item: T) => string): GroupedBy<T>
     return acc;
   }, {} as GroupedBy<T>);
 }
+const defaultAdviseAndPlan = `Advice on Discharge:
+• Follow up with the psychiatrist in ______ days and with the psychologist ______ times per week.
+• Follow up with relevant specialists for medical comorbidities as advised.
+• Ensure the patient’s safety. Remove access to potentially harmful objects. Seek immediate help if any suicidal thoughts or self-harm urges occur.
+• Take medications as advised. Do not stop, skip, or adjust doses without consulting your psychiatrist.
+• Family members should closely monitor medication intake and contact the centre immediately if any lapse or concern arises.
+• If receiving a long-acting injection, mark the next due date on your calendar (if applicable).
+
+Emergency Contact:
+In a crisis, reach our helpline at ‪+91 87500 75006‬ or contact the nearest emergency service immediately.`;
 
 const colors = [
   "rgba(75, 192, 192, 1)",
@@ -315,7 +325,10 @@ const Discharge = () => {
               label: dischargeData?.data?.conditionAtTheTimeOfDischarge || "",
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
-            adviseAndPlan: dischargeData?.data?.adviseAndPlan || "",
+           adviseAndPlan:
+    dischargeData?.data?.adviseAndPlan?.trim()
+      ? dischargeData.data.adviseAndPlan
+      : defaultAdviseAndPlan, 
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
   PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
     mentalStatusExaminationatDischarge:dischargeData?.data?.    mentalStatusExaminationatDischarge || "",
@@ -356,7 +369,11 @@ const Discharge = () => {
               label: dischargeData?.data?.conditionAtTheTimeOfDischarge || "",
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
-            adviseAndPlan: dischargeData?.data?.adviseAndPlan || "",
+          
+            adviseAndPlan:
+    dischargeData?.data?.adviseAndPlan?.trim()
+      ? dischargeData.data.adviseAndPlan
+      : defaultAdviseAndPlan,
             prescriptionMedicine: prescriptionMedicineUpdate,
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
   PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
@@ -1042,6 +1059,7 @@ const Discharge = () => {
                 className="w-full! rounded-[7px]! max-w-full! border border-gray-300 px-3 py-6!"
               />
             </div>
+            {/* here we have to edit  */}
             <RichTextEditor
               name="adviseAndPlan"
               value={data.adviseAndPlan}

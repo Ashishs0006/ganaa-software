@@ -575,6 +575,7 @@ const DoctorPrescription = () => {
       term: query,
       searchField: "name"
     });
+    console.log("medicine fetch is :", response)
     return response?.data?.data?.map(formatMedicineOption);
   };
 
