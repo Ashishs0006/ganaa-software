@@ -116,6 +116,7 @@ const TherapistWiseSession = () => {
         centerId: centers.join(",")
       });
 
+      console.log('✌️response --->', response);
       if (response.data.status === "success") {
         setData(response.data.data);
         setDischargeDate(response?.data?.data?.dischargeResult);

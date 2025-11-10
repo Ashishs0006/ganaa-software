@@ -46,58 +46,10 @@ const patientFollowupSchema = new mongoose.Schema<IPatientFollowup>({
     filePath: String,
   },
 
-    // New fields for patient followup
-  // center: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // patientName: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // UHID: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // age: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // gender: {
-  //   type: String,
-  //   trim: true,
-  //   enum: ['Male', 'Female', 'Other', ''],
-  // },
-  // contact: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // dischargeDate: {
-  //   type: Date,
-  // },
-  // stayDuration: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // psychologist: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // dischargePlan: {
-  //   type: String,
-  //   trim: true,
-  // },
-  // dischargePlanShared: {
-  //   type: String,
-  //   trim: true,
-  // },
   followupDate: {
     type: Date,
   },
-  // therapist: {
-  //   type: String,
-  //   trim: true,
-  // },
+ 
   urge: {
     type: String,
     trim: true,

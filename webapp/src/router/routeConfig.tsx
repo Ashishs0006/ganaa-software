@@ -49,6 +49,7 @@ import {
 import { RouteItem } from "@/router/type";
 import { RESOURCES, ROUTES } from "@/constants/resources";
 import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/FollowUp/PatientFollowUp";
+import PatientFollowup from "@/pages/Admin/Dashboard/Followup/Followup";
 
 export const routes: RouteItem[] = [
   {
@@ -94,6 +95,11 @@ export const routes: RouteItem[] = [
             path: ROUTES.THERAPIST_WISE_SESSION,
             element: <TherapistWiseSession />,
             resource: RESOURCES.THERAPIST_WISE_SESSION
+          },
+          {
+            path: ROUTES.FOLLOWUP,
+            element: <PatientFollowup />,
+            resource: RESOURCES.FOLLOWUP
           },
           {
             path: ROUTES.DOCTOR_WISE_SESSION,

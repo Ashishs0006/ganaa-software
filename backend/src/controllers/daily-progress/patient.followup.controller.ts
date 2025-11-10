@@ -25,8 +25,8 @@ export const uploadFile = upload.single('file');
 
 export const getAllPatientFollowup = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    if (!req.query.patientAdmissionHistoryId)
-      return next(new AppError('Patient Admission History Id in Params is Mandatory', 400));
+    // if (!req.query.patientAdmissionHistoryId)
+    //   return next(new AppError('Patient Admission History Id in Params is Mandatory', 400));
 
     const features = new APIFeatures<IPatientFollowup>(patientFollowupSchema.find({}), req.query)
       .filter('noteDateTime[gte]', 'noteDateTime[lte]')

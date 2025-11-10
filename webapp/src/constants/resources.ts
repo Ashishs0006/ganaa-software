@@ -7,7 +7,7 @@ export const RESOURCES = {
   DOCTOR_WISE_SESSION: "Doctor Wise Session",
   PATIENT_VITAL_REPORT: "Patient Vital Report",
   THERAPIST_WISE_SESSION: "Therapist Wise Session",
-
+  FOLLOWUP: "Followup",
   // LEAD: "Lead",
   CREATE_LEAD: "Create Lead",
   QUALIFIED_LEAD: "Qualified lead",
@@ -38,7 +38,6 @@ export const RESOURCES = {
   FAMILY_PORTAL: "Family Portal",
   DOWNLOAD_SECTION: "Download Section",
   AUDIT_LOG: "Resource Audit Log"
-  
 } as const;
 
 export const ROUTES = {
@@ -53,6 +52,7 @@ export const ROUTES = {
   DOCTOR_WISE_SESSION: "doctor-wise-session",
   PATIENT_VITAL_REPORT: "patients-report",
   THERAPIST_WISE_SESSION: "therapist-wise-session",
+  FOLLOWUP: "followup",
 
   PATIENT: "patients",
   ALL_PATIENT: "all-patient",

@@ -174,6 +174,7 @@ export const updateNewGroupActivitytabs = (id: string, data: unknown, params?: u
 // Dashboard
 export const getInsights = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/insights", { params, headers });
 export const getTherapistSession = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/therapist", { params, headers });
+export const getFollowups = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/followups", { params, headers });
 export const getDoctorSession = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/doctor", { params, headers });
 export const getDailyReport = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/daily-report", { params, headers });
 export const getWeeklyReport = (params?: unknown, headers?: AxiosHeaders) => http.get("/dashboard/weekly-report", { params, headers });

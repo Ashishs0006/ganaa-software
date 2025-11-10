@@ -10,6 +10,7 @@ router.use(AuthController.protect);
 router.route('/insights').get(DashboardController.insightDashboard);
 router.route('/weekly-report').get(DashboardController.weeklyReportDashboard);
 router.route('/therapist').get(DashboardController.therapistDashboard);
+router.route('/followups').get(DashboardController.followupsDashboard);
 router.route('/doctor').get(DashboardController.doctorDashboard);
 router.route('/daily-report').get(DashboardController.dailyReportDashboard);
 router.route('/vital-report').get(DashboardController.vitalReportDashboard);

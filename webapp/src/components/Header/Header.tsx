@@ -101,6 +101,14 @@ const Header = () => {
                   </NavLink>
                   <hr />
 
+                   <NavLink
+                    className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
+                    to="/admin/followup"
+                  >
+                    Foolowup
+                  </NavLink>
+                  <hr />
+
                   <NavLink
                     className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
                     to="/admin/doctor-wise-session"

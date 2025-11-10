@@ -23,6 +23,7 @@ import PatientAdmissionHistory from '../models/patient/patient.admission.history
 import DailyResourceAllocationReport from '../models/reports/daily.resource.report.model';
 import { ICenterInfo, IGenderCounts } from '../interfaces/controller/i.dashboard.controller';
 import PatientAdmissionHistoryRevision from '../models/patient/patient.admission.history.revision.model';
+import PatientFollowup from '../models/daily-progress/patient.followup.model';
 
 export const insightDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -103,13 +104,14 @@ export const therapistDashboard = catchAsync(
     ) as string[];
 
     const patients = await Patient.find({ _id: inpatientIds })
-      .select('_id uhid firstName lastName patientPic gender')
+      .select('_id uhid firstName lastName patientPic gender center')
       .setOptions({ skipResAllPopulate: true });
 
     const patientsWithCenterField = patients.map((patient, index) => ({
       ...patient.toObject(),
       centerId: patientAdmissionHistory[index].resourceAllocation?.centerId, // or any dynamic value
     }));
+    console.log('✌️patientsWithCenterField --->', patientsWithCenterField);
 
     // Get All Users Which has Therapist Role
     const therapistRoles = await Role.find({
@@ -156,6 +158,148 @@ export const therapistDashboard = catchAsync(
     });
   }
 );
+
+export const followupsDashboard = catchAsync(
+  async (req: UserRequest, res: Response, next: NextFunction) => {
+    // 1️⃣ Validate dates
+    if (!req.query.startDate) return next(new AppError('Start Date is Mandatory Field', 400));
+    if (!req.query.endDate) return next(new AppError('End Date is Mandatory Field', 400));
+
+    const start = new Date(req.query.startDate as string);
+    const end = new Date(req.query.endDate as string);
+
+    if (isNaN(start.getTime())) return next(new AppError('Invalid Start Date format', 400));
+    if (isNaN(end.getTime())) return next(new AppError('Invalid End Date format', 400));
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    const msInDay = 24 * 60 * 60 * 1000;
+    const maxSpan = 31 * msInDay;
+    if (end.getTime() - start.getTime() > maxSpan)
+      return next(new AppError('Date range cannot exceed 31 days', 400));
+
+    // 2️⃣ Prepare query filters
+    let patientHistoryQuery: IBasicObj = {};
+    let therapistQuery: IBasicObj = {};
+
+    if (req.query.centerId) {
+      const centerId = (req.query.centerId as string).split(',');
+      patientHistoryQuery['resourceAllocation.centerId'] = { $in: centerId };
+      therapistQuery['centerId'] = { $in: centerId };
+    }
+
+    // 3️⃣ Get Admission histories and populate patients
+    const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
+      .select('patientId dateOfAdmission resourceAllocation dischargeId currentStatus')
+      .populate({ path: 'dischargeId', select: 'date' })
+      .populate({
+        path: 'patientId',
+        select: '_id uhid firstName lastName gender center currentStatus patientPic',
+      })
+      .setOptions({
+        skipUrlGeneration: true,
+        skipResAllPopulate: false,
+        populateUser: true,
+        populateFeedback: true,
+      })
+      .lean();
+
+    // ✅ Filter only discharged patients
+    const filteredAdmissions = patientAdmissionHistory.filter(
+      (admission: any) => admission && admission.currentStatus === 'Discharged'
+    );
+
+    const inpatientIds = filteredAdmissions.map((el: any) => el.patientId?._id?.toString());
+    const inPatientAdmissionIds = filteredAdmissions.map((el) => el._id?.toString());
+
+    // 4️⃣ Map discharge data
+    const dischargeResult: any = {};
+    filteredAdmissions.forEach((admission: any) => {
+      const patientId = admission.patientId._id.toString();
+      const startDate = admission.dateOfAdmission;
+      const dischargeDate = admission.dischargeId?.date;
+
+      if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
+      dischargeResult[patientId].push({ start: startDate, end: dischargeDate });
+    });
+
+    // 5️⃣ Get all therapists (Therapist + Therapist+AM roles)
+    const therapistRoles = await Role.find({
+      name: { $in: ['Therapist', 'Therapist+AM'] },
+    }).select('_id');
+
+    const therapistRoleIds = therapistRoles.map((r: any) => r._id.toString());
+    const therapists = await User.find({
+      roleId: { $in: therapistRoleIds },
+      ...therapistQuery,
+    })
+      .select('_id firstName lastName centerId')
+      .setOptions({ skipUrlGeneration: true, shouldSkipRole: true })
+      .lean();
+
+    const therapistIds = therapists.map((t) => t._id.toString());
+
+    // 6️⃣ Fetch LOA, Therapist Notes, and Followup Data in parallel
+    const [loa, notes, patientFollowups] = await Promise.all([
+      Loa.find({
+        noteDateTime: { $gte: start, $lte: end },
+        patientAdmissionHistoryId: { $in: inPatientAdmissionIds },
+      }).lean(),
+
+      TherapistNote.find({
+        noteDateTime: { $gte: start, $lte: end },
+        patientAdmissionHistoryId: { $in: inPatientAdmissionIds },
+        therapistId: { $in: therapistIds },
+      })
+        .select(
+          '_id patientId noteDateTime note sessionType subSessionType score therapistId createdAt createdBy file'
+        )
+        .setOptions({ skipTherapistPopulation: false, skipUrlGeneration: false })
+        .lean(),
+
+      PatientFollowup.find({
+        patientId: { $in: inpatientIds },
+        $or: [
+          { noteDateTime: { $gte: start, $lte: end } },
+          { followupDate: { $gte: start, $lte: end } },
+        ],
+      })
+        .select(
+          '_id patientId therapistId noteDateTime note sessionType subSessionType score followupDate adherence meeting sponsor feedbackFromFamily currentStatus file'
+        )
+        .setOptions({ skipTherapistPopulation: false, skipUrlGeneration: false })
+        .lean(),
+    ]);
+
+    // 7️⃣ Attach followups to each patient
+    const patientsWithFollowups = filteredAdmissions.map((admission: any) => {
+      const patient = admission.patientId;
+      const centerId = admission.resourceAllocation?.centerId || null;
+      const followups = patientFollowups.filter(
+        (f) => f.patientId?.toString() === patient._id.toString()
+      );
+      return {
+        ...patient,
+        centerId,
+        dischargeHistory: dischargeResult[patient._id] || [],
+        followups, // 👈 All followups for this patient
+      };
+    });
+
+    // 8️⃣ Send Final Response
+    res.status(200).json({
+      status: 'success',
+      data: {
+        patients: patientsWithFollowups, // 👈 merged followups here
+        therapists,
+        loa,
+        notes,
+      },
+    });
+  }
+);
+
 
 export const doctorDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {

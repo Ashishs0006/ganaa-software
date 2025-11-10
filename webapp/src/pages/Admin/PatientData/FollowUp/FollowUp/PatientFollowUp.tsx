@@ -2280,26 +2280,28 @@ const PatientFollowup = () => {
                 <table className="w-full text-xs font-semibold text-left">
                   <thead className="bg-[#E9E8E5] w-full  top-0 sticky z-10 ">
                     <tr className="text-[#505050]  font-medium">
-                      <th className="pl-7 py-3 w-1/9 text-xs">Date & Time</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Therapist</th>
+                      <th className="pl-7 py-3 text-xs">Date & Time</th>
+                      <th className="px-4 py-3 text-xs">Therapist</th>
                       {state.illnessType !== "Mental Disorder" && (
                         <>
-                          <th className="px-2 py-3 w-1/9 text-xs">Current Status</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Medication Adherence</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Attending Meeting</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Making a sponsor</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Urge</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Prayer</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Literature</th>
-                          <th className="px-2 py-3 w-1/9 text-xs">Daycare</th>
+                          <th className="px-7 py-3 text-xs">Current Status</th>
+                          <th className="px-7 py-3 w-1/9 text-xs">Medication Adherence</th>
+                          <th className="px-7 py-3 w-1/9 text-xs text-wrap">Attending Meeting</th>
+                          <th className="px-5 py-3 w-1/9 text-xs">Making a sponsor</th>
+                          <th className="px-7 py-3 text-xs">Urge</th>
+                          <th className="px-7 py-3 text-xs">Prayer</th>
+                          <th className="px-7 py-3 text-xs">Literature</th>
+                          <th className="px-7 py-3 text-xs">Daycare</th>
                         </>
                       )}
 
-                      <th className="px-2 py-3 w-1/9 text-xs">File</th>
-                      <th className="px-2 py-3 w-1/9 text-xs">Notes</th>
+                      <th className="px-7 py-3 w-1/9 text-xs">File</th>
+                      {state.illnessType !== "Mental Disorder" && (
+                        <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
+                      )}
+                      <th className="px-7 py-3 w-1/9 text-xs">Notes</th>
                       <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                        <th className="px-2 py-3 w-1/9 text-xs">{""}</th>
+                        <th className="px-7 py-3 w-1/9 text-xs">{""}</th>
                       </RBACGuard>
                     </tr>
                   </thead>
@@ -2311,7 +2313,7 @@ const PatientFollowup = () => {
                           key={index}
                           className="hover:bg-[#F6F6F6C7] border-b text-xs border-[#DCDCDCE0]"
                         >
-                          <td className="pl-7 py-7 w-1/9">
+                          <td className="pl-7 py-7 text-nowrap">
                             <div className="flex flex-col justify-center">
                               <p>{value.noteDateTime && formatDate(value.noteDateTime)}</p>
                               <p className="text-gray-500 ">
@@ -2319,26 +2321,24 @@ const PatientFollowup = () => {
                               </p>
                             </div>
                           </td>
-                          <td className="px-2 py-7 w-1/9 ">
+                          <td className="px-7 py-7 ">
                             {value.therapistId.firstName} {value.therapistId.lastName}
                           </td>
                           {state.illnessType !== "Mental Disorder" && (
                             <>
-                              <td className="px-2 py-7 w-1/9 ">{value.currentStatus || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.adherence || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">
-                                {value.feedbackFromFamily || "--"}
-                              </td>
-                              <td className="px-2 py-7 w-1/9 ">{value.meeting || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.sponsor || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.urge || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.prayer || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.literature || "--"}</td>
-                              <td className="px-2 py-7 w-1/9 ">{value.daycareAtGanaa || "--"}</td>
+                              <td className="px-7 py-7">{value.currentStatus || "--"}</td>
+                              <td className="px-7 py-7 w-1/9 ">{value.adherence || "--"}</td>
+                              <td className="px-7 py-7 w-1/9 ">{value.meeting || "--"}</td>
+                              <td className="px-7 py-7 w-1/9 ">{value.sponsor || "--"}</td>
+
+                              <td className="px-7 py-7 ">{value.urge || "--"}</td>
+                              <td className="px-7 py-7 ">{value.prayer || "--"}</td>
+                              <td className="px-7 py-7 ">{value.literature || "--"}</td>
+                              <td className="px-7 py-7 ">{value.daycareAtGanaa || "--"}</td>
                             </>
                           )}
                           {value.file?.filePath ? (
-                            <td className="px-2 py-7 w-1/9 ">
+                            <td className="px-7 py-7 w-1/9 ">
                               <div
                                 id="view"
                                 ref={viewref}
@@ -2381,10 +2381,11 @@ const PatientFollowup = () => {
                               </div>
                             </td>
                           ) : (
-                            <td className="px-2 py-7 w-1/9 ">--</td>
+                            <td className="px-7 py-7 w-1/9 ">--</td>
                           )}
+                          <td className="px-7 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>
                           <td
-                            className="px-0 py-7  w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
+                            className="px-7 py-7 w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
                             dangerouslySetInnerHTML={{ __html: value?.note }}
                           ></td>
                           <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
