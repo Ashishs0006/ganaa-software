@@ -70,16 +70,20 @@ function groupBy<T>(array: T[], keySelector: (_item: T) => string): GroupedBy<T>
     return acc;
   }, {} as GroupedBy<T>);
 }
-const defaultAdviseAndPlan = `Advice on Discharge:
-• Follow up with the psychiatrist in ______ days and with the psychologist ______ times per week.
-• Follow up with relevant specialists for medical comorbidities as advised.
-• Ensure the patient’s safety. Remove access to potentially harmful objects. Seek immediate help if any suicidal thoughts or self-harm urges occur.
-• Take medications as advised. Do not stop, skip, or adjust doses without consulting your psychiatrist.
-• Family members should closely monitor medication intake and contact the centre immediately if any lapse or concern arises.
-• If receiving a long-acting injection, mark the next due date on your calendar (if applicable).
+const defaultAdviseAndPlan = `
 
-Emergency Contact:
-In a crisis, reach our helpline at ‪+91 87500 75006‬ or contact the nearest emergency service immediately.`;
+<ul>
+  <li>Follow up with the psychiatrist in ______ days and with the psychologist ______ times per week.</li>
+  <li>Follow up with relevant specialists for medical comorbidities as advised.</li>
+  <li>Ensure the patient’s safety. Remove access to potentially harmful objects. Seek immediate help if any suicidal thoughts or self-harm urges occur.</li>
+  <li>Take medications as advised. Do not stop, skip, or adjust doses without consulting your psychiatrist.</li>
+  <li>Family members should closely monitor medication intake and contact the centre immediately if any lapse or concern arises.</li>
+  <li>If receiving a long-acting injection, mark the next due date on your calendar (if applicable).</li>
+</ul>
+
+<p><strong>Emergency Contact:</strong><br/>
+In a crisis, reach our helpline at ‪+91 87500 75006‬ or contact the nearest emergency service immediately.</p>
+`;
 
 const colors = [
   "rgba(75, 192, 192, 1)",
@@ -1183,20 +1187,33 @@ const Discharge = () => {
               Save
               {state.loading && <Loader size="xs" />}
             </Button>
-            {patientDetails.currentStatus !== "Discharged" && (
-              <Button
-                type="submit"
-                disabled={state.loading}
-                className="min-w-[130px]! text-xs!  py-[11px]! bg-[#323E2A]! rounded-[10px]!"
-                name="next"
-                variant="contained"
-                size="base"
-                onClick={toggleOpen1}
-              >
-                Submit
-                {state.loading && <Loader size="xs" />}
-              </Button>
-            )}
+     {patientDetails.currentStatus !== "Discharged" && (
+  <Button
+    type="submit"
+    disabled={state.loading}
+    className="min-w-[130px]! text-xs! py-[11px]! bg-[#323E2A]! rounded-[10px]!"
+    name="next"
+    variant="contained"
+    size="base"
+    onClick={() => {
+      const dischargeDate = patientDetails?.dischargeDate;
+      if (dischargeDate) {
+        const today = new Date();
+        const discharge = new Date(dischargeDate);
+
+        if (discharge > today) {
+          toast.error("Discharge Date cannot be in the future.");
+          return; // prevent submit
+        }
+      }
+      toggleOpen1(); // normal behavior
+    }}
+  >
+    Submit
+    {state.loading && <Loader size="xs" />}
+  </Button>
+)}
+
           </div>
         </RBACGuard>
       </div>

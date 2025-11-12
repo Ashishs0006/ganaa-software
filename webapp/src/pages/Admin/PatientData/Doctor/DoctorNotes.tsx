@@ -61,6 +61,7 @@ import { RBACGuard } from "@/components/RBACGuard/RBACGuard";
 import { RESOURCES } from "@/constants/resources";
 import { BsFiletypePdf } from "react-icons/bs";
 import DataDownload from "./DataDownload/DataDownload";
+import { stat } from "fs";
 
 const DoctorNotes = () => {
   const { id, aId } = useParams();
@@ -135,7 +136,8 @@ const DoctorNotes = () => {
     patientProfilePic: "",
     doctorName: "",
     totalPages: "",
-    isTodayNoteExist: false
+    isTodayNoteExist: false,
+    dateOfBirth:"",
   });
 
   const [dropDownsState, setDropDownsState] = useState<IDoctorDropDownsState>({
@@ -160,7 +162,9 @@ const DoctorNotes = () => {
     if (id && aId) {
       try {
         const { data: patientData } = await getSinglePatient(id);
+        console.log("patinet detail :",patientData)
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
+        console.log("patient admisson history:",patientAdmissionHistory)
 
         const assignedDoctorFirstName =
           patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName || "";
@@ -187,12 +191,17 @@ const DoctorNotes = () => {
           dateOfAdmission: dateOfAdmission,
           patientAdmissionHistoryId: aId,
           patientProfilePic: patientData?.data?.patientPicUrl || "",
+          
+            // dateOfBirth: patientData?.data?.dob || "",
+            dateOfBirth:patientData?.data?.age || "",
+
           firstName: patientData?.data?.firstName || "",
           lastName: patientData?.data?.lastName || "",
           gender: patientData?.data?.gender || "",
           UHID: patientData?.data?.uhid || "",
           assignedDoctor: `${assignedDoctorFirstName} ${assignedDoctorLastName}`.trim(),
           doctorName: `${auth?.user?.firstName} ${auth?.user?.lastName}`
+          
         }));
         let date = "";
         if (new Date(patientAdmissionHistory?.data?.dateOfAdmission) > new Date()) {
@@ -222,6 +231,18 @@ const DoctorNotes = () => {
       }
     }
   };
+  const calculateAge = (dob: string) => {
+  if (!dob) return "";
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+console.log("hii date of birth is :",state.dateOfBirth)
 
   useEffect(() => {
     fetchDoctorNotes();
@@ -516,31 +537,47 @@ const DoctorNotes = () => {
                     )}
                   </div>
                 </div>
-                <div className="ml-4">
-                  <div className="flex mb-1  items-center">
-                    <h2
-                      title={`${state.firstName} ${state.lastName}`}
-                      className="text-xs font-semibold"
-                    >
-                      {state.firstName &&
-                        capitalizeFirstLetter(
-                          state.firstName?.length > 15
-                            ? state.firstName?.slice(0, 15) + "..."
-                            : state.firstName
-                        )}{" "}
-                      {state.lastName &&
-                        capitalizeFirstLetter(
-                          state.lastName.length > 15
-                            ? state.lastName.slice(0, 15) + "..."
-                            : state.lastName
-                        )}
-                    </h2>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    UHID:
-                    <span className="font-semibold text-black"> {formatId(state.UHID)}</span>
-                  </p>
-                </div>
+          <div className="ml-4">
+  <div className="flex mb-1 items-center">
+    <h2
+      title={`${state.firstName} ${state.lastName}`}
+      className="text-xs font-semibold"
+    >
+      {state.firstName &&
+        capitalizeFirstLetter(
+          state.firstName?.length > 15
+            ? state.firstName?.slice(0, 15) + "..."
+            : state.firstName
+        )}{" "}
+      {state.lastName &&
+        capitalizeFirstLetter(
+          state.lastName.length > 15
+            ? state.lastName.slice(0, 15) + "..."
+            : state.lastName
+        )}
+    </h2>
+  </div>
+
+  <p className="text-xs text-gray-600">
+    UHID:
+    <span className="font-semibold text-black"> {formatId(state.UHID)}</span>
+  </p>
+
+  {/* 👇 New line for Age and Date of Admission */}
+  <p className="text-xs text-gray-600 mt-0.5">
+    AGE:{" "}
+    <span className="font-semibold text-black">
+      {state.dateOfBirth} yrs
+    </span>{" "}
+    | DOA:{" "}
+    <span className="font-semibold text-black">
+      {state.dateOfAdmission
+        ? new Date(state.dateOfAdmission).toLocaleDateString("en-GB")
+        : "--/--/----"}
+    </span>
+  </p>
+</div>
+
               </div>
               <div className="border mx-5 h-10 my-auto"></div>
               <div>

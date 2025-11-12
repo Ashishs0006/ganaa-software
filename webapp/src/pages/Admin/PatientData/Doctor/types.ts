@@ -18,6 +18,8 @@ export interface IDoctorState {
   patientId: string;
   doctorName: string;
   isTodayNoteExist?: boolean;
+  dateOfBirth?:string
+
 }
 export interface IDoctorNote {
   _id: string;
