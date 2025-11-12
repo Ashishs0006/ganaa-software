@@ -71,26 +71,52 @@ const AuditLogs = () => {
     }
   };
 
-  const handleChange = useCallback((index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  // const handleChange = useCallback((index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
 
-    const isNumeric = (val: string) => val === "" || /^\d*\.?\d*$/.test(val);
-    const numberFields = ["discountPercentage", "pricePerDayPerBed", "totalNumberOfDaysSpent"];
+  //   const isNumeric = (val: string) => val === "" || /^\d*\.?\d*$/.test(val);
+  //   const numberFields = ["discountPercentage", "pricePerDayPerBed", "totalNumberOfDaysSpent"];
 
-    if (numberFields.includes(name) && !isNumeric(value)) return;
+  //   if (numberFields.includes(name) && !isNumeric(value)) return;
 
-    let numericValue = +value;
+  //   let numericValue = +value;
 
-    // Clamp discount between 0 and 100
-    if (name === "discountPercentage") {
-      if (numericValue > 100) numericValue = 100;
-      if (numericValue < 0) numericValue = 0; // optional: prevent negative discount
-    }
+  //   // Clamp discount between 0 and 100
+  //   if (name === "discountPercentage") {
+  //     if (numericValue > 100) numericValue = 100;
+  //     if (numericValue < 0) numericValue = 0; // optional: prevent negative discount
+  //   }
 
-    setData((prevData) =>
-      prevData.map((item, i) => (i === index ? { ...item, [name]: numericValue } : item))
-    );
-  }, []);
+  //   setData((prevData) =>
+  //     prevData.map((item, i) => (i === index ? { ...item, [name]: numericValue } : item))
+  //   );
+  // }, []);
+const handleChange = useCallback((index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+
+  const isNumeric = (val: string) => val === "" || /^\d*\.?\d*$/.test(val);
+  const numberFields = ["discountPercentage", "pricePerDayPerBed", "totalNumberOfDaysSpent"];
+
+  // allow decimals
+  if (numberFields.includes(name) && !isNumeric(value)) return;
+
+  setData((prevData) =>
+    prevData.map((item, i) => {
+      if (i !== index) return item;
+
+      let updatedValue: string | number = value;
+
+      // Clamp discount between 0 and 100 (only when numeric)
+      if (name === "discountPercentage" && value !== "" && !isNaN(Number(value))) {
+        const numericValue = Number(value);
+        if (numericValue > 100) updatedValue = "100";
+        else if (numericValue < 0) updatedValue = "0";
+      }
+
+      return { ...item, [name]: updatedValue };
+    })
+  );
+}, []);
 
   const handleSubmit = async (_e: SyntheticEvent) => {
     try {
