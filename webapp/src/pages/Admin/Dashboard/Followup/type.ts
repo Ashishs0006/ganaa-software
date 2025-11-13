@@ -10,7 +10,8 @@ export interface IPatient {
   centerId?: ICenter;
   followups: IPatientFollowup[];
   patientPic: string;
-    therapistId?: ITherapist;
+  therapistId?: ITherapist;
+  dischargeDate?: string;
 }
 
 export interface ITherapist {

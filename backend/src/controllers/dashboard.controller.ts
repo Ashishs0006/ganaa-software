@@ -111,7 +111,6 @@ export const therapistDashboard = catchAsync(
       ...patient.toObject(),
       centerId: patientAdmissionHistory[index].resourceAllocation?.centerId, // or any dynamic value
     }));
-    console.log('✌️patientsWithCenterField --->', patientsWithCenterField);
 
     // Get All Users Which has Therapist Role
     const therapistRoles = await Role.find({
@@ -161,7 +160,7 @@ export const therapistDashboard = catchAsync(
 
 export const followupsDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    // 1️⃣ Validate dates
+    // 1️ Validate dates
     if (!req.query.startDate) return next(new AppError('Start Date is Mandatory Field', 400));
     if (!req.query.endDate) return next(new AppError('End Date is Mandatory Field', 400));
 
@@ -179,7 +178,7 @@ export const followupsDashboard = catchAsync(
     if (end.getTime() - start.getTime() > maxSpan)
       return next(new AppError('Date range cannot exceed 31 days', 400));
 
-    // 2️⃣ Prepare query filters
+    // 2️Prepare query filters
     let patientHistoryQuery: IBasicObj = {};
     let therapistQuery: IBasicObj = {};
 
@@ -189,7 +188,7 @@ export const followupsDashboard = catchAsync(
       therapistQuery['centerId'] = { $in: centerId };
     }
 
-    // 3️⃣ Get Admission histories and populate patients
+    // 3️Get Admission histories and populate patients
     const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
       .select('patientId dateOfAdmission resourceAllocation dischargeId currentStatus')
       .populate({ path: 'dischargeId', select: 'date' })
@@ -205,7 +204,7 @@ export const followupsDashboard = catchAsync(
       })
       .lean();
 
-    // ✅ Filter only discharged patients
+    // Filter only discharged patients
     const filteredAdmissions = patientAdmissionHistory.filter(
       (admission: any) => admission && admission.currentStatus === 'Discharged'
     );
@@ -213,7 +212,7 @@ export const followupsDashboard = catchAsync(
     const inpatientIds = filteredAdmissions.map((el: any) => el.patientId?._id?.toString());
     const inPatientAdmissionIds = filteredAdmissions.map((el) => el._id?.toString());
 
-    // 4️⃣ Map discharge data
+    // 4️Map discharge data
     const dischargeResult: any = {};
     filteredAdmissions.forEach((admission: any) => {
       const patientId = admission.patientId._id.toString();
@@ -224,7 +223,7 @@ export const followupsDashboard = catchAsync(
       dischargeResult[patientId].push({ start: startDate, end: dischargeDate });
     });
 
-    // 5️⃣ Get all therapists (Therapist + Therapist+AM roles)
+    // 5️Get all therapists (Therapist + Therapist+AM roles)
     const therapistRoles = await Role.find({
       name: { $in: ['Therapist', 'Therapist+AM'] },
     }).select('_id');
@@ -240,7 +239,7 @@ export const followupsDashboard = catchAsync(
 
     const therapistIds = therapists.map((t) => t._id.toString());
 
-    // 6️⃣ Fetch LOA, Therapist Notes, and Followup Data in parallel
+    // 6️Fetch LOA, Therapist Notes, and Followup Data in parallel
     const [loa, notes, patientFollowups] = await Promise.all([
       Loa.find({
         noteDateTime: { $gte: start, $lte: end },
@@ -272,26 +271,28 @@ export const followupsDashboard = catchAsync(
         .lean(),
     ]);
 
-    // 7️⃣ Attach followups to each patient
+    // 7️Attach followups to each patient
     const patientsWithFollowups = filteredAdmissions.map((admission: any) => {
       const patient = admission.patientId;
       const centerId = admission.resourceAllocation?.centerId || null;
+       const dischargeDate = admission.dischargeId?.date || null;
       const followups = patientFollowups.filter(
         (f) => f.patientId?.toString() === patient._id.toString()
       );
       return {
         ...patient,
         centerId,
+        dischargeDate,
         dischargeHistory: dischargeResult[patient._id] || [],
-        followups, // 👈 All followups for this patient
+        followups, // All followups for this patient
       };
     });
 
-    // 8️⃣ Send Final Response
+    // 8️Send Final Response
     res.status(200).json({
       status: 'success',
       data: {
-        patients: patientsWithFollowups, // 👈 merged followups here
+        patients: patientsWithFollowups, //  merged followups here
         therapists,
         loa,
         notes,

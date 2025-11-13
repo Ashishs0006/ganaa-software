@@ -151,12 +151,12 @@ const PatientFollowup = () => {
       <div className="w-[1304px] mx-auto">
         <div className="flex justify-between py-5 items-end">
           <div className="flex flex-col">
-            <p className="text-[22px] font-bold">Followup</p>
-            <p className="text-[10px] mt-2 font-medium ">
+            <p className="text-[22px] font-bold">Patient Follow-up Report</p>
+            {/* <p className="text-[10px] mt-2 font-medium ">
               R - Regular 15 min Session, T - 45-60 min Therapy Session, NF- Neurofeedback, HT -
               History, FS - Family Session, FM - Family Meeting, FC - Family Call, MSE, LOA Leave of
               Absence
-            </p>
+            </p> */}
           </div>
           <div className="flex gap-4 items-center">
             <DateTime
@@ -222,13 +222,18 @@ const PatientFollowup = () => {
                       </div>
                     </th>
 
+                    <th className="sticky left-[450px] pr-16 bg-[#CCB69E] text-nowrap px-3 py-2 text-center text-xs font-semibold text-black">
+                      <div className="w-[50px] flex items-center gap-2 font-semibold ">
+                        Date of discharge
+                      </div>
+                    </th>
                     {/* 🔹 Fixed 10 Followup columns */}
                     {[...Array(10)].map((_, i) => (
                       <th
                         key={i}
                         className="bg-[#CCB69E] text-nowrap px-10 py-2 text-center text-xs font-semibold text-black"
                       >
-                        Followup {i + 1}
+                        Follow-up {i + 1}
                       </th>
                     ))}
                   </tr>
@@ -301,6 +306,11 @@ const PatientFollowup = () => {
                             {therapistName}
                           </td>
 
+                          {/* 🔹 Date of Discharge */}
+                          <td className="px-3 sticky left-[440px] pr-0 z-10 bg-white py-4 text-xs text-left">
+                            {patient?.dischargeDate && formatDate(patient?.dischargeDate)}
+                          </td>
+
                           {/* 🔹 Fixed 10 followup columns with chat icon */}
                           {[...Array(10)].map((_, idx) => {
                             const followup = followups[idx];
@@ -312,20 +322,37 @@ const PatientFollowup = () => {
                                 } text-center font-medium text-black`}
                               >
                                 {followup ? (
-                                  <img
-                                    src={messageIcon}
-                                    onClick={() => {
-                                      setModalNote([followup]);
-                                      setState((prev) => ({
-                                        ...prev,
-                                        displayModal: true,
-                                        patientData: patient,
-                                        therapistData: followup.therapistId
-                                      }));
-                                    }}
-                                    className="w-4 h-4 text-[#505050] cursor-pointer mx-auto"
-                                    title="View Followup"
-                                  />
+                                  <div className="relative  w-full">
+                                    <img
+                                      src={messageIcon}
+                                      onClick={() => {
+                                        setModalNote([followup as unknown as INote]);
+                                        // setState((prev) => ({
+                                        //   ...prev,
+                                        //   displayModal: true,
+                                        //   patientData: patient,
+                                        //   therapistData: followup.therapistId
+                                        // }));
+                                        setState((prev) => ({
+                                          ...prev,
+                                          displayModal: true,
+                                          patientData: patient,
+                                          // therapistData: {
+                                          //   _id: followup.therapistId?._id || "",
+                                          //   firstName: followup.therapistId?.firstName || "",
+                                          //   lastName: followup.therapistId?.lastName || "",
+                                          //   centerId: followup.therapistId?.centerId || {
+                                          //     centerName: ""
+                                          //   }
+                                          // }
+                                        }));
+                                      }}
+                                      className=" w-4 h-4 text-[#505050] cursor-pointer mx-auto"
+                                      title="View Followup"
+                                    />
+
+                                    <div className="absolute p-1 right-11 top-[0%] rounded-full bg-red-500"></div>
+                                  </div>
                                 ) : (
                                   "-"
                                 )}
@@ -345,10 +372,29 @@ const PatientFollowup = () => {
         isOpen={state.displayModal}
         toggleModal={() => {
           setModalNote([]);
+          // setState((prev) => ({
+          //   ...prev,
+          //   displayModal: false,
+          //   patientData: {
+          //     _id: "",
+          //     firstName: "",
+          //     lastName: "",
+          //     uhid: "",
+          //     patientPicUrl: "",
+          //     gender: ""
+          //   },
+          //   therapistData: {
+          //     _id: "",
+          //     firstName: "",
+          //     lastName: "",
+          //     centerId: { centerName: "" }
+          //   }
+          // }));
           setState((prev) => ({
             ...prev,
             displayModal: false,
             patientData: {
+              ...prev.patientData,
               _id: "",
               firstName: "",
               lastName: "",
@@ -356,17 +402,18 @@ const PatientFollowup = () => {
               patientPicUrl: "",
               gender: ""
             },
-            therapistData: {
-              _id: "",
-              firstName: "",
-              lastName: "",
-              centerId: { centerName: "" }
-            }
+            // therapistData: {
+            //   ...prev.therapistData,
+            //   _id: "",
+            //   firstName: "",
+            //   lastName: "",
+            //   centerId: { centerName: "" }
+            // }
           }));
         }}
       >
         <div className="w-full h-[70vh] overflow-hidden mx-auto bg-gray-100 rounded-lg p-4 shadow-sm">
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <p className="text-lg font-bold">
               {state.patientData.firstName} {state.patientData.lastName}
             </p>
@@ -374,9 +421,9 @@ const PatientFollowup = () => {
               UHID: {state.patientData.uhid} • Therapist: {state.therapistData.firstName}{" "}
               {state.therapistData.lastName}
             </p>
-          </div>
+          </div> */}
 
-          <table className="w-full text-xs font-semibold text-left">
+          <table className="w-full mt-10 text-xs font-semibold text-left">
             <thead className="bg-[#E9E8E5] w-full top-0 sticky z-10">
               <tr className="text-[#505050] font-medium">
                 <th className="pl-7 py-3 text-xs">Date & Time</th>
