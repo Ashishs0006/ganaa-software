@@ -31,6 +31,7 @@ export interface ITherapistState {
   patientId: string;
   therapistName: string;
   isTodayNoteExist: boolean;
+   dateOfBirth?:string
 }
 
 export interface ITherapistNote {

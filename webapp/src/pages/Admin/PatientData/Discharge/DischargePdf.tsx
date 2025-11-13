@@ -17,6 +17,7 @@ import handleError from "@/utils/handleError";
 
 const toBase64 = async (url: string | URL | Request) => {
   const response = await fetch(url);
+  console.log("hii the response of dowloand discharge data is :", response)
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -262,6 +263,98 @@ const DischargeSummaryPdf = ({
               margin: [0, 0, 0, 10]
             }
           ],
+
+// ✅ New Sections Added Below Chief Complaints
+
+data.diagnosticFormulation && [
+  { text: "Diagnostic Formulation", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.diagnosticFormulation.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
+data.PsychologistNotes && [
+  { text: "Psychologist Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
+data.PsychiatricNotes && [
+  { text: "Psychiatric Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
+data.mentalStatusExaminationatDischarge && [
+  { text: "Mental Status Examination at Discharge", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.mentalStatusExaminationatDischarge.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
+
           data.investigation && [
             { text: "Investigation:", style: "sectionHeader" },
             {

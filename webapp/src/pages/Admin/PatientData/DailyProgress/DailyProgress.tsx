@@ -636,18 +636,36 @@ const DailyProgress = () => {
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-gray-600">
-                  <span>Admission Date:</span>
-                  <span className="font-medium ml-1 text-black">
-                    {state?.admissionDate && formatDate(state?.admissionDate)}
-                  </span>
-                  <p className="text-xs text-gray-600">
-                    UHID:
-                    <span className="font-medium ml-1 text-nowrap whitespace-nowrap text-black">
-                      {formatId(state?.UHID)}
-                    </span>
-                  </p>
-                </div>
+               <div className="text-xs text-gray-600">
+  <span>Admission Date:</span>
+  <span className="font-medium ml-1 text-black">
+    {state?.admissionDate && formatDate(state?.admissionDate)}
+  </span>
+
+  {/* UHID Row */}
+  <p className="text-xs text-gray-600 mt-1">
+    UHID:
+    <span className="font-medium ml-1 text-nowrap whitespace-nowrap text-black">
+      {formatId(state?.UHID)}
+    </span>
+  </p>
+
+
+  <p className="text-xs text-gray-600 mt-0.5">
+    AGE:
+    <span className="font-medium ml-1 text-black">
+      {state?.age ? `${state.age} yrs` : "--"}
+    </span>
+    {"  "} | {"  "}
+    DOA:
+    <span className="font-medium ml-1 text-black">
+      {state?.admissionDate
+        ? formatDate(state?.admissionDate)
+        : "--/--/----"}
+    </span>
+  </p>
+</div>
+
               </div>
             </div>
             <h1 className="mb-6 text-xs font-bold">Assigned Resources</h1>

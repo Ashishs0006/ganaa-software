@@ -112,7 +112,8 @@ const TherapistNotes = () => {
     patientId: "",
     gender: "",
     therapistName: "",
-    isTodayNoteExist: false
+    isTodayNoteExist: false,
+    dateOfBirth:""
   });
   const [dropDownsState, setDropDownsState] = useState<ITherapistDropDownsState>({
     displayAddForm: false,
@@ -197,6 +198,7 @@ const TherapistNotes = () => {
           gender: patientData?.data?.gender || "",
           age: patientData?.data?.age || "",
           UHID: patientData?.data?.uhid || "",
+           dateOfBirth:patientData?.data?.age || "",
           assignedTherapist: `${
             patientAdmissionHistory?.data?.resourceAllocation?.assignedTherapistId?.firstName || ""
           } ${
@@ -750,7 +752,7 @@ const TherapistNotes = () => {
                     )}
                   </div>
                 </div>
-                <div className="ml-4">
+                {/* <div className="ml-4">
                   <div className="flex mb-1  items-center">
                     <h2
                       title={`${state.firstName} ${state.lastName}`}
@@ -774,7 +776,47 @@ const TherapistNotes = () => {
                     UHID:
                     <span className="font-medium text-black"> {formatId(state.UHID)}</span>
                   </p>
-                </div>
+                </div> */}
+                          <div className="ml-4">
+  <div className="flex mb-1 items-center">
+    <h2
+      title={`${state.firstName} ${state.lastName}`}
+      className="text-xs font-semibold"
+    >
+      {state.firstName &&
+        capitalizeFirstLetter(
+          state.firstName?.length > 15
+            ? state.firstName?.slice(0, 15) + "..."
+            : state.firstName
+        )}{" "}
+      {state.lastName &&
+        capitalizeFirstLetter(
+          state.lastName.length > 15
+            ? state.lastName.slice(0, 15) + "..."
+            : state.lastName
+        )}
+    </h2>
+  </div>
+
+  <p className="text-xs text-gray-600">
+    UHID:
+    <span className="font-semibold text-black"> {formatId(state.UHID)}</span>
+  </p>
+
+  {/* 👇 New line for Age and Date of Admission */}
+  <p className="text-xs text-gray-600 mt-0.5">
+    AGE:{" "}
+    <span className="font-semibold text-black">
+      {state.dateOfBirth} yrs
+    </span>{" "}
+    | DOA:{" "}
+    <span className="font-semibold text-black">
+      {state.dateOfAdmission
+        ? new Date(state.dateOfAdmission).toLocaleDateString("en-GB")
+        : "--/--/----"}
+    </span>
+  </p>
+</div>
               </div>
               <div className="border mx-5 h-10 my-auto"></div>
               <div>

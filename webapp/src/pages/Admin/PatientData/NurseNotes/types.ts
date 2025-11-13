@@ -25,6 +25,7 @@ export interface INurseState {
   dateOfAdmission: string;
   patientId: string;
   gender: string;
+   dateOfBirth?:string
 }
 
 export interface INurseNoteState {
@@ -44,6 +45,7 @@ export interface INurseNoteState {
   vitalsDate: string;
   vitalsTime: string;
   noteDateTime?: string;
+ 
 }
 
 export interface INurseDropDownsState {
