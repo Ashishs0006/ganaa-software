@@ -2,10 +2,10 @@ import { Button, DateTime, Modal } from "@/components";
 import calender from "@/assets/images/calender.svg";
 import { IoIosArrowDown } from "react-icons/io";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { getFollowups, getTherapistSession } from "@/apis";
+import { getFollowups} from "@/apis";
 import { IData, INote, IPatient, ITherapist } from "./type";
 import { ISelectOption } from "@/components/Select/types";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { convertBackendDateToTime, formatDate, formatId } from "@/utils/formater";
 import messageIcon from "@/assets/images/messageIcon.svg";
 import toast from "react-hot-toast";
@@ -26,9 +26,9 @@ interface IState {
 const PatientFollowup = () => {
   const navigate = useNavigate();
   const { auth } = useAuth();
-  const [dischargeDate, setDischargeDate] = useState({});
+  // const [dischargeDate, setDischargeDate] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
-  const [dateArray, setDateArray] = useState<string[]>([]);
+  // const [dateArray, setDateArray] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),

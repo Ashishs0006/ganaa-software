@@ -61,7 +61,7 @@ import { RBACGuard } from "@/components/RBACGuard/RBACGuard";
 import { RESOURCES } from "@/constants/resources";
 import { BsFiletypePdf } from "react-icons/bs";
 import DataDownload from "./DataDownload/DataDownload";
-import { stat } from "fs";
+
 
 const DoctorNotes = () => {
   const { id, aId } = useParams();
@@ -231,18 +231,7 @@ const DoctorNotes = () => {
       }
     }
   };
-  const calculateAge = (dob: string) => {
-  if (!dob) return "";
-  const birthDate = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age;
-};
-console.log("hii date of birth is :",state.dateOfBirth)
+
 
   useEffect(() => {
     fetchDoctorNotes();
