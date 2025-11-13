@@ -89,7 +89,6 @@ const PatientFollowup = () => {
 
   const [modalNote, setModalNote] = useState<INote[] | []>([]);
   const [data, setData] = useState<IData>();
-  console.log("✌️data --->", data);
 
   const fetchSessionData = async () => {
     setState((prev) => ({ ...prev, loading: true }));
@@ -117,10 +116,9 @@ const PatientFollowup = () => {
         centerId: centers.join(",")
       });
 
-      console.log("✌️response --->", response);
       if (response.data.status === "success") {
         setData(response.data.data);
-        setDischargeDate(response?.data?.data?.dischargeResult);
+        // setDischargeDate(response?.data?.data?.dischargeResult);
 
         const dates: string[] = [];
         const currentDate = new Date(startDate);
@@ -129,7 +127,7 @@ const PatientFollowup = () => {
           dates.push(currentDate.toISOString().split("T")[0]);
           currentDate.setDate(currentDate.getDate() + 1);
         }
-        setDateArray(dates);
+        // setDateArray(dates);
       } else {
         console.error("Failed to fetch Session data");
       }
@@ -351,7 +349,7 @@ const PatientFollowup = () => {
                                       title="View Followup"
                                     />
 
-                                    <div className="absolute p-1 right-11 top-[0%] rounded-full bg-red-500"></div>
+                                    <div className="absolute p-1 right-13 top-[0%] rounded-full bg-red-500"></div>
                                   </div>
                                 ) : (
                                   "-"
@@ -439,6 +437,8 @@ const PatientFollowup = () => {
                 <th className="px-7 py-3 w-1/9 text-xs">File</th>
                 <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
                 <th className="px-7 py-3 w-1/9 text-xs">Notes</th>
+                <th className="px-7 py-3 w-1/9 text-xs"></th>
+
               </tr>
             </thead>
 
@@ -499,6 +499,7 @@ const PatientFollowup = () => {
                       className="px-7 py-7 max-w-[250px] overflow-hidden text-overflow-ellipsis break-all"
                       dangerouslySetInnerHTML={{ __html: value?.note || "--" }}
                     ></td>
+                    <td className="px-7 py-7"></td>
                   </tr>
                 ))
               ) : (

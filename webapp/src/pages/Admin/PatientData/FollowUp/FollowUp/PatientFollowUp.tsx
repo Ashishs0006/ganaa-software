@@ -2383,13 +2383,13 @@ const PatientFollowup = () => {
                           ) : (
                             <td className="px-7 py-7 w-1/9 ">--</td>
                           )}
-                          <td className="px-7 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>
+                          {state.illnessType !== "Mental Disorder" && <td className="px-7 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>}
                           <td
                             className="px-7 py-7 w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
                             dangerouslySetInnerHTML={{ __html: value?.note }}
                           ></td>
                           <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
-                            <td className="pr-2 py-7 w-1/7 text-xs">
+                            <td className="pr-0 py-7 text-xs">
                               <div
                                 onClick={() => {
                                   if (!patient.loa.loa) {

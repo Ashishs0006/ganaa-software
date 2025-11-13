@@ -12,6 +12,14 @@ export interface IPatient {
   patientPic: string;
   therapistId?: ITherapist;
   dischargeDate?: string;
+  patientData?: {
+    _id?: number;
+    firstName?: string;
+    lastName?: string;
+    uhid?: string;
+    patientPicUrl?: string;
+    gender?: string;
+  };
 }
 
 export interface ITherapist {
