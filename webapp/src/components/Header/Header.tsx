@@ -105,7 +105,7 @@ const Header = () => {
                     className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
                     to="/admin/followup"
                   >
-                    Foolow-up
+                  Follow-up
                   </NavLink>
                   <hr />
 

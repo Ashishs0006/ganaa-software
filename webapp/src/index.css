@@ -117,3 +117,17 @@ input.custom-no-autofill:-webkit-autofill {
   -webkit-text-fill-color: #000 !important;
   border: none !important;
 }
+
+
+  .note-cell {
+    max-height: 90px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+  }
+  .note-cell > * {
+    margin: 0 !important;
+    padding: 0;
+  }
+
+

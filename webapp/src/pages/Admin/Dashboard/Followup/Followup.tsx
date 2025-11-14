@@ -495,10 +495,12 @@ const PatientFollowup = () => {
                     <td className="px-7 py-7">{value.feedbackFromFamily || "--"}</td>
 
                     {/* Notes */}
-                    <td
-                      className="px-7 py-7 max-w-[250px] overflow-hidden text-overflow-ellipsis break-all"
-                      dangerouslySetInnerHTML={{ __html: value?.note || "--" }}
-                    ></td>
+                   <td className="px-7 py-7 max-w-[250px]">
+  <div className="note-cell" 
+    dangerouslySetInnerHTML={{ __html: value?.note || "--" }}
+  />
+</td>
+
                     <td className="px-7 py-7"></td>
                   </tr>
                 ))
