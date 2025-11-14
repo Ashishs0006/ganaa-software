@@ -8,7 +8,7 @@ export interface IPatient {
   patientPicUrl: string;
   gender?: string;
   centerId?: ICenter;
-  followups: IPatientFollowup[];
+  followups?: IPatientFollowup[];
   patientPic: string;
   therapistId?: ITherapist;
   dischargeDate?: string;

@@ -82,7 +82,7 @@ const PatientFollowup = () => {
     loading: false,
     center: { label: "Select", value: "" },
     displayModal: false,
-    patientData: { _id: "", firstName: "", lastName: "", uhid: "", patientPicUrl: "", gender: "" },
+    patientData: { _id: "", firstName: "", lastName: "", uhid: "", patientPicUrl: "", gender: "" ,patientPic:"",},
     therapistData: { _id: "", firstName: "", lastName: "", centerId: { centerName: "" } },
     sort: false
   });
@@ -526,7 +526,8 @@ const PatientFollowup = () => {
                   firstName: "",
                   lastName: "",
                   uhid: "",
-                  patientPicUrl: ""
+                  patientPicUrl: "",
+                  patientPic:""
                 },
                 therapistData: {
                   _id: "",
