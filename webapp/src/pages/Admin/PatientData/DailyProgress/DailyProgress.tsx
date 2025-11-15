@@ -637,10 +637,10 @@ const DailyProgress = () => {
                   )}
                 </div>
                <div className="text-xs text-gray-600">
-  <span>Admission Date:</span>
+  {/* <span>Admission Date:</span>
   <span className="font-medium ml-1 text-black">
     {state?.admissionDate && formatDate(state?.admissionDate)}
-  </span>
+  </span> */}
 
   {/* UHID Row */}
   <p className="text-xs text-gray-600 mt-1">
@@ -651,18 +651,19 @@ const DailyProgress = () => {
   </p>
 
 
-  <p className="text-xs text-gray-600 mt-0.5">
-    AGE:
-    <span className="font-medium ml-1 text-black">
-      {state?.age ? `${state.age} yrs` : "--"}
-    </span>
-    {"  "} | {"  "}
-    DOA:
-    <span className="font-medium ml-1 text-black">
-      {state?.admissionDate
-        ? formatDate(state?.admissionDate)
-        : "--/--/----"}
-    </span>
+<p className="text-xs text-gray-600 mt-0.5">
+  AGE:{" "}
+  <span className="font-semibold text-black">
+    {state?.age ? `${state.age} yrs` : "--"}
+  </span>{" "}
+  | DOA:{" "}
+  <span className="font-semibold text-black">
+    {state?.admissionDate
+      ? formatDate(state?.admissionDate)
+      : "--/--/----"}
+  </span>
+
+
   </p>
 </div>
 

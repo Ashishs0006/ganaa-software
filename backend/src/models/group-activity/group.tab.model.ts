@@ -49,7 +49,7 @@ const groupTabSchema = new mongoose.Schema<IGroupTab>({
 });
 
 // Ensure uniqueness per date + center
-groupTabSchema.index({ activityDateTime: 1, centerId: 1 }, { unique: true });
+groupTabSchema.index({ activityDateTime: 1, centerId: 1 });
 
 const GroupTab = mongoose.model<IGroupTab>(Collections.groupTab.name, groupTabSchema);
 

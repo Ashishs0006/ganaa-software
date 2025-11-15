@@ -1601,7 +1601,7 @@ const PatientFollowup = () => {
                               handleSelect(name, data);
                             }}
                           />
-                          <Select
+                          {/* <Select
                             disable={state.isTodayNoteExist}
                             label="Making a sponsor"
                             options={[
@@ -1617,7 +1617,92 @@ const PatientFollowup = () => {
                             onChange={(name, data) => {
                               handleSelect(name, data);
                             }}
-                          />
+                          /> */}
+                          <div className="flex gap-[10px] items-start justify-start flex-col">
+  <label className="font-medium text-[14px]"> Making a sponsor and following his guidelines</label>
+
+  <div className="flex gap-5 items-center justify-center mb-3">
+    
+    {/* Yes option */}
+    <div className="flex items-center">
+      <input
+        type="radio"
+        id="sponsor-yes"
+        name="sponsor"
+        value="Yes"
+        checked={data?.sponsor === "Yes"}
+        onChange={(e) =>
+          handleSelect("sponsor", {
+            label: e.target.value,
+            value: e.target.value
+          })
+        }
+        disabled={state.isTodayNoteExist}
+        className="hidden"
+      />
+      <label
+        htmlFor="sponsor-yes"
+        className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+          data?.sponsor === "Yes" ? "border-[#586B3A]!" : "border-[#586B3A]"
+        } ${
+          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+        }`}
+      >
+        {data?.sponsor === "Yes" && (
+          <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+        )}
+      </label>
+      <label
+        htmlFor="sponsor-yes"
+        className={`ms-2 text-sm font-medium ${
+          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+        }`}
+      >
+        Yes
+      </label>
+    </div>
+
+    {/* No option */}
+    <div className="flex items-center">
+      <input
+        type="radio"
+        id="sponsor-no"
+        name="sponsor"
+        value="No"
+        checked={data?.sponsor === "No"}
+        onChange={(e) =>
+          handleSelect("sponsor", {
+            label: e.target.value,
+            value: e.target.value
+          })
+        }
+        disabled={state.isTodayNoteExist}
+        className="hidden"
+      />
+      <label
+        htmlFor="sponsor-no"
+        className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+          data?.sponsor === "No" ? "border-[#586B3A]!" : "border-[#586B3A]"
+        } ${
+          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+        }`}
+      >
+        {data?.sponsor === "No" && (
+          <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+        )}
+      </label>
+      <label
+        htmlFor="sponsor-no"
+        className={`ms-2 text-sm font-medium ${
+          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+        }`}
+      >
+        No
+      </label>
+    </div>
+  </div>
+</div>
+
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Urge</label>
@@ -1986,7 +2071,7 @@ const PatientFollowup = () => {
                           </div>
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-[14px]">Doing 12-step program</label>
+                            <label className="font-medium text-[14px]">Doing 12-step program work regularly</label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -2079,7 +2164,7 @@ const PatientFollowup = () => {
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
-                              Doing review with Ganaa doctor
+                            Doing review with Ganaa doctor every 15 days
                             </label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
