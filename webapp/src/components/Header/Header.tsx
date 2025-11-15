@@ -101,13 +101,8 @@ const Header = () => {
                   </NavLink>
                   <hr />
 
-                   <NavLink
-                    className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
-                    to="/admin/followup"
-                  >
-                Patient Follow-Up Report
-                  </NavLink>
-                  <hr />
+               
+                
 
                   <NavLink
                     className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
@@ -122,6 +117,13 @@ const Header = () => {
                     to="/admin/patients-report"
                   >
                     Patients Report
+                  </NavLink>
+                  <hr />
+                    <NavLink
+                    className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
+                    to="/admin/followup"
+                  >
+                Patient Follow-Up Report
                   </NavLink>
                 </div>
               </div>

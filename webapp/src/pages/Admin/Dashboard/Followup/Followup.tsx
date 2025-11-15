@@ -349,7 +349,9 @@ const PatientFollowup = () => {
                                       title="View Followup"
                                     />
 
-                                    <div className="absolute p-1 right-13 top-[0%] rounded-full bg-red-500"></div>
+                                 <div className="absolute p-1 right-[3.3rem] -top-1 rounded-full bg-red-500"></div>
+
+
                                   </div>
                                 ) : (
                                   "-"
