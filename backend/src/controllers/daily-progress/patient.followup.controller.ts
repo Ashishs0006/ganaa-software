@@ -17,7 +17,7 @@ import { IPatientFollowup } from '../../interfaces/model/daily-progress/i.patien
  */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 },
+  limits: { fileSize: 6 * 1024 * 1024 },
   fileFilter: MFileFilter.pdfFilter,
 });
 

@@ -62,12 +62,10 @@ const BasicDetails = () => {
   const [uhid, setUhid] = useState<string>();
 
   const [idProofFiles, setIdProofFiles] = useState<File[]>([]);
-console.log('✌️idProofFiles --->', idProofFiles);
   // const [patientIdProofUrls, setIdProofUrls] = useState<string[]>([]); // uploaded or fetched URLs
   const [idProofError, setIdProofError] = useState<string>("");
 
   const patientData = useSelector((store: RootState) => store.patient);
-// console.log('✌️patientData --->', patientData);
   const stepperData = useSelector((store: RootState) => store.stepper);
   const dropdownData = useSelector((store: RootState) => store.dropdown);
 

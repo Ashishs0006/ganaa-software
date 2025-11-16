@@ -93,6 +93,11 @@ const PatientFollowup = () => {
   const [showFollowupRestrictionModal, setShowFollowupRestrictionModal] = useState<boolean>(false);
   // const [lastFollowupDate, setLastFollowupDate] = useState<string | null>(null);
   // const [daysSinceLastFollowup, setDaysSinceLastFollowup] = useState<number | null>(null);
+  const [modalState, setmodalState] = useState({
+    displayNoteModal: false,
+    selectedNote: ""
+    // ...other state
+  });
 
   const [data, setData] = useState<IPatientFollowupState>({
     id: "",
@@ -740,10 +745,10 @@ const PatientFollowup = () => {
   }, []);
 
   const handleDropFiles = useCallback((files: File[]) => {
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
     try {
       if (files[0].size > maxSize) {
-        throw new Error("File size exceeds 5 MB limit.");
+        throw new Error("File size exceeds 10 MB limit.");
       }
     } catch (error) {
       handleError(error);
@@ -1619,90 +1624,99 @@ const PatientFollowup = () => {
                             }}
                           /> */}
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-  <label className="font-medium text-[14px]"> Making a sponsor and following his guidelines</label>
+                            <label className="font-medium text-[14px]">
+                              {" "}
+                              Making a sponsor and following his guidelines
+                            </label>
 
-  <div className="flex gap-5 items-center justify-center mb-3">
-    
-    {/* Yes option */}
-    <div className="flex items-center">
-      <input
-        type="radio"
-        id="sponsor-yes"
-        name="sponsor"
-        value="Yes"
-        checked={data?.sponsor === "Yes"}
-        onChange={(e) =>
-          handleSelect("sponsor", {
-            label: e.target.value,
-            value: e.target.value
-          })
-        }
-        disabled={state.isTodayNoteExist}
-        className="hidden"
-      />
-      <label
-        htmlFor="sponsor-yes"
-        className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-          data?.sponsor === "Yes" ? "border-[#586B3A]!" : "border-[#586B3A]"
-        } ${
-          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
-        }`}
-      >
-        {data?.sponsor === "Yes" && (
-          <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
-        )}
-      </label>
-      <label
-        htmlFor="sponsor-yes"
-        className={`ms-2 text-sm font-medium ${
-          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-        }`}
-      >
-        Yes
-      </label>
-    </div>
+                            <div className="flex gap-5 items-center justify-center mb-3">
+                              {/* Yes option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="sponsor-yes"
+                                  name="sponsor"
+                                  value="Yes"
+                                  checked={data?.sponsor === "Yes"}
+                                  onChange={(e) =>
+                                    handleSelect("sponsor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="sponsor-yes"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.sponsor === "Yes"
+                                      ? "border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.sponsor === "Yes" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="sponsor-yes"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  Yes
+                                </label>
+                              </div>
 
-    {/* No option */}
-    <div className="flex items-center">
-      <input
-        type="radio"
-        id="sponsor-no"
-        name="sponsor"
-        value="No"
-        checked={data?.sponsor === "No"}
-        onChange={(e) =>
-          handleSelect("sponsor", {
-            label: e.target.value,
-            value: e.target.value
-          })
-        }
-        disabled={state.isTodayNoteExist}
-        className="hidden"
-      />
-      <label
-        htmlFor="sponsor-no"
-        className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
-          data?.sponsor === "No" ? "border-[#586B3A]!" : "border-[#586B3A]"
-        } ${
-          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
-        }`}
-      >
-        {data?.sponsor === "No" && (
-          <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
-        )}
-      </label>
-      <label
-        htmlFor="sponsor-no"
-        className={`ms-2 text-sm font-medium ${
-          state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-        }`}
-      >
-        No
-      </label>
-    </div>
-  </div>
-</div>
-
+                              {/* No option */}
+                              <div className="flex items-center">
+                                <input
+                                  type="radio"
+                                  id="sponsor-no"
+                                  name="sponsor"
+                                  value="No"
+                                  checked={data?.sponsor === "No"}
+                                  onChange={(e) =>
+                                    handleSelect("sponsor", {
+                                      label: e.target.value,
+                                      value: e.target.value
+                                    })
+                                  }
+                                  disabled={state.isTodayNoteExist}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="sponsor-no"
+                                  className={`w-5 h-5 flex items-center justify-center rounded-full border-2 cursor-pointer ${
+                                    data?.sponsor === "No"
+                                      ? "border-[#586B3A]!"
+                                      : "border-[#586B3A]"
+                                  } ${
+                                    state.isTodayNoteExist ? "cursor-not-allowed opacity-50" : ""
+                                  }`}
+                                >
+                                  {data?.sponsor === "No" && (
+                                    <div className="w-3 h-3 rounded-full bg-[#586B3A]"></div>
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="sponsor-no"
+                                  className={`ms-2 text-sm font-medium ${
+                                    state.isTodayNoteExist
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                >
+                                  No
+                                </label>
+                              </div>
+                            </div>
+                          </div>
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">Urge</label>
@@ -2071,7 +2085,9 @@ const PatientFollowup = () => {
                           </div>
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
-                            <label className="font-medium text-[14px]">Doing 12-step program work regularly</label>
+                            <label className="font-medium text-[14px]">
+                              Doing 12-step program work regularly
+                            </label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
                               {/* Yes option */}
@@ -2164,7 +2180,7 @@ const PatientFollowup = () => {
 
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
-                            Doing review with Ganaa doctor every 15 days
+                              Doing review with Ganaa doctor every 15 days
                             </label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">
@@ -2270,7 +2286,7 @@ const PatientFollowup = () => {
                       )}
                     </div>
 
-                    <div className="col-span-1 col-start-1 ">
+                    <div className="col-span-1 col-start-1">
                       <RichTextEditor
                         name="note"
                         disable={state.isTodayNoteExist}
@@ -2468,11 +2484,27 @@ const PatientFollowup = () => {
                           ) : (
                             <td className="px-7 py-7 w-1/9 ">--</td>
                           )}
-                          {state.illnessType !== "Mental Disorder" && <td className="px-7 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>}
-                          <td
-                            className="px-7 py-7 w-3/5 overflow-hidden text-overflow-ellipsis break-all max-w-md"
-                            dangerouslySetInnerHTML={{ __html: value?.note }}
-                          ></td>
+                          {state.illnessType !== "Mental Disorder" && (
+                            <td className="px-7 py-7 w-1/9 ">{value.feedbackFromFamily || "--"}</td>
+                          )}
+                          <td className="px-7 py-7 w-[500px] max-w-[500px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {value?.note
+                              ? value.note.replace(/<[^>]+>/g, "").slice(0, 20) + "..."
+                              : "--"}
+                            <button
+                              className="text-blue-500 ml-2 underline"
+                              onClick={() => {
+                                setmodalState((prev) => ({
+                                  ...prev,
+                                  displayNoteModal: true,
+                                  selectedNote: value.note
+                                }));
+                              }}
+                            >
+                              View
+                            </button>
+                          </td>
+
                           <RBACGuard resource={RESOURCES.THERAPIST_NOTES} action="write">
                             <td className="pr-0 py-7 text-xs">
                               <div
@@ -2545,6 +2577,25 @@ const PatientFollowup = () => {
           </div>
         </div>
       </div>
+
+        <Modal
+          isOpen={modalState.displayNoteModal}
+          toggleModal={() => setmodalState((prev) => ({ ...prev, displayNoteModal: false }))}
+          crossIcon
+          // title="Follow-up Date Not Allowed"
+        >
+          {/* <div className="fixed inset-0 flex justify-center items-center z-50"> */}
+          <div className="p-6 rounded-md max-w-[80vw] m-2 max-h-[80vh] overflow-y-auto shadow-xl">
+            <h2 className="text-lg font-bold mb-4">Followup Notes</h2>
+
+            <div
+              className="prose max-w-full"
+              dangerouslySetInnerHTML={{ __html: modalState.selectedNote }}
+            ></div>
+
+          </div>
+          {/* </div> */}
+        </Modal>
 
       {/* Followup Restriction Modal */}
       <Modal

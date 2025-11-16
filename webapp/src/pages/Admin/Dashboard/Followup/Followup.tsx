@@ -2,7 +2,7 @@ import { Button, DateTime, Modal } from "@/components";
 import calender from "@/assets/images/calender.svg";
 import { IoIosArrowDown } from "react-icons/io";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { getFollowups} from "@/apis";
+import { getFollowups } from "@/apis";
 import { IData, INote, IPatient, ITherapist } from "./type";
 import { ISelectOption } from "@/components/Select/types";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -82,13 +82,26 @@ const PatientFollowup = () => {
     loading: false,
     center: { label: "Select", value: "" },
     displayModal: false,
-    patientData: { _id: "", firstName: "", lastName: "", uhid: "", patientPicUrl: "", gender: "" ,patientPic:"",},
+    patientData: {
+      _id: "",
+      firstName: "",
+      lastName: "",
+      uhid: "",
+      patientPicUrl: "",
+      gender: "",
+      patientPic: ""
+    },
     therapistData: { _id: "", firstName: "", lastName: "", centerId: { centerName: "" } },
     sort: false
   });
 
   const [modalNote, setModalNote] = useState<INote[] | []>([]);
   const [data, setData] = useState<IData>();
+ const [modalState, setmodalState] = useState({
+    displayNoteModal: false,
+    selectedNote: ""
+    // ...other state
+  });
 
   const fetchSessionData = async () => {
     setState((prev) => ({ ...prev, loading: true }));
@@ -334,7 +347,7 @@ const PatientFollowup = () => {
                                         setState((prev) => ({
                                           ...prev,
                                           displayModal: true,
-                                          patientData: patient,
+                                          patientData: patient
                                           // therapistData: {
                                           //   _id: followup.therapistId?._id || "",
                                           //   firstName: followup.therapistId?.firstName || "",
@@ -349,9 +362,7 @@ const PatientFollowup = () => {
                                       title="View Followup"
                                     />
 
-                                 <div className="absolute p-1 right-[3.3rem] -top-1 rounded-full bg-red-500"></div>
-
-
+                                    <div className="absolute p-1 right-[3.3rem] -top-1 rounded-full bg-red-500"></div>
                                   </div>
                                 ) : (
                                   "-"
@@ -368,6 +379,9 @@ const PatientFollowup = () => {
           </div>
         )}
       </div>
+
+     
+
       <Modal
         isOpen={state.displayModal}
         toggleModal={() => {
@@ -401,7 +415,7 @@ const PatientFollowup = () => {
               uhid: "",
               patientPicUrl: "",
               gender: ""
-            },
+            }
             // therapistData: {
             //   ...prev.therapistData,
             //   _id: "",
@@ -412,7 +426,7 @@ const PatientFollowup = () => {
           }));
         }}
       >
-        <div className="w-full h-[70vh] overflow-hidden mx-auto bg-gray-100 rounded-lg p-4 shadow-sm">
+        <div className="w-[90vw] h-[70vh] overflow-hidden mx-auto bg-gray-100 rounded-lg p-4 shadow-sm">
           {/* <div className="mb-4">
             <p className="text-lg font-bold">
               {state.patientData.firstName} {state.patientData.lastName}
@@ -440,7 +454,6 @@ const PatientFollowup = () => {
                 <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
                 <th className="px-7 py-3 w-1/9 text-xs">Notes</th>
                 <th className="px-7 py-3 w-1/9 text-xs"></th>
-
               </tr>
             </thead>
 
@@ -497,11 +510,23 @@ const PatientFollowup = () => {
                     <td className="px-7 py-7">{value.feedbackFromFamily || "--"}</td>
 
                     {/* Notes */}
-                   <td className="px-7 py-7 max-w-[250px]">
-  <div className="note-cell" 
-    dangerouslySetInnerHTML={{ __html: value?.note || "--" }}
-  />
-</td>
+                    <td className="px-7 py-7 w-[500px] max-w-[500px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {value?.note
+                              ? value.note.replace(/<[^>]+>/g, "").slice(0, 20) + "..."
+                              : "--"}
+                            <button
+                              className="text-blue-500 ml-2 underline"
+                              onClick={() => {
+                                setmodalState((prev) => ({
+                                  ...prev,
+                                  displayNoteModal: true,
+                                  selectedNote: value.note
+                                }));
+                              }}
+                            >
+                              View
+                            </button>
+                          </td>
 
                     <td className="px-7 py-7"></td>
                   </tr>
@@ -529,7 +554,7 @@ const PatientFollowup = () => {
                   lastName: "",
                   uhid: "",
                   patientPicUrl: "",
-                  patientPic:""
+                  patientPic: ""
                 },
                 therapistData: {
                   _id: "",
@@ -557,6 +582,24 @@ const PatientFollowup = () => {
             </svg>
           </div>
         </div>
+
+         <Modal
+        isOpen={modalState.displayNoteModal}
+        toggleModal={() => setmodalState((prev) => ({ ...prev, displayNoteModal: false }))}
+        crossIcon
+        // title="Follow-up Date Not Allowed"
+      >
+        {/* <div className="fixed inset-0 flex justify-center items-center z-50"> */}
+        <div className="p-6 rounded-md w-full max-w-[80vw] m-2 max-h-[80vh] overflow-y-auto">
+          <h2 className="text-lg font-bold mb-4">Followup Notes</h2>
+
+          <div
+            className="prose max-w-full"
+            dangerouslySetInnerHTML={{ __html: modalState.selectedNote }}
+          ></div>
+        </div>
+        {/* </div> */}
+      </Modal>
       </Modal>
     </div>
   );
