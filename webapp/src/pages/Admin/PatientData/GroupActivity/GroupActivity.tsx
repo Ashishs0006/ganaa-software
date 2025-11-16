@@ -17,7 +17,7 @@ import { capitalizeFirstLetter, formatId } from "@/utils/formater";
 import toast from "react-hot-toast";
 import handleError from "@/utils/handleError";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { TableShimmer } from "@/components/Shimmer/Shimmer";
 import messageIcon from "@/assets/images/messageIcon.svg";
 import messageIcondisbale from "@/assets/images/messageIconDisable.svg";
@@ -32,7 +32,10 @@ import Filter from "@/components/Filter/Filter";
 const GroupActivity = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [selected, setSelected] = useState("All");
+    const [searchParams] = useSearchParams();
+  
+  // Get selected from URL params, default to "All"
+  const selected = searchParams.get("filter") || "All";
   const { auth } = useAuth();
 
   const [loaData, setLoaData] = useState<string[]>([]);
@@ -762,7 +765,7 @@ const handleSubmit = async (id: string | undefined) => {
                 </CustomCalendar>
               </div>
               {/* <div className="flex ">GDL2</div> */}
-              <Filter selected={selected} setSelected={setSelected} />
+              <Filter  />
             </div>
           </div>
           {state.loading && (

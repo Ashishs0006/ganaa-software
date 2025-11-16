@@ -440,20 +440,20 @@ const PatientFollowup = () => {
           <table className="w-full mt-10 text-xs font-semibold text-left">
             <thead className="bg-[#E9E8E5] w-full top-0 sticky z-10">
               <tr className="text-[#505050] font-medium">
-                <th className="pl-7 py-3 text-xs">Date & Time</th>
+                <th className="pl-2 py-3 text-xs">Date & Time</th>
                 <th className="px-4 py-3 text-xs">Therapist</th>
-                <th className="px-7 py-3 text-xs">Current Status</th>
-                <th className="px-7 py-3 w-1/9 text-xs">Medication Adherence</th>
-                <th className="px-7 py-3 w-1/9 text-xs">Attending Meeting</th>
-                <th className="px-5 py-3 w-1/9 text-xs">Making a Sponsor</th>
-                <th className="px-7 py-3 text-xs">Urge</th>
-                <th className="px-7 py-3 text-xs">Prayer</th>
-                <th className="px-7 py-3 text-xs">Literature</th>
-                <th className="px-7 py-3 text-xs">Daycare</th>
-                <th className="px-7 py-3 w-1/9 text-xs">File</th>
+                <th className="px-4 py-3 text-xs">Current Status</th>
+                <th className="px-4 py-3 w-1/9 text-xs">Medication Adherence</th>
+                <th className="px-4 py-3 w-1/9 text-xs">Attending Meeting</th>
+                <th className="px-4 py-3 w-1/7 text-xs">Making a Sponsor</th>
+                <th className="px-4 py-3 text-xs">Urge</th>
+                <th className="px-4 py-3 text-xs">Prayer</th>
+                <th className="px-4 py-3 text-xs">Literature</th>
+                <th className="px-4 py-3 text-xs">Daycare</th>
+                <th className="px-4 py-3 w-1/9 text-xs">File</th>
                 <th className="px-2 py-3 w-1/9 text-xs">Family Feedback</th>
-                <th className="px-7 py-3 w-1/9 text-xs">Notes</th>
-                <th className="px-7 py-3 w-1/9 text-xs"></th>
+                <th className="px-4 py-3 w-1/9 text-xs">Notes</th>
+                <th className="px-4 py-3 w-1/9 text-xs"></th>
               </tr>
             </thead>
 
@@ -465,7 +465,7 @@ const PatientFollowup = () => {
                     className="hover:bg-[#F6F6F6C7] border-b text-xs border-[#DCDCDCE0]"
                   >
                     {/* Date & Time */}
-                    <td className="pl-7 py-7 text-nowrap">
+                    <td className="pl-3 py-7 text-nowrap">
                       <div className="flex flex-col justify-center">
                         <p>{value.noteDateTime && formatDate(value.noteDateTime)}</p>
                         <p className="text-gray-500">
@@ -475,45 +475,45 @@ const PatientFollowup = () => {
                     </td>
 
                     {/* Therapist */}
-                    <td className="px-7 py-7">
+                    <td className="px-4 py-7">
                       {value.therapistId?.firstName} {value.therapistId?.lastName}
                     </td>
 
                     {/* Followup Data */}
-                    <td className="px-7 py-7">{value.currentStatus || "--"}</td>
-                    <td className="px-7 py-7">{value.adherence || "--"}</td>
-                    <td className="px-7 py-7">{value.meeting || "--"}</td>
-                    <td className="px-7 py-7">{value.sponsor || "--"}</td>
-                    <td className="px-7 py-7">{value.urge || "--"}</td>
-                    <td className="px-7 py-7">{value.prayer || "--"}</td>
-                    <td className="px-7 py-7">{value.literature || "--"}</td>
-                    <td className="px-7 py-7">{value.daycareAtGanaa || "--"}</td>
+                    <td className="px-4 py-7">{value.currentStatus || "--"}</td>
+                    <td className="px-4 py-7">{value.adherence || "--"}</td>
+                    <td className="px-4 py-7">{value.meeting || "--"}</td>
+                    <td className="px-4 py-7">{value.sponsor || "--"}</td>
+                    <td className="px-4 py-7">{value.urge || "--"}</td>
+                    <td className="px-4 py-7">{value.prayer || "--"}</td>
+                    <td className="px-4 py-7">{value.literature || "--"}</td>
+                    <td className="px-4 py-7">{value.daycareAtGanaa || "--"}</td>
 
                     {/* File */}
                     {value.file?.filePath ? (
-                      <td className="px-7 py-7 w-1/9">
+                      <td className="px-5 py-7 w-1/9">
                         <a
                           href={value.file.filePath}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center gap-2 bg-[#FAFFE2] border-2 border-dashed border-[#CAD2AA] rounded-lg px-2 py-1 hover:bg-[#F1F8D9]"
+                          className="flex items-center gap-2 bg-[#FAFFE2] border-2 border-dashed border-[#CAD2AA] rounded-lg px-3 py-1 hover:bg-[#F1F8D9]"
                         >
-                          <img src={pdfFile} className="w-4" />
+                          <img src={pdfFile} className="w-3" />
                           <p className="text-xs font-bold">View</p>
                         </a>
                       </td>
                     ) : (
-                      <td className="px-7 py-7 w-1/9">--</td>
+                      <td className="px-4 py-7 w-1/9">--</td>
                     )}
 
                     {/* Family Feedback */}
-                    <td className="px-7 py-7">{value.feedbackFromFamily || "--"}</td>
+                    <td className="px-4 py-7">{value.feedbackFromFamily || "--"}</td>
 
                     {/* Notes */}
-                    <td className="px-7 py-7 w-[500px] max-w-[500px] whitespace-nowrap overflow-hidden text-ellipsis">
-                            {value?.note
+                    <td className="px-4 py-7 w-[500px] max-w-[500px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {/* {value?.note
                               ? value.note.replace(/<[^>]+>/g, "").slice(0, 20) + "..."
-                              : "--"}
+                              : "--"} */}
                             <button
                               className="text-blue-500 ml-2 underline"
                               onClick={() => {
@@ -528,7 +528,7 @@ const PatientFollowup = () => {
                             </button>
                           </td>
 
-                    <td className="px-7 py-7"></td>
+                    <td className="px-4 py-7"></td>
                   </tr>
                 ))
               ) : (
