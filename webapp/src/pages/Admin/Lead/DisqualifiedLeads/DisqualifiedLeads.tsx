@@ -26,7 +26,9 @@ import { useNavigate } from "react-router-dom";
 
 const DisqualifiedLeads = () => {
   const [searchParams] = useSearchParams();
-      const [selected, setSelected] = useState("All");
+   const selected = searchParams.get("filter") || "All";
+
+      // const [selected, setSelected] = useState("All");
       const { auth } = useAuth();
   const navigate = useNavigate();
 
@@ -300,7 +302,7 @@ const DisqualifiedLeads = () => {
                   { title: "Follow Up Date", value: "nextFollowUpDate" }
                 ]}
               />
-                <Filter selected={selected} setSelected={setSelected} />
+                <Filter  />
               {/* <div className="flex cursor-pointer bg-[#575F4A] text-white font-semibold items-center text-xs justify-center px-3 py-2 border border-[#D4D4D4] rounded-lg">
                 All Filters
                 <MdKeyboardArrowDown size={15} />
