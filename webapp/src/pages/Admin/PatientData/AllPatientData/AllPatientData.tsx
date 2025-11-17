@@ -26,7 +26,7 @@ import { useAuth } from "@/providers/AuthProvider";
 
 const AllPatientData = () => {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState("All");
+  // const [selected, setSelected] = useState("All");
   const [searchParams, _setSearchParams] = useSearchParams();
 
   const dispatch = useDispatch();
@@ -340,7 +340,7 @@ const AllPatientData = () => {
                   { title: "UHID", value: "uhid" }
                 ]}
               />
-              <Filter selected={selected} setSelected={setSelected} />
+              <Filter />
             </div>
           </div>
 
