@@ -79,7 +79,6 @@ import DownloadFollowup from "./PatientFollowup/DownloadFollowup";
 
 const PatientFollowup = () => {
   const { id, aId } = useParams();
-  // console.log("✌️id, aId --->", id, aId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -238,10 +237,9 @@ const PatientFollowup = () => {
 
       if (id && aId) {
         const { data: patientData } = await getSinglePatient(id);
-        console.log("✌️patientData --->", patientData);
+        
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
-        console.log("✌️patientAdmissionHistory --->", patientAdmissionHistory);
-
+    
         // Fetch the latest followup data to get the new fields
         const { data: latestFollowupData } = await getAllPatientFollowup({
           limit: 1,
@@ -988,56 +986,28 @@ const PatientFollowup = () => {
     };
   }, []);
 
-  // Function to check if new followup is allowed (only on 15th, 16th, or 17th day)
-  const checkFollowupRestriction = (): boolean => {
-    if (totalTherapistNotes.length === 0) return true; // No previous followups, allow creation
+// Allow only 1 followup per day
+const checkFollowupRestriction = (): boolean => {
+  if (totalTherapistNotes.length === 0) return true; // No previous notes
 
-    // Get the latest followup date
-    const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
-      const currentDate = new Date(current.noteDateTime);
-      const latestDate = new Date(latest.noteDateTime);
-      return currentDate > latestDate ? current : latest;
-    });
+  // Get latest followup
+  const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
+    const currentDate = new Date(current.noteDateTime);
+    const latestDate = new Date(latest.noteDateTime);
+    return currentDate > latestDate ? current : latest;
+  });
 
-    const latestDate = new Date(latestFollowup.noteDateTime);
-    const currentDate = new Date();
+  const latestDate = new Date(latestFollowup.noteDateTime);
+  const today = new Date();
 
-    // Calculate days difference
-    const timeDiff = currentDate.getTime() - latestDate.getTime();
-    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+  // Compare only the date parts (ignore time)
+  const latestDateStr = latestDate.toDateString();
+  const todayStr = today.toDateString();
 
-    // setLastFollowupDate(latestFollowup.noteDateTime);
-    // setDaysSinceLastFollowup(daysDiff);
+  // ❌ If latest followup is already today → do not allow new followup
+  return latestDateStr !== todayStr;
+};
 
-    // Allow followup only on 15th, 16th, or 17th day after last followup
-    return daysDiff >= 15 && daysDiff <= 17;
-  };
-
-  // Add this function to calculate the next allowed date range
-  const getNextAllowedDateRange = () => {
-    if (totalTherapistNotes.length === 0) return { minDate: null, maxDate: null };
-
-    // Get the latest followup date
-    const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
-      const currentDate = new Date(current.noteDateTime);
-      const latestDate = new Date(latest.noteDateTime);
-      return currentDate > latestDate ? current : latest;
-    });
-
-    const latestDate = new Date(latestFollowup.noteDateTime);
-
-    // Calculate min date (15 days after latest followup)
-    const minDate = new Date(latestDate);
-    minDate.setDate(minDate.getDate() + 15);
-    minDate.setHours(0, 0, 0, 0);
-
-    // Calculate max date (17 days after latest followup)
-    const maxDate = new Date(latestDate);
-    maxDate.setDate(maxDate.getDate() + 17);
-    maxDate.setHours(23, 59, 59, 999);
-
-    return { minDate, maxDate, latestDate };
-  };
 
   return (
     <div className="bg-[#ffffff]  min-h-[calc(100vh-64px)]">
@@ -1339,53 +1309,57 @@ const PatientFollowup = () => {
                               </div>
                             </CustomCalendar> */}
 
-                            <CustomCalendar
-                              value={data.noteDate}
-                              disabledDate={(current) => {
-                                if (!current) return false;
+                          <CustomCalendar
+  value={data.noteDate}
+  disabledDate={(current) => {
+    if (!current) return false;
 
-                                const currentDate = current.toDate();
-                                currentDate.setHours(0, 0, 0, 0);
+    const selectedDate = current.toDate();
+    selectedDate.setHours(0, 0, 0, 0);
 
-                                const yesterday = new Date();
-                                yesterday.setDate(yesterday.getDate() - 1);
-                                yesterday.setHours(23, 59, 59, 999);
+    // 1) Disable past dates (before today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-                                // Disable dates before yesterday
-                                if (currentDate < yesterday) {
-                                  return true;
-                                }
+    if (selectedDate < today) {
+      return true;
+    }
 
-                                // If there are existing followups and this is a new entry (not editing)
-                                if (totalTherapistNotes.length > 0 && !data.id) {
-                                  const { minDate, maxDate } = getNextAllowedDateRange();
+    // 2) Restrict same-day followup (only when creating new, not editing)
+    if (totalTherapistNotes.length > 0 && !data.id) {
+      const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
+        const currentDate = new Date(current.noteDateTime);
+        const latestDate = new Date(latest.noteDateTime);
+        return currentDate > latestDate ? current : latest;
+      });
 
-                                  if (minDate && maxDate) {
-                                    // Enable only dates between minDate (15th day) and maxDate (17th day)
-                                    // Disable all other dates
-                                    return currentDate < minDate || currentDate > maxDate;
-                                  }
-                                }
+      const latestDate = new Date(latestFollowup.noteDateTime);
+      latestDate.setHours(0, 0, 0, 0);
 
-                                // If no existing followups, allow all future dates
-                                // Or if editing existing entry, allow the date
-                                return false;
-                              }}
-                              onChange={(date) => {
-                                handleDateTimeChange(date, "date");
-                              }}
-                            >
-                              <div className="flex items-center">
-                                {data?.noteDate && formateNormalDate(data.noteDate)}
-                                <div className="flex items-center justify-center w-5 mx-1 h-5">
-                                  <img
-                                    alt="calender"
-                                    src={calendar}
-                                    className="w-full h-full cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            </CustomCalendar>
+      // ❌ Disable if selected date = latest followup’s date
+      if (selectedDate.getTime() === latestDate.getTime()) {
+        return true;
+      }
+    }
+
+    return false; // allow all other dates
+  }}
+  onChange={(date) => {
+    handleDateTimeChange(date, "date");
+  }}
+>
+  <div className="flex items-center">
+    {data?.noteDate && formateNormalDate(data.noteDate)}
+    <div className="flex items-center justify-center w-5 mx-1 h-5">
+      <img
+        alt="calender"
+        src={calendar}
+        className="w-full h-full cursor-pointer"
+      />
+    </div>
+  </div>
+</CustomCalendar>
+
                             <span className="mx-2">|</span>
 
                             <CustomTimePicker
@@ -1626,7 +1600,7 @@ const PatientFollowup = () => {
                           <div className="flex gap-[10px] items-start justify-start flex-col">
                             <label className="font-medium text-[14px]">
                               {" "}
-                              Making a sponsor and following his guidelines
+                              Making a sponsor and following Given guidelines
                             </label>
 
                             <div className="flex gap-5 items-center justify-center mb-3">

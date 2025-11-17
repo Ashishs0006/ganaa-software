@@ -26,6 +26,7 @@ export interface IPatientDischarge extends mongoose.Document {
    PsychologistNotes?: String,
     PsychiatricNotes?:String,
    mentalStatusExaminationatDischarge?: String,
+   diagnosis?:String
 
   prescriptionDateTime?: Date;
   prescriptionMedicine?: IPrescriptionMedicine[];

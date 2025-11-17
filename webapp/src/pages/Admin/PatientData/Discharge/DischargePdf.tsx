@@ -140,31 +140,31 @@ const DischargeSummaryPdf = ({
             margin: [0, 0, 0, 20]
           },
 
-          patientDetails.admissionType && [
-            { text: "Admission Type", style: "sectionHeader" },
-            {
-              table: {
-                widths: ["100%"],
-                body: [
-                  [
-                    {
-                      text: `${patientDetails.admissionType} ${
-                        patientDetails.involuntaryAdmissionType
-                          ? `- ${patientDetails.involuntaryAdmissionType}`
-                          : ""
-                      }`,
-                      margin: [5, 5, 5, 5],
-                      fontSize: 11,
-                      alignment: "left"
-                    }
-                  ]
-                ]
-              },
-              layout: "grid", // adds full border
-              margin: [0, 0, 0, 10],
-              noWrap: false
-            }
-          ],
+          // patientDetails.admissionType && [
+          //   { text: "Admission Type", style: "sectionHeader" },
+          //   {
+          //     table: {
+          //       widths: ["100%"],
+          //       body: [
+          //         [
+          //           {
+          //             text: `${patientDetails.admissionType} ${
+          //               patientDetails.involuntaryAdmissionType
+          //                 ? `- ${patientDetails.involuntaryAdmissionType}`
+          //                 : ""
+          //             }`,
+          //             margin: [5, 5, 5, 5],
+          //             fontSize: 11,
+          //             alignment: "left"
+          //           }
+          //         ]
+          //       ]
+          //     },
+          //     layout: "grid", // adds full border
+          //     margin: [0, 0, 0, 10],
+          //     noWrap: false
+          //   }
+          // ],
           data.chiefComplaints && [
             { text: "Chief Complaints", style: "sectionHeader" },
             {
@@ -264,7 +264,7 @@ const DischargeSummaryPdf = ({
             }
           ],
 
-// ✅ New Sections Added Below Chief Complaints
+
 
 data.diagnosticFormulation && [
   { text: "Diagnostic Formulation", style: "sectionHeader" },
@@ -275,6 +275,27 @@ data.diagnosticFormulation && [
         [
           {
             text: data.diagnosticFormulation.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+data.diagnosis && [
+  { text: "Diagnosis", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.diagnosis.replace(/<[^>]+>/g, ""),
             margin: [5, 5, 5, 5],
             fontSize: 11,
             alignment: "left"

@@ -41,6 +41,7 @@ const patientDischargeSchema = new mongoose.Schema<IPatientDischarge>({
   PsychologistNotes: String,
     PsychiatricNotes:String,
 mentalStatusExaminationatDischarge: String,
+diagnosis:String,
 
   prescriptionDateTime: {
     type: Date,

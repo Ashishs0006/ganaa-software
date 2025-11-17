@@ -180,7 +180,8 @@ const Discharge = () => {
     adviseAndPlan: "",
     PsychologistNotes:"",
     PsychiatricNotes:"",
-    mentalStatusExaminationatDischarge:""
+    mentalStatusExaminationatDischarge:"",
+    diagnosis:""
 
   });
 
@@ -200,7 +201,8 @@ const Discharge = () => {
     adviseAndPlan: "",
      PsychologistNotes:"",
     PsychiatricNotes:"",
-    mentalStatusExaminationatDischarge:""
+    mentalStatusExaminationatDischarge:"",
+    diagnosis:""
   });
 
   const [deleteModal, setDeleteModal] = useState<{ isModal: boolean; id?: number }>({
@@ -266,6 +268,7 @@ const Discharge = () => {
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
   PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
   mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+  diagnosis:dischargeData?.data?.diagnosis || "",
             involuntaryAdmissionType: patientAdmissionHistory?.data?.involuntaryAdmissionType,
             doctor: `${
               patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName || ""
@@ -335,7 +338,8 @@ const Discharge = () => {
       : defaultAdviseAndPlan, 
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
   PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
-    mentalStatusExaminationatDischarge:dischargeData?.data?.    mentalStatusExaminationatDischarge || "",
+    mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+     diagnosis:dischargeData?.data?.diagnosis || "",
           }));
           setPrescriptionDateTime(dischargeData?.data?.prescriptionDateTime || "");
           const prescriptionMedicineUpdate =
@@ -382,6 +386,7 @@ const Discharge = () => {
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
   PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
     mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+     diagnosis:dischargeData?.data?.diagnosis || "",
           }));
         }
         setLoading(false);
@@ -429,7 +434,8 @@ const Discharge = () => {
       prescriptionMedicine: formatPrescription,
       PsychologistNotes: data.PsychologistNotes,
     PsychiatricNotes: data.PsychiatricNotes,
-        mentalStatusExaminationatDischarge:data.mentalStatusExaminationatDischarge
+        mentalStatusExaminationatDischarge:data.mentalStatusExaminationatDischarge,
+         diagnosis:data.diagnosis || "",
     
     };
     console.log("hii the update payload is :", payload)
@@ -827,7 +833,13 @@ const Discharge = () => {
               onChange={handleChangeQuill}
               label="Diagnostic Formulation"
             />
+                <RichTextEditor
+              name="diagnosis"
+              value={data.diagnosis }
+              onChange={handleChangeQuill}
+              label="Diagnosis"
           
+            />
             <RichTextEditor
               name="mentalStatusExaminationatdisharge"
               value={data.mentalStatusExaminationatDischarge}
@@ -851,6 +863,7 @@ const Discharge = () => {
       value={data.PsychologistNotes}
       onChange={handleChangeQuill}
       label="Psychologist’s Notes"
+      
     />
 
   
