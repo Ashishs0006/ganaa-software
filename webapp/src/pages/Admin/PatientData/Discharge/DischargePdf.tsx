@@ -309,50 +309,6 @@ data.diagnosis && [
   }
 ],
 
-data.PsychologistNotes && [
-  { text: "Psychologist Notes", style: "sectionHeader" },
-  {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 5],
-            fontSize: 11,
-            alignment: "left"
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10],
-    noWrap: false
-  }
-],
-
-data.PsychiatricNotes && [
-  { text: "Psychiatric Notes", style: "sectionHeader" },
-  {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 5],
-            fontSize: 11,
-            alignment: "left"
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10],
-    noWrap: false
-  }
-],
-
 data.mentalStatusExaminationatDischarge && [
   { text: "Mental Status Examination at Discharge", style: "sectionHeader" },
   {
@@ -372,6 +328,83 @@ data.mentalStatusExaminationatDischarge && [
     layout: "grid",
     margin: [0, 0, 0, 10],
     noWrap: false
+  }
+],
+
+// ---------------------
+// HOSPITALISATION SUMMARY (MAIN HEADING)
+// ---------------------
+(data.hospitalisationSummary || data.PsychiatricNotes || data.PsychologistNotes) && [
+  { text: "Hospitalisation Summary", style: "sectionHeader" },
+
+  // --- MAIN Hospitalisation Summary DATA ---
+  data.hospitalisationSummary && {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.hospitalisationSummary.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 10],
+            fontSize: 11
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10]
+  },
+
+  // --- Psychiatrist’s Notes (WITH DATA) ---
+  data.PsychiatricNotes && {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: "Psychiatrist’s Notes",
+            bold: true,
+            fontSize: 13,
+            margin: [5, 5, 5, 5]
+          }
+        ],
+        [
+          {
+            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 10],
+            fontSize: 11
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10]
+  },
+
+  // --- Psychologist’s Notes (WITH DATA) ---
+  data.PsychologistNotes && {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: "Psychologist’s Notes",
+            bold: true,
+            fontSize: 13,
+            margin: [5, 5, 5, 5]
+          }
+        ],
+        [
+          {
+            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 10],
+            fontSize: 11
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 15]
   }
 ],
 

@@ -458,11 +458,18 @@ const AllPatientData = () => {
                                   <p>{patient?.patientHistory?.currentStatus}</p>
                                 </div>
                               )}
-                              {checkRegPending(patient).isValid && (
-                                <div className=" w-fit rounded-[5px] bg-[#FFEDD5] gap-1 text-[10px] font-semibold px-[5px] py-[3px] flex items-center">
-                                  <p className="text-[#B74F00]">Reg. Incomplete</p>
-                                </div>
-                              )}
+                         {checkRegPending(patient).isValid ? (
+  // COMPLETE
+  <div className="w-fit rounded-[5px] bg-green-100 gap-1 text-[10px] font-semibold px-[5px] py-[3px] flex items-center">
+    <p className="text-green-800">Reg. Complete</p>
+  </div>
+) : (
+  // INCOMPLETE
+  <div className="w-fit rounded-[5px] bg-[#FFEDD5] gap-1 text-[10px] font-semibold px-[5px] py-[3px] flex items-center">
+    <p className="text-[#B74F00]">Reg. Incomplete</p>
+  </div>
+)}
+
                             </div>
                           </div>
                         </div>
