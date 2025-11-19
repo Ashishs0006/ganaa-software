@@ -27,6 +27,7 @@ import PatientFollowup from '../models/daily-progress/patient.followup.model';
 
 export const insightDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
+    console.log("huluuuuuu")
     const monthRange = (req.query.range as string)?.split(',');
     if (!monthRange) return next(new AppError('Range is Mandatory Parameter', 400));
 

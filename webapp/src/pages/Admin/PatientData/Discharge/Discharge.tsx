@@ -82,7 +82,7 @@ const defaultAdviseAndPlan = `
 </ul>
 
 <p><strong>Emergency Contact:</strong><br/>
-In a crisis, reach our helpline at ‪+91 87500 75006‬ or contact the nearest emergency service immediately.</p>
+In a crisis, reach our helpline at +918750075006 or contact the nearest emergency service immediately.</p>
 `;
 
 const colors = [

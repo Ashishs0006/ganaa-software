@@ -17,7 +17,7 @@ import handleError from "@/utils/handleError";
 
 const toBase64 = async (url: string | URL | Request) => {
   const response = await fetch(url);
-  console.log("hii the response of dowloand discharge data is :", response)
+ 
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -26,6 +26,37 @@ const toBase64 = async (url: string | URL | Request) => {
     reader.readAsDataURL(blob);
   });
 };
+const cleanHtml = (htmlString: string) => {
+  return htmlString
+    .replace(/<ul>|<\/ul>/g, "")
+    .replace(/<li>/g, "• ")
+    .replace(/<\/li>/g, "\n")
+    .replace(/<p>/g, "")
+    .replace(/<\/p>/g, "\n")
+    .replace(/<br\s*\/?>/g, "\n")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\n\s*\n\s*/g, "\n")
+    .trim();
+};
+// Convert HTML from RichTextEditor to clean plain text for PDF
+const htmlToPlainText = (html: string): string => {
+  if (!html) return "";
+
+  let text = html;
+
+  // Remove empty lines, non-breaking spaces, <br>, <p><br></p>
+  text = text.replace(/(&nbsp;|<br>|<p><br><\/p>)/g, "");
+
+  // Convert <li> to bullet points
+  text = text.replace(/<li>/g, "• ");
+  text = text.replace(/<\/li>/g, "\n");
+
+  // Remove remaining HTML tags like <ul>, <strong>, <p>, etc.
+  text = text.replace(/<[^>]+>/g, "");
+
+  return text.trim();
+};
+
 
 const DischargeSummaryPdf = ({
   patientDetails,
@@ -80,6 +111,7 @@ const DischargeSummaryPdf = ({
             alignment: "center"
           };
         },
+                                  // remove leading/trailing space
 
         content: [
           // {
@@ -514,22 +546,14 @@ data.mentalStatusExaminationatDischarge && [
               margin: [0, 0, 0, 10]
             }
           ],
-          data.adviseAndPlan && [
+    data.adviseAndPlan && [
             { text: "Advice and Plan on Discharge:", style: "sectionHeader" },
             {
               table: {
                 widths: ["100%"],
-
-                body: [
-                  [
-                    {
-                      text: data.adviseAndPlan.replace(/<[^>]+>/g, ""),
-                      margin: [5, 5, 5, 5]
-                    }
-                  ]
-                ]
+                body: [[{    text: htmlToPlainText(data.adviseAndPlan), margin: [5, 5, 5, 5] }]]
               },
-              layout: "grid", // adds full border
+              layout: "grid",
               margin: [0, 0, 0, 10]
             }
           ],
