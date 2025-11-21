@@ -20,6 +20,7 @@ export interface IPatient {
     patientPicUrl?: string;
     gender?: string;
   };
+  dischargeHistory?: any[];
 }
 
 export interface ITherapist {

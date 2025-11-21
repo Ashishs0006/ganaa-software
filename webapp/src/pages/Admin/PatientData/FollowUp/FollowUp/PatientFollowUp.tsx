@@ -88,7 +88,8 @@ const PatientFollowup = () => {
   const sessionMenuRef = useRef<HTMLDivElement>(null);
   const therapistMenuRef = useRef<HTMLDivElement>(null);
 
-
+  // Add state for the followup restriction modal
+  const [showFollowupRestrictionModal, setShowFollowupRestrictionModal] = useState<boolean>(false);
   // const [lastFollowupDate, setLastFollowupDate] = useState<string | null>(null);
   // const [daysSinceLastFollowup, setDaysSinceLastFollowup] = useState<number | null>(null);
   const [modalState, setmodalState] = useState({
@@ -558,8 +559,8 @@ const PatientFollowup = () => {
   const handleSubmit = async () => {
     try {
       // Check if new followup creation is restricted
-      if (!data.id) {
-       
+      if (!data.id && !checkFollowupRestriction()) {
+        setShowFollowupRestrictionModal(true);
         return;
       }
 
@@ -867,7 +868,7 @@ const PatientFollowup = () => {
           selectedDate.getTime() !== tomorrow.getTime() &&
           selectedDate.getTime() !== dayAfterTomorrow.getTime()
         ) {
-          
+          setShowFollowupRestrictionModal(true);
         }
       }
     } else if (type == "time") {
@@ -988,26 +989,26 @@ const PatientFollowup = () => {
   }, []);
 
 // Allow only 1 followup per day
-// const checkFollowupRestriction = (): boolean => {
-//   if (totalTherapistNotes.length === 0) return true; // No previous notes
+const checkFollowupRestriction = (): boolean => {
+  if (totalTherapistNotes.length === 0) return true; // No previous notes
 
-//   // Get latest followup
-//   const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
-//     const currentDate = new Date(current.noteDateTime);
-//     const latestDate = new Date(latest.noteDateTime);
-//     return currentDate > latestDate ? current : latest;
-//   });
+  // Get latest followup
+  const latestFollowup = totalTherapistNotes.reduce((latest, current) => {
+    const currentDate = new Date(current.noteDateTime);
+    const latestDate = new Date(latest.noteDateTime);
+    return currentDate > latestDate ? current : latest;
+  });
 
-//   const latestDate = new Date(latestFollowup.noteDateTime);
-//   const today = new Date();
+  const latestDate = new Date(latestFollowup.noteDateTime);
+  const today = new Date();
 
-//   // Compare only the date parts (ignore time)
-//   const latestDateStr = latestDate.toDateString();
-//   const todayStr = today.toDateString();
+  // Compare only the date parts (ignore time)
+  const latestDateStr = latestDate.toDateString();
+  const todayStr = today.toDateString();
 
-//   // ❌ If latest followup is already today → do not allow new followup
-//   return latestDateStr !== todayStr;
-// };
+  // ❌ If latest followup is already today → do not allow new followup
+  return latestDateStr !== todayStr;
+};
 
 
   return (
@@ -2573,7 +2574,7 @@ const PatientFollowup = () => {
         </Modal>
 
       {/* Followup Restriction Modal */}
-      {/* <Modal
+      <Modal
         isOpen={showFollowupRestrictionModal}
         toggleModal={() => setShowFollowupRestrictionModal(false)}
         // title="Follow-up Date Not Allowed"
@@ -2610,7 +2611,7 @@ const PatientFollowup = () => {
             </Button>
           </div>
         </div>
-      </Modal> */}
+      </Modal>
 
       <DeleteConfirm
         toggleModal={toggleModal}

@@ -17,7 +17,7 @@ import handleError from "@/utils/handleError";
 
 const toBase64 = async (url: string | URL | Request) => {
   const response = await fetch(url);
- 
+  console.log("hii the response of dowloand discharge data is :", response)
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -26,37 +26,6 @@ const toBase64 = async (url: string | URL | Request) => {
     reader.readAsDataURL(blob);
   });
 };
-const cleanHtml = (htmlString: string) => {
-  return htmlString
-    .replace(/<ul>|<\/ul>/g, "")
-    .replace(/<li>/g, "• ")
-    .replace(/<\/li>/g, "\n")
-    .replace(/<p>/g, "")
-    .replace(/<\/p>/g, "\n")
-    .replace(/<br\s*\/?>/g, "\n")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\n\s*\n\s*/g, "\n")
-    .trim();
-};
-// Convert HTML from RichTextEditor to clean plain text for PDF
-const htmlToPlainText = (html: string): string => {
-  if (!html) return "";
-
-  let text = html;
-
-  // Remove empty lines, non-breaking spaces, <br>, <p><br></p>
-  text = text.replace(/(&nbsp;|<br>|<p><br><\/p>)/g, "");
-
-  // Convert <li> to bullet points
-  text = text.replace(/<li>/g, "• ");
-  text = text.replace(/<\/li>/g, "\n");
-
-  // Remove remaining HTML tags like <ul>, <strong>, <p>, etc.
-  text = text.replace(/<[^>]+>/g, "");
-
-  return text.trim();
-};
-
 
 const DischargeSummaryPdf = ({
   patientDetails,
@@ -111,7 +80,6 @@ const DischargeSummaryPdf = ({
             alignment: "center"
           };
         },
-                                  // remove leading/trailing space
 
         content: [
           // {
@@ -341,6 +309,50 @@ data.diagnosis && [
   }
 ],
 
+data.PsychologistNotes && [
+  { text: "Psychologist Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
+data.PsychiatricNotes && [
+  { text: "Psychiatric Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+
 data.mentalStatusExaminationatDischarge && [
   { text: "Mental Status Examination at Discharge", style: "sectionHeader" },
   {
@@ -360,83 +372,6 @@ data.mentalStatusExaminationatDischarge && [
     layout: "grid",
     margin: [0, 0, 0, 10],
     noWrap: false
-  }
-],
-
-// ---------------------
-// HOSPITALISATION SUMMARY (MAIN HEADING)
-// ---------------------
-(data.hospitalisationSummary || data.PsychiatricNotes || data.PsychologistNotes) && [
-  { text: "Hospitalisation Summary", style: "sectionHeader" },
-
-  // --- MAIN Hospitalisation Summary DATA ---
-  data.hospitalisationSummary && {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: data.hospitalisationSummary.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 10],
-            fontSize: 11
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10]
-  },
-
-  // --- Psychiatrist’s Notes (WITH DATA) ---
-  data.PsychiatricNotes && {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: "Psychiatrist’s Notes",
-            bold: true,
-            fontSize: 13,
-            margin: [5, 5, 5, 5]
-          }
-        ],
-        [
-          {
-            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 10],
-            fontSize: 11
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10]
-  },
-
-  // --- Psychologist’s Notes (WITH DATA) ---
-  data.PsychologistNotes && {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: "Psychologist’s Notes",
-            bold: true,
-            fontSize: 13,
-            margin: [5, 5, 5, 5]
-          }
-        ],
-        [
-          {
-            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 10],
-            fontSize: 11
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 15]
   }
 ],
 
@@ -546,14 +481,22 @@ data.mentalStatusExaminationatDischarge && [
               margin: [0, 0, 0, 10]
             }
           ],
-    data.adviseAndPlan && [
+          data.adviseAndPlan && [
             { text: "Advice and Plan on Discharge:", style: "sectionHeader" },
             {
               table: {
                 widths: ["100%"],
-                body: [[{    text: htmlToPlainText(data.adviseAndPlan), margin: [5, 5, 5, 5] }]]
+
+                body: [
+                  [
+                    {
+                      text: data.adviseAndPlan.replace(/<[^>]+>/g, ""),
+                      margin: [5, 5, 5, 5]
+                    }
+                  ]
+                ]
               },
-              layout: "grid",
+              layout: "grid", // adds full border
               margin: [0, 0, 0, 10]
             }
           ],

@@ -168,7 +168,7 @@ if (req.body.mentalStatusExaminationatdisharge) {
   req.body.mentalStatusExaminationatDischarge = req.body.mentalStatusExaminationatdisharge;
   delete req.body.mentalStatusExaminationatdisharge;
 }
-    
+    console.log("req body is :", req.body)
 
     const updatedata = await PatientDischarge.findByIdAndUpdate(
       admissionHistory?.dischargeId,

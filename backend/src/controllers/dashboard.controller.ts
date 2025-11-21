@@ -27,7 +27,6 @@ import PatientFollowup from '../models/daily-progress/patient.followup.model';
 
 export const insightDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-  
     const monthRange = (req.query.range as string)?.split(',');
     if (!monthRange) return next(new AppError('Range is Mandatory Parameter', 400));
 
@@ -191,7 +190,7 @@ export const followupsDashboard = catchAsync(
 
     // 3️Get Admission histories and populate patients
     const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
-      .select('patientId dateOfAdmission resourceAllocation dischargeId currentStatus')
+      .select('patientId dateOfAdmission resourceAllocation assignedTherapistId dischargeId currentStatus')
       .populate({ path: 'dischargeId', select: 'date' })
       .populate({
         path: 'patientId',
@@ -206,6 +205,7 @@ export const followupsDashboard = catchAsync(
       .lean();
 
     // Filter only discharged patients
+    console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
     const filteredAdmissions = patientAdmissionHistory.filter(
       (admission: any) => admission && admission.currentStatus === 'Discharged'
     );
@@ -219,9 +219,9 @@ export const followupsDashboard = catchAsync(
       const patientId = admission.patientId._id.toString();
       const startDate = admission.dateOfAdmission;
       const dischargeDate = admission.dischargeId?.date;
-
+      const resourceAllocation = admission.resourceAllocation || {};
       if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
-      dischargeResult[patientId].push({ start: startDate, end: dischargeDate });
+      dischargeResult[patientId].push({ start: startDate, end: dischargeDate, resourceAllocation:resourceAllocation });
     });
 
     // 5️Get all therapists (Therapist + Therapist+AM roles)
@@ -266,7 +266,7 @@ export const followupsDashboard = catchAsync(
         ],
       })
         .select(
-          '_id patientId therapistId noteDateTime note sessionType subSessionType score followupDate adherence meeting sponsor feedbackFromFamily currentStatus file'
+          '_id patientId createdAt therapistId noteDateTime note sessionType subSessionType score followupDate adherence meeting sponsor feedbackFromFamily currentStatus file'
         )
         .setOptions({ skipTherapistPopulation: false, skipUrlGeneration: false })
         .lean(),

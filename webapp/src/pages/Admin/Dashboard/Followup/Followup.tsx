@@ -97,6 +97,7 @@ const PatientFollowup = () => {
 
   const [modalNote, setModalNote] = useState<INote[] | []>([]);
   const [data, setData] = useState<IData>();
+console.log('✌️data --->', data);
  const [modalState, setmodalState] = useState({
     displayNoteModal: false,
     selectedNote: ""
@@ -188,7 +189,7 @@ const fetchSessionData = async () => {
           </div>
           <div className="flex gap-4 items-center">
             <DateTime
-              maxDate={new Date()}
+              // maxDate={new Date()}
               ranges={dateRange}
               onChange={handleSelectDate}
               onClick={handleClick}
@@ -284,10 +285,14 @@ const fetchSessionData = async () => {
                         : b?.firstName?.localeCompare(a.firstName)
                     )
                     .map((patient) => {
+                      const therapistData = patient?.dischargeHistory && patient?.dischargeHistory.filter((name) => name.resourceAllocation.assignedTherapistId)
+                      const therapistName = therapistData && therapistData.length > 0 ? {
+                        name: `${therapistData[0].resourceAllocation.assignedTherapistId.firstName} ${therapistData[0].resourceAllocation.assignedTherapistId.lastName}`
+                      } : {name: "-"};
                       const followups = patient.followups || []; // fetched from backend
-                      const therapistName = followups[0]?.therapistId
-                        ? `${followups[0].therapistId.firstName} ${followups[0].therapistId.lastName}`
-                        : "-";
+                      // const therapistName = followups[0]?.therapistId
+                      //   ? `${followups[0].therapistId.firstName} ${followups[0].therapistId.lastName}`
+                      //   : "-";
 
                       return (
                         <tr key={patient._id} className="border-b border-[#d9d4c9] font-semibold">
@@ -331,7 +336,7 @@ const fetchSessionData = async () => {
 
                           {/* 🔹 Therapist */}
                           <td className="px-3 sticky left-[340px] pr-10 z-10 bg-white py-4 text-xs text-left">
-                            {therapistName}
+                            {therapistName && therapistName.name ? therapistName.name : "-"}
                           </td>
 
                           {/* 🔹 Date of Discharge */}
