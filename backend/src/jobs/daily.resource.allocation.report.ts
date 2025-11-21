@@ -41,7 +41,7 @@ export const buildDailyResourceAllocation = async () => {
           currentStatus: { $in: ['Inpatient', 'Discharge Initiated'] },
           'resourceAllocation.roomTypeId': el._id,
         });
-
+console.log("total occupied beds:",totalOccupiedBeds)
         const roomTypeObj = {
           roomTypeId: el._id.toString(),
           name: el.name,
@@ -120,7 +120,7 @@ export const buildDailyResourceAllocation = async () => {
           .lean();
 
         const todayDischargeMapped = todayDischargeDetails.map((dc) => {
-          console.log('✌️dcAllocation --->', dc);
+         
           // const stayDuration = Math.ceil(
           //   (dc.date.getTime() - new Date(dc.date).getTime()) / (1000 * 60 * 60 * 24)
           // );

@@ -27,7 +27,7 @@ import PatientFollowup from '../models/daily-progress/patient.followup.model';
 
 export const insightDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    console.log("huluuuuuu")
+  
     const monthRange = (req.query.range as string)?.split(',');
     if (!monthRange) return next(new AppError('Range is Mandatory Parameter', 400));
 
@@ -410,7 +410,7 @@ export const doctorDashboard = catchAsync(
 export const dailyReportDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
     const { startDate, endDate } = req.query;
-
+console.log("Hiihfhfdhfhf")
     if (!startDate || !endDate) {
       return next(new AppError('Both Start Date and End Date are required', 400));
     }

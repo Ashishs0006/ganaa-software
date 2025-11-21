@@ -236,9 +236,11 @@ const PatientFollowup = () => {
 
       if (id && aId) {
         const { data: patientData } = await getSinglePatient(id);
+        console.log("patientData:",patientData)
         
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
-    
+
+    console.log("patienthistory:",patientAdmissionHistory)
         // Fetch the latest followup data to get the new fields
         const { data: latestFollowupData } = await getAllPatientFollowup({
           limit: 1,

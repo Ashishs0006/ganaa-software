@@ -102,54 +102,71 @@ const PatientFollowup = () => {
     selectedNote: ""
     // ...other state
   });
+const fetchSessionData = async () => {
+  setState((prev) => ({ ...prev, loading: true }));
+  let centers;
+  const selected = searchParams.get("filter") || "All";
 
-  const fetchSessionData = async () => {
-    setState((prev) => ({ ...prev, loading: true }));
-    let centers;
-    const selected = searchParams.get("filter") || "All";
+  if (selected === "All" || !selected) {
+    centers = auth.user.centerId.map((data) => data._id);
+    if (centers.length <= 0) navigate("/");
+  } else {
+    centers = [selected];
+  }
 
-    if (selected === "All" || !selected) {
-      centers = auth.user.centerId.map((data) => data._id);
-      if (centers.length <= 0) navigate("/");
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  const startDate = searchParams.get("startDate") || thirtyDaysAgo.toISOString();
+  const endDate = searchParams.get("endDate") || today.toISOString();
+
+  try {
+    const response = await getFollowups({
+      startDate,
+      endDate,
+      centerId: centers.join(",")
+    });
+
+ if (response.data.status === "success") {
+  const apiData = response.data.data;
+  console.log("api data is :",apiData)
+
+  // 🔥 Remove Duplicate Patients (TS Safe)
+  const uniquePatientMap = new Map<string, IPatient>();
+
+  (apiData.patients || []).forEach((p: IPatient) => {
+    if (!uniquePatientMap.has(p._id)) {
+      uniquePatientMap.set(p._id, p);
+    }
+  });
+
+  const uniquePatients = Array.from(uniquePatientMap.values());
+
+  // Final data set with unique patients
+  setData({
+    ...apiData,
+    patients: uniquePatients
+  });
+
+  const dates: string[] = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    dates.push(currentDate.toISOString().split("T")[0]);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
     } else {
-      centers = [selected];
+      console.error("Failed to fetch Session data");
     }
+  } catch (error) {
+    console.error("Error fetching Session data:", error);
+  } finally {
+    setState((prev) => ({ ...prev, loading: false }));
+  }
+};
 
-    const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-
-    const startDate = searchParams.get("startDate") || thirtyDaysAgo.toISOString();
-    const endDate = searchParams.get("endDate") || today.toISOString();
-
-    try {
-      const response = await getFollowups({
-        startDate,
-        endDate,
-        centerId: centers.join(",")
-      });
-
-      if (response.data.status === "success") {
-        setData(response.data.data);
-        // setDischargeDate(response?.data?.data?.dischargeResult);
-
-        const dates: string[] = [];
-        const currentDate = new Date(startDate);
-
-        while (currentDate <= new Date(endDate)) {
-          dates.push(currentDate.toISOString().split("T")[0]);
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-        // setDateArray(dates);
-      } else {
-        console.error("Failed to fetch Session data");
-      }
-    } catch (error) {
-      console.error("Error fetching Session data:", error);
-    } finally {
-      setState((prev) => ({ ...prev, loading: false }));
-    }
-  };
 
   useEffect(() => {
     fetchSessionData();
