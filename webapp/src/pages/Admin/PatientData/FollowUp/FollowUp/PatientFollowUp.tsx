@@ -868,7 +868,7 @@ const PatientFollowup = () => {
           selectedDate.getTime() !== tomorrow.getTime() &&
           selectedDate.getTime() !== dayAfterTomorrow.getTime()
         ) {
-          setShowFollowupRestrictionModal(true);
+          setShowFollowupRestrictionModal(false);
         }
       }
     } else if (type == "time") {

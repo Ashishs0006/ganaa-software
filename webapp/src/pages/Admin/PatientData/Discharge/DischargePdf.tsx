@@ -201,26 +201,26 @@ const DischargeSummaryPdf = ({
               noWrap: false
             }
           ],
-          data.historyOfPresentIllness && [
-            { text: "History of Presenting Illness: ", style: "sectionHeader" },
-            {
-              table: {
-                widths: ["100%"],
+          // data.historyOfPresentIllness && [
+          //   { text: "History of Presenting Illness: ", style: "sectionHeader" },
+          //   {
+          //     table: {
+          //       widths: ["100%"],
 
-                body: [
-                  [
-                    {
+          //       body: [
+          //         [
+          //           {
                    
-                         text: formatQuillText(data.historyOfPresentIllness),
-                      margin: [5, 5, 5, 5]
-                    }
-                  ]
-                ]
-              },
-              layout: "grid", // adds full border
-              margin: [0, 0, 0, 10]
-            }
-          ],
+          //                text: formatQuillText(data.historyOfPresentIllness),
+          //             margin: [5, 5, 5, 5]
+          //           }
+          //         ]
+          //       ]
+          //     },
+          //     layout: "grid", // adds full border
+          //     margin: [0, 0, 0, 10]
+          //   }
+          // ],
           data.physicalExaminationAtAdmission && [
             { text: "Physical Examination at Admission:", style: "sectionHeader" },
             {
@@ -341,7 +341,8 @@ data.mentalStatusExaminationatDischarge && [
         [
           {
            
-                 text: formatQuillText(data.mentalStatusExaminationatdisharge),
+                 text: formatQuillText(data.mentalStatusExaminationatDischarge),
+                 
             margin: [5, 5, 5, 5],
             fontSize: 11,
             alignment: "left"
