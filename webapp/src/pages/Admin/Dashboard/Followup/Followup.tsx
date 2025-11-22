@@ -180,7 +180,7 @@ const fetchSessionData = async () => {
       <div className="w-[1304px] mx-auto">
         <div className="flex justify-between py-5 items-end">
           <div className="flex flex-col">
-            <p className="text-[22px] font-bold">Patient Follow-up Report Harshit developer </p>
+            <p className="text-[22px] font-bold">Patient Follow-up Report</p>
             {/* <p className="text-[10px] mt-2 font-medium ">
               R - Regular 15 min Session, T - 45-60 min Therapy Session, NF- Neurofeedback, HT -
               History, FS - Family Session, FM - Family Meeting, FC - Family Call, MSE, LOA Leave of
