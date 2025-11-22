@@ -38,7 +38,7 @@ export const buildDailyResourceAllocation = async () => {
         });
 
         const totalOccupiedBeds = await PatientAdmissionHistory.countDocuments({
-          currentStatus: { $in: ['Inpatient', 'Discharge Initiated'] },
+          currentStatus: { $in: ['Inpatient', 'Discharge'] },
           'resourceAllocation.roomTypeId': el._id,
         });
 console.log("total occupied beds:",totalOccupiedBeds)
@@ -150,7 +150,6 @@ console.log("total occupied beds:",totalOccupiedBeds)
         };
       })
     );
-
     const reportDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 55, 0);
 
     return {
