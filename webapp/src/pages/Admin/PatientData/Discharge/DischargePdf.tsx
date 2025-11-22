@@ -27,6 +27,7 @@ const toBase64 = async (url: string | URL | Request) => {
   });
 };
 const formatQuillText = (html: string) => {
+   if (!html || typeof html !== "string") return ""; 
   return html
     .replace(/<li>/g, "• ")       // bullet symbol
     .replace(/<\/li>/g, "\n")     // new line per bullet
@@ -391,7 +392,7 @@ data.PsychologistNotes && [
       body: [
         [
           {
-           
+            
                  text: formatQuillText(data.PsychologistNotes),
             margin: [5, 5, 5, 5],
             fontSize: 11,
@@ -415,8 +416,7 @@ data.PsychologistNotes && [
                 body: [
                   [
                     {
-                     
-                           text: formatQuillText(data.investigation),
+                      text: data.investigation.replace(/<[^>]+>/g, ""),
                       margin: [5, 5, 5, 5]
                     }
                   ]
