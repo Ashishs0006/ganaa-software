@@ -12,7 +12,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import handleError from "@/utils/handleError";
 
-// 👇 This is the correct access path
+
 (pdfMake as typeof pdfMake & { vfs: any }).vfs = (pdfFonts as any).vfs;
 
 const toBase64 = async (url: string | URL | Request) => {
@@ -26,6 +26,19 @@ const toBase64 = async (url: string | URL | Request) => {
     reader.readAsDataURL(blob);
   });
 };
+const formatQuillText = (html: string) => {
+  return html
+    .replace(/<li>/g, "• ")       // bullet symbol
+    .replace(/<\/li>/g, "\n")     // new line per bullet
+    .replace(/<br\s*\/?>/g, "\n") // convert <br> to newline
+    .replace(/<\/p>/g, "\n")      // paragraph end -> newline
+    .replace(/<p>/g, "")          // remove opening <p>
+    .replace(/<\/?ul>/g, "")      // remove <ul> wrapper
+    .replace(/<[^>]+>/g, "")      // remove remaining tags
+    .replace(/\n{2,}/g, "\n")     // remove extra blank lines
+    .trim();
+};
+
 
 const DischargeSummaryPdf = ({
   patientDetails,
@@ -173,7 +186,8 @@ const DischargeSummaryPdf = ({
                 body: [
                   [
                     {
-                      text: data.chiefComplaints.replace(/<[^>]+>/g, ""),
+                      
+                         text: formatQuillText(data.chiefComplaints),
                       margin: [5, 5, 5, 5],
                       fontSize: 11,
                       alignment: "left"
@@ -195,7 +209,8 @@ const DischargeSummaryPdf = ({
                 body: [
                   [
                     {
-                      text: data.historyOfPresentIllness.replace(/<[^>]+>/g, ""),
+                   
+                         text: formatQuillText(data.historyOfPresentIllness),
                       margin: [5, 5, 5, 5]
                     }
                   ]
@@ -214,7 +229,8 @@ const DischargeSummaryPdf = ({
                 body: [
                   [
                     {
-                      text: data.physicalExaminationAtAdmission.replace(/<[^>]+>/g, ""),
+                     
+                         text: formatQuillText(data.physicalExaminationAtAdmission),
                       margin: [5, 5, 5, 5]
                     }
                   ]
@@ -234,7 +250,8 @@ const DischargeSummaryPdf = ({
                 body: [
                   [
                     {
-                      text: data.mentalStatusExamination.replace(/<[^>]+>/g, ""),
+                    
+                         text: formatQuillText(data.mentalStatusExamination),
                       margin: [5, 5, 5, 5]
                     }
                   ]
@@ -253,7 +270,8 @@ const DischargeSummaryPdf = ({
                 body: [
                   [
                     {
-                      text: data.hospitalisationSummary.replace(/<[^>]+>/g, ""),
+                    
+                         text: formatQuillText(data.hospitalisationSummary),
                       margin: [5, 5, 5, 5]
                     }
                   ]
@@ -274,7 +292,8 @@ data.diagnosticFormulation && [
       body: [
         [
           {
-            text: data.diagnosticFormulation.replace(/<[^>]+>/g, ""),
+          
+               text: formatQuillText(data.diagnosticFormulation),
             margin: [5, 5, 5, 5],
             fontSize: 11,
             alignment: "left"
@@ -295,7 +314,8 @@ data.diagnosis && [
       body: [
         [
           {
-            text: data.diagnosis.replace(/<[^>]+>/g, ""),
+         
+                  text: formatQuillText(data.diagnosis),
             margin: [5, 5, 5, 5],
             fontSize: 11,
             alignment: "left"
@@ -309,49 +329,7 @@ data.diagnosis && [
   }
 ],
 
-data.PsychologistNotes && [
-  { text: "Psychologist Notes", style: "sectionHeader" },
-  {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: data.PsychologistNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 5],
-            fontSize: 11,
-            alignment: "left"
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10],
-    noWrap: false
-  }
-],
 
-data.PsychiatricNotes && [
-  { text: "Psychiatric Notes", style: "sectionHeader" },
-  {
-    table: {
-      widths: ["100%"],
-      body: [
-        [
-          {
-            text: data.PsychiatricNotes.replace(/<[^>]+>/g, ""),
-            margin: [5, 5, 5, 5],
-            fontSize: 11,
-            alignment: "left"
-          }
-        ]
-      ]
-    },
-    layout: "grid",
-    margin: [0, 0, 0, 10],
-    noWrap: false
-  }
-],
 
 data.mentalStatusExaminationatDischarge && [
   { text: "Mental Status Examination at Discharge", style: "sectionHeader" },
@@ -361,7 +339,8 @@ data.mentalStatusExaminationatDischarge && [
       body: [
         [
           {
-            text: data.mentalStatusExaminationatDischarge.replace(/<[^>]+>/g, ""),
+           
+                 text: formatQuillText(data.mentalStatusExaminationatdisharge),
             margin: [5, 5, 5, 5],
             fontSize: 11,
             alignment: "left"
@@ -375,6 +354,57 @@ data.mentalStatusExaminationatDischarge && [
   }
 ],
 
+{
+  text: "Hospitalization Summary",
+  bold: true,
+  fontSize: 15,
+  margin: [0, 10, 0, 5]
+},
+
+data.PsychiatricNotes && [
+  { text: "Psychiatrist’s Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+           
+                 text: formatQuillText(data.PsychiatricNotes),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
+data.PsychologistNotes && [
+  { text: " Psychologist’s Notes", style: "sectionHeader" },
+  {
+    table: {
+      widths: ["100%"],
+      body: [
+        [
+          {
+           
+                 text: formatQuillText(data.PsychologistNotes),
+            margin: [5, 5, 5, 5],
+            fontSize: 11,
+            alignment: "left"
+          }
+        ]
+      ]
+    },
+    layout: "grid",
+    margin: [0, 0, 0, 10],
+    noWrap: false
+  }
+],
 
           data.investigation && [
             { text: "Investigation:", style: "sectionHeader" },
@@ -385,7 +415,8 @@ data.mentalStatusExaminationatDischarge && [
                 body: [
                   [
                     {
-                      text: data.investigation.replace(/<[^>]+>/g, ""),
+                     
+                           text: formatQuillText(data.investigation),
                       margin: [5, 5, 5, 5]
                     }
                   ]
@@ -490,7 +521,7 @@ data.mentalStatusExaminationatDischarge && [
                 body: [
                   [
                     {
-                      text: data.adviseAndPlan.replace(/<[^>]+>/g, ""),
+                   text: formatQuillText(data.adviseAndPlan),
                       margin: [5, 5, 5, 5]
                     }
                   ]

@@ -1,12 +1,8 @@
-
-
-export function checkRegPending(data: Record<string, any>): {
-  isValid: boolean;
-  missingFields: string[];
-} {
+export function checkRegPending(data: Record<string, any>) {
   const missingFields: string[] = [];
 
-  const fields = [
+  // REQUIRED FIELDS ONLY
+  const requiredFields = [
     // basic detail
     "firstName",
     "lastName",
@@ -14,10 +10,7 @@ export function checkRegPending(data: Record<string, any>): {
     "email",
     "phoneNumberCountryCode",
     "phoneNumber",
-    "alternativephoneNumberCountryCode",
-    "alternativeMobileNumber",
     "gender",
-    "identificationMark",
     "country",
     "fullAddress",
     "area",
@@ -25,72 +18,42 @@ export function checkRegPending(data: Record<string, any>): {
     "referralDetails",
     "patientPicUrl",
     "patientHistory.admissionType",
+
+    // If admission type is involuntary — extra validation
     "patientHistory.involuntaryAdmissionType",
 
-    // profile&contact
+    // profile/contact
     "education",
-    "familyIncome",
-    "religion",
-    "language",
     "isMarried",
-    "numberOfChildren",
     "occupation",
 
-    // "patientHistory.admissionChecklist.applicationForAdmission",
-    // "patientHistory.admissionChecklist.capacityAssessment",
-    // "patientHistory.admissionChecklist.voluntaryAdmissionForm",
-    // "patientHistory.admissionChecklist.hospitalGuidelineForm",
-    // "patientHistory.admissionChecklist.inVoluntaryAdmissionForm",
-    // "patientHistory.admissionChecklist.finacialCounselling",
-    // "patientHistory.admissionChecklist.minorAdmissionForm",
-    // "patientHistory.admissionChecklist.form90",
-
-    // "patientHistory.admissionChecklist.orientationOfFamily",
-    // "patientHistory.admissionChecklist.orientationOfPatient",
-    // "patientHistory.admissionChecklist.familyDeclaration",
-    // "patientHistory.admissionChecklist.section94",
-
-    // "patientHistory.admissionChecklist.insuredFile",
-    // "patientHistory.admissionChecklist.isInsured",
-    // "patientHistory.admissionChecklist.insuredDetail",
-
-    //resourceAllocation
+    // resource allocation
     "patientHistory.resourceAllocation.centerId._id",
     "patientHistory.resourceAllocation.roomTypeId._id",
     "patientHistory.resourceAllocation.roomNumberId._id",
-    "patientHistory.resourceAllocation.lockerNumberId._id",
-    "patientHistory.resourceAllocation.belongingsInLocker",
     "patientHistory.resourceAllocation.assignedDoctorId._id",
     "patientHistory.resourceAllocation.assignedTherapistId._id",
     "patientHistory.resourceAllocation.careStaff",
-    "patientHistory.resourceAllocation.nurse"
-
-    // "patientHistory.illnessType",
-    // "patientHistory.patientCondition",
-    // "patientHistory.conditionDetails",
-    // "patientHistory.coverageStatus",
+    "patientHistory.resourceAllocation.nurse",
   ];
 
-  if (typeof data !== "object" || !Array.isArray(fields)) {
-    return { isValid: true, missingFields };
-  }
+  const inVoluntary = data?.patientHistory?.admissionType === "Involuntary";
 
-  const inVoluntary = data?.patientHistory?.admissionType == "Involuntary";
-
-  for (const field of fields) {
+  for (const field of requiredFields) {
+    // Skip involuntary admission check if patient is NOT involuntary
     if (field === "patientHistory.involuntaryAdmissionType" && !inVoluntary) {
       continue;
     }
-    if (typeof field !== "string") {
-      continue; // Skip invalid fields
-    }
 
-    const fieldValue = field.split(".").reduce((obj: any, key: string) => obj && obj[key], data);
+    const fieldValue = field.split(".").reduce((obj: any, key) => obj && obj[key], data);
 
     if (fieldValue === undefined || fieldValue === null || fieldValue === "") {
       missingFields.push(field);
     }
   }
 
-  return { isValid: missingFields.length !== 0, missingFields };
+  return {
+    isValid: missingFields.length === 0, // true when ALL required fields filled
+    missingFields,
+  };
 }
