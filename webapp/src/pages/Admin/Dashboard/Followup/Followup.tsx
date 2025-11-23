@@ -97,13 +97,77 @@ const PatientFollowup = () => {
 
   const [modalNote, setModalNote] = useState<INote[] | []>([]);
   const [data, setData] = useState<IData>();
-console.log('✌️data --->', data);
- const [modalState, setmodalState] = useState({
+  // console.log("✌️data --->", data);
+  const [modalState, setmodalState] = useState({
     displayNoteModal: false,
     selectedNote: ""
     // ...other state
   });
-const fetchSessionData = async () => {
+  // const fetchSessionData = async () => {
+  //   setState((prev) => ({ ...prev, loading: true }));
+  //   let centers;
+  //   const selected = searchParams.get("filter") || "All";
+
+  //   if (selected === "All" || !selected) {
+  //     centers = auth.user.centerId.map((data) => data._id);
+  //     if (centers.length <= 0) navigate("/");
+  //   } else {
+  //     centers = [selected];
+  //   }
+
+  //   const today = new Date();
+  //   const thirtyDaysAgo = new Date();
+  //   thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  //   const startDate = searchParams.get("startDate") || thirtyDaysAgo.toISOString();
+  //   const endDate = searchParams.get("endDate") || today.toISOString();
+
+  //   try {
+  //     const response = await getFollowups({
+  //       startDate,
+  //       endDate,
+  //       centerId: centers.join(",")
+  //     });
+
+  //     if (response.data.status === "success") {
+  //       const apiData = response.data.data;
+  //       console.log("api data is :", apiData);
+
+  //       // 🔥 Remove Duplicate Patients (TS Safe)
+  //       const uniquePatientMap = new Map<string, IPatient>();
+
+  //       (apiData.patients || []).forEach((p: IPatient) => {
+  //         if (!uniquePatientMap.has(p._id)) {
+  //           uniquePatientMap.set(p._id, p);
+  //         }
+  //       });
+
+  //       const uniquePatients = Array.from(uniquePatientMap.values());
+
+  //       // Final data set with unique patients
+  //       setData({
+  //         ...apiData
+  //         // patients: uniquePatients
+  //       });
+
+  //       const dates: string[] = [];
+  //       const currentDate = new Date(startDate);
+
+  //       while (currentDate <= new Date(endDate)) {
+  //         dates.push(currentDate.toISOString().split("T")[0]);
+  //         currentDate.setDate(currentDate.getDate() + 1);
+  //       }
+  //     } else {
+  //       console.error("Failed to fetch Session data");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching Session data:", error);
+  //   } finally {
+  //     setState((prev) => ({ ...prev, loading: false }));
+  //   }
+  // };
+
+  const fetchSessionData = async () => {
   setState((prev) => ({ ...prev, loading: true }));
   let centers;
   const selected = searchParams.get("filter") || "All";
@@ -115,12 +179,14 @@ const fetchSessionData = async () => {
     centers = [selected];
   }
 
+  // 🔥 SET DEFAULT DATES TO NEXT 10 DAYS
   const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const tenDaysFromNow = new Date();
+  tenDaysFromNow.setDate(today.getDate() + 10);
 
-  const startDate = searchParams.get("startDate") || thirtyDaysAgo.toISOString();
-  const endDate = searchParams.get("endDate") || today.toISOString();
+  // Use selected dates OR default to next 10 days
+  const startDate = searchParams.get("startDate") || today.toISOString();
+  const endDate = searchParams.get("endDate") || tenDaysFromNow.toISOString();
 
   try {
     const response = await getFollowups({
@@ -129,37 +195,23 @@ const fetchSessionData = async () => {
       centerId: centers.join(",")
     });
 
- if (response.data.status === "success") {
-  const apiData = response.data.data;
-  console.log("api data is :",apiData)
+    if (response.data.status === "success") {
+      const apiData = response.data.data;
+      // console.log("api data is :", apiData)
 
-  // 🔥 Remove Duplicate Patients (TS Safe)
-  const uniquePatientMap = new Map<string, IPatient>();
+      // Remove Duplicate Patients
+      const uniquePatientMap = new Map<string, IPatient>();
+      (apiData.patients || []).forEach((p: IPatient) => {
+        if (!uniquePatientMap.has(p._id)) {
+          uniquePatientMap.set(p._id, p);
+        }
+      });
 
-  (apiData.patients || []).forEach((p: IPatient) => {
-    if (!uniquePatientMap.has(p._id)) {
-      uniquePatientMap.set(p._id, p);
-    }
-  });
-
-  const uniquePatients = Array.from(uniquePatientMap.values());
-
-  // Final data set with unique patients
-  setData({
-    ...apiData,
-    patients: uniquePatients
-  });
-
-  const dates: string[] = [];
-  const currentDate = new Date(startDate);
-
-  while (currentDate <= new Date(endDate)) {
-    dates.push(currentDate.toISOString().split("T")[0]);
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-    } else {
-      console.error("Failed to fetch Session data");
+      const uniquePatients = Array.from(uniquePatientMap.values());
+      setData({
+        ...apiData,
+        patients: uniquePatients
+      });
     }
   } catch (error) {
     console.error("Error fetching Session data:", error);
@@ -167,13 +219,13 @@ const fetchSessionData = async () => {
     setState((prev) => ({ ...prev, loading: false }));
   }
 };
-
-
   useEffect(() => {
     fetchSessionData();
   }, [searchParams, searchParams.get("filter")]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+ 
 
   return (
     <div className="bg-[#F4F2F0] pb-5  min-h-[calc(100vh-64px)]">
@@ -285,11 +337,19 @@ const fetchSessionData = async () => {
                         : b?.firstName?.localeCompare(a.firstName)
                     )
                     .map((patient) => {
-                      const therapistData = patient?.dischargeHistory && patient?.dischargeHistory.filter((name) => name.resourceAllocation.assignedTherapistId)
-                      const therapistName = therapistData && therapistData.length > 0 ? {
-                        name: `${therapistData[0].resourceAllocation.assignedTherapistId.firstName} ${therapistData[0].resourceAllocation.assignedTherapistId.lastName}`
-                      } : {name: "-"};
+                      const therapistData =
+                        patient?.dischargeHistory &&
+                        patient?.dischargeHistory.filter(
+                          (name) => name.resourceAllocation.assignedTherapistId
+                        );
+                      const therapistName =
+                        therapistData && therapistData.length > 0
+                          ? {
+                              name: `${therapistData[0].resourceAllocation.assignedTherapistId.firstName} ${therapistData[0].resourceAllocation.assignedTherapistId.lastName}`
+                            }
+                          : { name: "-" };
                       const followups = patient.followups || []; // fetched from backend
+                      // console.log("✌️followups --->", followups);
                       // const therapistName = followups[0]?.therapistId
                       //   ? `${followups[0].therapistId.firstName} ${followups[0].therapistId.lastName}`
                       //   : "-";
@@ -360,24 +420,10 @@ const fetchSessionData = async () => {
                                       src={messageIcon}
                                       onClick={() => {
                                         setModalNote([followup as unknown as INote]);
-                                        // setState((prev) => ({
-                                        //   ...prev,
-                                        //   displayModal: true,
-                                        //   patientData: patient,
-                                        //   therapistData: followup.therapistId
-                                        // }));
                                         setState((prev) => ({
                                           ...prev,
                                           displayModal: true,
                                           patientData: patient
-                                          // therapistData: {
-                                          //   _id: followup.therapistId?._id || "",
-                                          //   firstName: followup.therapistId?.firstName || "",
-                                          //   lastName: followup.therapistId?.lastName || "",
-                                          //   centerId: followup.therapistId?.centerId || {
-                                          //     centerName: ""
-                                          //   }
-                                          // }
                                         }));
                                       }}
                                       className=" w-4 h-4 text-[#505050] cursor-pointer mx-auto"
@@ -401,8 +447,6 @@ const fetchSessionData = async () => {
           </div>
         )}
       </div>
-
-     
 
       <Modal
         isOpen={state.displayModal}
@@ -533,22 +577,22 @@ const fetchSessionData = async () => {
 
                     {/* Notes */}
                     <td className="px-4 py-7 w-[500px] max-w-[500px] whitespace-nowrap overflow-hidden text-ellipsis">
-                            {/* {value?.note
+                      {/* {value?.note
                               ? value.note.replace(/<[^>]+>/g, "").slice(0, 20) + "..."
                               : "--"} */}
-                            <button
-                              className="text-blue-500 ml-2 underline"
-                              onClick={() => {
-                                setmodalState((prev) => ({
-                                  ...prev,
-                                  displayNoteModal: true,
-                                  selectedNote: value.note
-                                }));
-                              }}
-                            >
-                              View
-                            </button>
-                          </td>
+                      <button
+                        className="text-blue-500 ml-2 underline"
+                        onClick={() => {
+                          setmodalState((prev) => ({
+                            ...prev,
+                            displayNoteModal: true,
+                            selectedNote: value.note
+                          }));
+                        }}
+                      >
+                        View
+                      </button>
+                    </td>
 
                     <td className="px-4 py-7"></td>
                   </tr>
@@ -605,23 +649,23 @@ const fetchSessionData = async () => {
           </div>
         </div>
 
-         <Modal
-        isOpen={modalState.displayNoteModal}
-        toggleModal={() => setmodalState((prev) => ({ ...prev, displayNoteModal: false }))}
-        crossIcon
-        // title="Follow-up Date Not Allowed"
-      >
-        {/* <div className="fixed inset-0 flex justify-center items-center z-50"> */}
-        <div className="p-6 rounded-md w-full max-w-[80vw] m-2 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-lg font-bold mb-4">Followup Notes</h2>
+        <Modal
+          isOpen={modalState.displayNoteModal}
+          toggleModal={() => setmodalState((prev) => ({ ...prev, displayNoteModal: false }))}
+          crossIcon
+          // title="Follow-up Date Not Allowed"
+        >
+          {/* <div className="fixed inset-0 flex justify-center items-center z-50"> */}
+          <div className="p-6 rounded-md w-full max-w-[80vw] m-2 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-lg font-bold mb-4">Followup Notes</h2>
 
-          <div
-            className="prose max-w-full"
-            dangerouslySetInnerHTML={{ __html: modalState.selectedNote }}
-          ></div>
-        </div>
-        {/* </div> */}
-      </Modal>
+            <div
+              className="prose max-w-full"
+              dangerouslySetInnerHTML={{ __html: modalState.selectedNote }}
+            ></div>
+          </div>
+          {/* </div> */}
+        </Modal>
       </Modal>
     </div>
   );

@@ -24,6 +24,7 @@ import DailyResourceAllocationReport from '../models/reports/daily.resource.repo
 import { ICenterInfo, IGenderCounts } from '../interfaces/controller/i.dashboard.controller';
 import PatientAdmissionHistoryRevision from '../models/patient/patient.admission.history.revision.model';
 import PatientFollowup from '../models/daily-progress/patient.followup.model';
+import { ObjectId } from 'mongoose';
 
 export const insightDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -159,13 +160,20 @@ export const therapistDashboard = catchAsync(
 );
 
 export const followupsDashboard = catchAsync(
-  async (req: UserRequest, res: Response, next: NextFunction) => {
-    // 1️ Validate dates
-    if (!req.query.startDate) return next(new AppError('Start Date is Mandatory Field', 400));
-    if (!req.query.endDate) return next(new AppError('End Date is Mandatory Field', 400));
-
-    const start = new Date(req.query.startDate as string);
-    const end = new Date(req.query.endDate as string);
+   async (req: UserRequest, res: Response, next: NextFunction) => {
+    // 1️ Set default dates to next 10 days if not provided
+    let start, end;
+    
+    if (!req.query.startDate || !req.query.endDate) {
+      // Default to next 10 days
+      start = new Date();
+      end = new Date();
+      end.setDate(end.getDate() + 10);
+    } else {
+      // Use provided dates
+      start = new Date(req.query.startDate as string);
+      end = new Date(req.query.endDate as string);
+    }
 
     if (isNaN(start.getTime())) return next(new AppError('Invalid Start Date format', 400));
     if (isNaN(end.getTime())) return next(new AppError('Invalid End Date format', 400));
@@ -177,7 +185,6 @@ export const followupsDashboard = catchAsync(
     const maxSpan = 31 * msInDay;
     if (end.getTime() - start.getTime() > maxSpan)
       return next(new AppError('Date range cannot exceed 31 days', 400));
-
     // 2️Prepare query filters
     let patientHistoryQuery: IBasicObj = {};
     let therapistQuery: IBasicObj = {};
@@ -188,9 +195,22 @@ export const followupsDashboard = catchAsync(
       therapistQuery['centerId'] = { $in: centerId };
     }
 
+    const patientsData = await Patient.find({}).lean();
+    const patientIds = patientsData.map((el) => el._id as ObjectId);
+
+    const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
+
+    // 4️ Enrich data exactly like getAllPatient does
+    const enrichedPatients = patientsData.map((record) => ({
+      ...record,
+      patientHistory: admissionHistoryMap[record._id?.toString()!],
+    }));
+
+    // console.log('enrichedPatients --->', enrichedPatients);
+
     // 3️Get Admission histories and populate patients
     const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
-      .select('patientId dateOfAdmission resourceAllocation assignedTherapistId dischargeId currentStatus')
+      .select('patientId dateOfAdmission resourceAllocation assignedTherapistId dischargeId')
       .populate({ path: 'dischargeId', select: 'date' })
       .populate({
         path: 'patientId',
@@ -203,26 +223,33 @@ export const followupsDashboard = catchAsync(
         populateFeedback: true,
       })
       .lean();
+    // console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
 
     // Filter only discharged patients
-    console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
-    const filteredAdmissions = patientAdmissionHistory.filter(
-      (admission: any) => admission && admission.currentStatus === 'Discharged'
+    const filteredAdmissions = enrichedPatients.filter(
+      (admission: any) => admission && admission.patientHistory.currentStatus === 'Discharged'
     );
+    // console.log('filteredAdmissions --->', filteredAdmissions);
 
-    const inpatientIds = filteredAdmissions.map((el: any) => el.patientId?._id?.toString());
+    const inpatientIds = filteredAdmissions.map((el: any) => el._id?.toString());
+// console.log('✌️inpatientIds --->', inpatientIds);
     const inPatientAdmissionIds = filteredAdmissions.map((el) => el._id?.toString());
 
     // 4️Map discharge data
     const dischargeResult: any = {};
     filteredAdmissions.forEach((admission: any) => {
-      const patientId = admission.patientId._id.toString();
-      const startDate = admission.dateOfAdmission;
-      const dischargeDate = admission.dischargeId?.date;
-      const resourceAllocation = admission.resourceAllocation || {};
+      const patientId = admission.patientHistory.patientId.toString();
+      const startDate = admission.patientHistory.dateOfAdmission;
+      const dischargeDate = admission.patientHistory.dischargeId?.date;
+      const resourceAllocation = admission.patientHistory.resourceAllocation || {};
       if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
-      dischargeResult[patientId].push({ start: startDate, end: dischargeDate, resourceAllocation:resourceAllocation });
+      dischargeResult[patientId].push({
+        start: startDate,
+        end: dischargeDate,
+        resourceAllocation: resourceAllocation,
+      });
     });
+        // console.log('✌️dischargeResult --->', dischargeResult);
 
     // 5️Get all therapists (Therapist + Therapist+AM roles)
     const therapistRoles = await Role.find({
@@ -274,14 +301,22 @@ export const followupsDashboard = catchAsync(
 
     // 7️Attach followups to each patient
     const patientsWithFollowups = filteredAdmissions.map((admission: any) => {
-      const patient = admission.patientId;
-      const centerId = admission.resourceAllocation?.centerId || null;
-       const dischargeDate = admission.dischargeId?.date || null;
+      const patientId = admission.patientHistory.patientId._id;
+      const firstName = admission.firstName;
+      const lastName = admission.lastName;
+      const patient = admission;
+      const centerId = admission.patientHistory.resourceAllocation?.centerId || null;
+      const dischargeDate = admission.patientHistory.dischargeId?.date || null;
       const followups = patientFollowups.filter(
         (f) => f.patientId?.toString() === patient._id.toString()
       );
+      // console.log('followups --->', followups);
+      // console.log('followups --->', followups);
       return {
         ...patient,
+        patientId,
+        firstName,
+        lastName,
         centerId,
         dischargeDate,
         dischargeHistory: dischargeResult[patient._id] || [],
@@ -301,7 +336,6 @@ export const followupsDashboard = catchAsync(
     });
   }
 );
-
 
 export const doctorDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -410,7 +444,7 @@ export const doctorDashboard = catchAsync(
 export const dailyReportDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
     const { startDate, endDate } = req.query;
-console.log("Hiihfhfdhfhf")
+    console.log('Hiihfhfdhfhf');
     if (!startDate || !endDate) {
       return next(new AppError('Both Start Date and End Date are required', 400));
     }
