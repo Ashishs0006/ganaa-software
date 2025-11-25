@@ -150,7 +150,7 @@ const DischargeSummaryPdf = ({
                 ]
               ]
             },
-            layout: "grid", 
+            layout: "grid", // full borders
             margin: [0, 0, 0, 20]
           },
 

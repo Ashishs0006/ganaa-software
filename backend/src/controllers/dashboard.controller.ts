@@ -159,8 +159,186 @@ export const therapistDashboard = catchAsync(
   }
 );
 
+// export const followupsDashboard = catchAsync(
+//    async (req: UserRequest, res: Response, next: NextFunction) => {
+//     // 1️ Set default dates to next 10 days if not provided
+//     let start, end;
+    
+//     if (!req.query.startDate || !req.query.endDate) {
+//       // Default to next 10 days
+//       start = new Date();
+//       end = new Date();
+//       end.setDate(end.getDate() + 10);
+//     } else {
+//       // Use provided dates
+//       start = new Date(req.query.startDate as string);
+//       end = new Date(req.query.endDate as string);
+//     }
+
+//     if (isNaN(start.getTime())) return next(new AppError('Invalid Start Date format', 400));
+//     if (isNaN(end.getTime())) return next(new AppError('Invalid End Date format', 400));
+
+//     start.setHours(0, 0, 0, 0);
+//     end.setHours(23, 59, 59, 999);
+
+//     const msInDay = 24 * 60 * 60 * 1000;
+//     const maxSpan = 31 * msInDay;
+//     if (end.getTime() - start.getTime() > maxSpan)
+//       return next(new AppError('Date range cannot exceed 31 days', 400));
+//     // 2️Prepare query filters
+//     let patientHistoryQuery: IBasicObj = {};
+//     let therapistQuery: IBasicObj = {};
+
+//     if (req.query.centerId) {
+//       const centerId = (req.query.centerId as string).split(',');
+//       patientHistoryQuery['resourceAllocation.centerId'] = { $in: centerId };
+//       therapistQuery['centerId'] = { $in: centerId };
+//     }
+
+//     const patientsData = await Patient.find({}).lean();
+//     const patientIds = patientsData.map((el) => el._id as ObjectId);
+
+//     const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
+
+//     // 4️ Enrich data exactly like getAllPatient does
+//     const enrichedPatients = patientsData.map((record) => ({
+//       ...record,
+//       patientHistory: admissionHistoryMap[record._id?.toString()!],
+//     }));
+
+//     // console.log('enrichedPatients --->', enrichedPatients);
+
+//     // 3️Get Admission histories and populate patients
+//     const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
+//       .select('patientId dateOfAdmission resourceAllocation assignedTherapistId dischargeId')
+//       .populate({ path: 'dischargeId', select: 'date' })
+//       .populate({
+//         path: 'patientId',
+//         select: '_id uhid firstName lastName gender center currentStatus patientPic',
+//       })
+//       .setOptions({
+//         skipUrlGeneration: true,
+//         skipResAllPopulate: false,
+//         populateUser: true,
+//         populateFeedback: true,
+//       })
+//       .lean();
+//     // console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
+
+//     // Filter only discharged patients
+//     const filteredAdmissions = enrichedPatients.filter(
+//       (admission: any) => admission && admission.patientHistory.currentStatus === 'Discharged'
+//     );
+//     // console.log('filteredAdmissions --->', filteredAdmissions);
+
+//     const inpatientIds = filteredAdmissions.map((el: any) => el._id?.toString());
+// // console.log('✌️inpatientIds --->', inpatientIds);
+//     const inPatientAdmissionIds = filteredAdmissions.map((el) => el._id?.toString());
+
+//     // 4️Map discharge data
+//     const dischargeResult: any = {};
+//     filteredAdmissions.forEach((admission: any) => {
+//       const patientId = admission.patientHistory.patientId.toString();
+//       const startDate = admission.patientHistory.dateOfAdmission;
+//       const dischargeDate = admission.patientHistory.dischargeId?.date;
+//       const resourceAllocation = admission.patientHistory.resourceAllocation || {};
+//       if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
+//       dischargeResult[patientId].push({
+//         start: startDate,
+//         end: dischargeDate,
+//         resourceAllocation: resourceAllocation,
+//       });
+//     });
+//         // console.log('✌️dischargeResult --->', dischargeResult);
+
+//     // 5️Get all therapists (Therapist + Therapist+AM roles)
+//     const therapistRoles = await Role.find({
+//       name: { $in: ['Therapist', 'Therapist+AM'] },
+//     }).select('_id');
+
+//     const therapistRoleIds = therapistRoles.map((r: any) => r._id.toString());
+//     const therapists = await User.find({
+//       roleId: { $in: therapistRoleIds },
+//       ...therapistQuery,
+//     })
+//       .select('_id firstName lastName centerId')
+//       .setOptions({ skipUrlGeneration: true, shouldSkipRole: true })
+//       .lean();
+
+//     const therapistIds = therapists.map((t) => t._id.toString());
+
+//     // 6️Fetch LOA, Therapist Notes, and Followup Data in parallel
+//     const [loa, notes, patientFollowups] = await Promise.all([
+//       Loa.find({
+//         noteDateTime: { $gte: start, $lte: end },
+//         patientAdmissionHistoryId: { $in: inPatientAdmissionIds },
+//       }).lean(),
+
+//       TherapistNote.find({
+//         noteDateTime: { $gte: start, $lte: end },
+//         patientAdmissionHistoryId: { $in: inPatientAdmissionIds },
+//         therapistId: { $in: therapistIds },
+//       })
+//         .select(
+//           '_id patientId noteDateTime note sessionType subSessionType score therapistId createdAt createdBy file'
+//         )
+//         .setOptions({ skipTherapistPopulation: false, skipUrlGeneration: false })
+//         .lean(),
+
+//       PatientFollowup.find({
+//         patientId: { $in: inpatientIds },
+//         $or: [
+//           { noteDateTime: { $gte: start, $lte: end } },
+//           { followupDate: { $gte: start, $lte: end } },
+//         ],
+//       })
+//         .select(
+//           '_id patientId createdAt therapistId noteDateTime note sessionType subSessionType score followupDate adherence meeting sponsor feedbackFromFamily currentStatus file'
+//         )
+//         .setOptions({ skipTherapistPopulation: false, skipUrlGeneration: false })
+//         .lean(),
+//     ]);
+
+//     // 7️Attach followups to each patient
+//     const patientsWithFollowups = filteredAdmissions.map((admission: any) => {
+//       const patientId = admission.patientHistory.patientId._id;
+//       const firstName = admission.firstName;
+//       const lastName = admission.lastName;
+//       const patient = admission;
+//       const centerId = admission.patientHistory.resourceAllocation?.centerId || null;
+//       const dischargeDate = admission.patientHistory.dischargeId?.date || null;
+//       const followups = patientFollowups.filter(
+//         (f) => f.patientId?.toString() === patient._id.toString()
+//       );
+//       // console.log('followups --->', followups);
+//       // console.log('followups --->', followups);
+//       return {
+//         ...patient,
+//         patientId,
+//         firstName,
+//         lastName,
+//         centerId,
+//         dischargeDate,
+//         dischargeHistory: dischargeResult[patient._id] || [],
+//         followups, // All followups for this patient
+//       };
+//     });
+
+//     // 8️Send Final Response
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         patients: patientsWithFollowups, //  merged followups here
+//         therapists,
+//         loa,
+//         notes,
+//       },
+//     });
+//   }
+// );
+
 export const followupsDashboard = catchAsync(
-   async (req: UserRequest, res: Response, next: NextFunction) => {
+  async (req: UserRequest, res: Response, next: NextFunction) => {
     // 1️ Set default dates to next 10 days if not provided
     let start, end;
     
@@ -185,6 +363,7 @@ export const followupsDashboard = catchAsync(
     const maxSpan = 31 * msInDay;
     if (end.getTime() - start.getTime() > maxSpan)
       return next(new AppError('Date range cannot exceed 31 days', 400));
+
     // 2️Prepare query filters
     let patientHistoryQuery: IBasicObj = {};
     let therapistQuery: IBasicObj = {};
@@ -195,9 +374,12 @@ export const followupsDashboard = catchAsync(
       therapistQuery['centerId'] = { $in: centerId };
     }
 
+    // 🔥 KEEP THE ORIGINAL APPROACH BUT FILTER PROPERLY
+    // Get ALL patients first (like original code)
     const patientsData = await Patient.find({}).lean();
     const patientIds = patientsData.map((el) => el._id as ObjectId);
 
+    // Get admission history map for ALL patients
     const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
 
     // 4️ Enrich data exactly like getAllPatient does
@@ -206,50 +388,65 @@ export const followupsDashboard = catchAsync(
       patientHistory: admissionHistoryMap[record._id?.toString()!],
     }));
 
-    // console.log('enrichedPatients --->', enrichedPatients);
+    console.log('🔍 DEBUG - enrichedPatients sample:', enrichedPatients.slice(0, 2));
 
-    // 3️Get Admission histories and populate patients
-    const patientAdmissionHistory = await PatientAdmissionHistory.find(patientHistoryQuery)
-      .select('patientId dateOfAdmission resourceAllocation assignedTherapistId dischargeId')
-      .populate({ path: 'dischargeId', select: 'date' })
-      .populate({
-        path: 'patientId',
-        select: '_id uhid firstName lastName gender center currentStatus patientPic',
-      })
-      .setOptions({
-        skipUrlGeneration: true,
-        skipResAllPopulate: false,
-        populateUser: true,
-        populateFeedback: true,
-      })
-      .lean();
-    // console.log('✌️patientAdmissionHistory --->', patientAdmissionHistory);
+    // 🔥 FILTER BY CENTER AND DISCHARGE STATUS TOGETHER
+    const filteredAdmissions = enrichedPatients.filter((admission: any) => {
+      if (!admission || !admission.patientHistory) return false;
+      
+      // Check if patient is discharged
+      const isDischarged = admission.patientHistory.currentStatus === 'Discharged';
+      
+      // Check center filter if provided
+      if (req.query.centerId) {
+        const centerId = (req.query.centerId as string).split(',');
+        const patientCenterId = admission.patientHistory.resourceAllocation?.centerId?._id?.toString();
+        const isInSelectedCenter = patientCenterId && centerId.includes(patientCenterId);
+        
+        return isDischarged && isInSelectedCenter;
+      }
+      
+      return isDischarged;
+    });
 
-    // Filter only discharged patients
-    const filteredAdmissions = enrichedPatients.filter(
-      (admission: any) => admission && admission.patientHistory.currentStatus === 'Discharged'
-    );
-    // console.log('filteredAdmissions --->', filteredAdmissions);
+    console.log('🔍 DEBUG - filteredAdmissions count:', filteredAdmissions.length);
+    console.log('🔍 DEBUG - filteredAdmissions sample:', filteredAdmissions.slice(0, 2));
+
+    // If no discharged patients found, return empty response
+    if (filteredAdmissions.length === 0) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          patients: [],
+          therapists: [],
+          loa: [],
+          notes: [],
+        },
+      });
+    }
 
     const inpatientIds = filteredAdmissions.map((el: any) => el._id?.toString());
-// console.log('✌️inpatientIds --->', inpatientIds);
-    const inPatientAdmissionIds = filteredAdmissions.map((el) => el._id?.toString());
+    const inPatientAdmissionIds = filteredAdmissions.map((el) => el.patientHistory?._id?.toString()).filter(Boolean);
 
     // 4️Map discharge data
     const dischargeResult: any = {};
     filteredAdmissions.forEach((admission: any) => {
-      const patientId = admission.patientHistory.patientId.toString();
-      const startDate = admission.patientHistory.dateOfAdmission;
-      const dischargeDate = admission.patientHistory.dischargeId?.date;
-      const resourceAllocation = admission.patientHistory.resourceAllocation || {};
-      if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
-      dischargeResult[patientId].push({
-        start: startDate,
-        end: dischargeDate,
-        resourceAllocation: resourceAllocation,
-      });
+      const patientId = admission._id?.toString();
+      const history = admission.patientHistory;
+      
+      if (history && patientId) {
+        const startDate = history.dateOfAdmission;
+        const dischargeDate = history.dischargeId?.date;
+        const resourceAllocation = history.resourceAllocation || {};
+        
+        if (!dischargeResult[patientId]) dischargeResult[patientId] = [];
+        dischargeResult[patientId].push({
+          start: startDate,
+          end: dischargeDate,
+          resourceAllocation: resourceAllocation,
+        });
+      }
     });
-        // console.log('✌️dischargeResult --->', dischargeResult);
 
     // 5️Get all therapists (Therapist + Therapist+AM roles)
     const therapistRoles = await Role.find({
@@ -301,17 +498,16 @@ export const followupsDashboard = catchAsync(
 
     // 7️Attach followups to each patient
     const patientsWithFollowups = filteredAdmissions.map((admission: any) => {
-      const patientId = admission.patientHistory.patientId._id;
+      const patientId = admission._id;
       const firstName = admission.firstName;
       const lastName = admission.lastName;
       const patient = admission;
-      const centerId = admission.patientHistory.resourceAllocation?.centerId || null;
-      const dischargeDate = admission.patientHistory.dischargeId?.date || null;
+      const centerId = admission.patientHistory?.resourceAllocation?.centerId || null;
+      const dischargeDate = admission.patientHistory?.dischargeId?.date || null;
       const followups = patientFollowups.filter(
         (f) => f.patientId?.toString() === patient._id.toString()
       );
-      // console.log('followups --->', followups);
-      // console.log('followups --->', followups);
+      
       return {
         ...patient,
         patientId,
@@ -328,7 +524,7 @@ export const followupsDashboard = catchAsync(
     res.status(200).json({
       status: 'success',
       data: {
-        patients: patientsWithFollowups, //  merged followups here
+        patients: patientsWithFollowups,
         therapists,
         loa,
         notes,
@@ -336,7 +532,6 @@ export const followupsDashboard = catchAsync(
     });
   }
 );
-
 export const doctorDashboard = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
     if (!req.query.startDate) return next(new AppError('Start Date is Mandatory Field', 400));

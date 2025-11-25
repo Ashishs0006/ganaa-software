@@ -221,6 +221,8 @@ const PatientFollowup = () => {
 };
   useEffect(() => {
     fetchSessionData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [searchParams, searchParams.get("filter")]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
