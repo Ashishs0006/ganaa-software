@@ -2574,7 +2574,7 @@ const checkFollowupRestriction = (): boolean => {
         </Modal>
 
       {/* Followup Restriction Modal */}
-      <Modal
+      {/* <Modal
         isOpen={showFollowupRestrictionModal}
         toggleModal={() => setShowFollowupRestrictionModal(false)}
         // title="Follow-up Date Not Allowed"
@@ -2611,7 +2611,59 @@ const checkFollowupRestriction = (): boolean => {
             </Button>
           </div>
         </div>
-      </Modal>
+      </Modal> */}
+<Modal
+  isOpen={showFollowupRestrictionModal}
+  toggleModal={() => setShowFollowupRestrictionModal(false)}
+>
+  <div className="p-5">
+    {/* Layout row: icon + text */}
+    <div className="flex items-start gap-4">
+      
+      {/* Icon */}
+      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-red-100">
+        <svg 
+          className="w-6 h-6 text-red-600" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth="2" 
+            d="M6 18L18 6M6 6l12 12" 
+          />
+        </svg>
+      </div>
+
+      {/* Text Content */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900">
+          Action Not Allowed
+        </h3>
+        <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+          The selected date is restricted and cannot be chosen.
+        </p>
+        {data.noteDate && (
+          <p className="mt-2 text-xs text-gray-400">
+            Selected: {formateNormalDate(data.noteDate)}
+          </p>
+        )}
+      </div>
+    </div>
+
+    {/* Button */}
+    <div className="mt-6 flex justify-end">
+      <Button
+        onClick={() => setShowFollowupRestrictionModal(false)}
+        className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg"
+      >
+        Close
+      </Button>
+    </div>
+  </div>
+</Modal>
 
       <DeleteConfirm
         toggleModal={toggleModal}
