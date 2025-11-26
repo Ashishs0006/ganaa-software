@@ -37,10 +37,44 @@ if (envValidationStatus != null) {
 const app = express();
 const host = Env.SERVER_IP || '127.0.0.1';
 const port = Number(Env.SERVER_PORT) || 3000;
+async function fixGroupTabOldIndex() {
+  try {
+    if (!mongoose.connection.db) {
+      console.log("Mongo DB not ready yet, skipping...");
+      return;
+    }
+
+    const collection = mongoose.connection.db.collection('grouptabs');
+
+    const indexes = await collection.indexes();
+    console.log('Existing Indexes:', indexes);
+
+    const oldIndex = indexes.find(i => i.name === 'activityDateTime_1');
+    if (oldIndex) {
+      console.log('Deleting old index activityDateTime_1...');
+      await collection.dropIndex('activityDateTime_1');
+      console.log('Old index deleted ✔');
+    } else {
+      console.log('Old index not found');
+    }
+
+    console.log('Creating correct composite unique index...');
+    await collection.createIndex(
+      { activityDateTime: 1, centerId: 1 },
+      { unique: true }
+    );
+
+    console.log('Correct composite unique index created ✔');
+  } catch (err) {
+    console.error('Index Fix Failed ❌:', err);
+  }
+}
+
 
 mongoose
   .connect(Env.DATABASE_URL as string, { autoIndex: true })
-  .then(() => console.log('DB connections succesfull'))
+  .then(() => {console.log('DB connections succesfull')
+fixGroupTabOldIndex()})
   .catch((err) => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
@@ -129,6 +163,11 @@ const server = http.createServer(app);
 // Anti-Slowloris: Set Timeouts
 server.keepAliveTimeout = 5000; // 5 seconds
 server.headersTimeout = 65000; // 65 seconds (must be > keepAliveTimeout)
+
+
+// 🔥 ONE-TIME FIX FUNCTION — RUN AND REMOVE 🔥
+
+
 
 server.listen(port, host, () => {
   console.log(`Server started on ${host}:${port}`);
