@@ -1311,7 +1311,7 @@ const checkFollowupRestriction = (): boolean => {
                               </div>
                             </CustomCalendar> */}
 
-                          <CustomCalendar
+<CustomCalendar
   value={data.noteDate}
   disabledDate={(current) => {
     if (!current) return false;
@@ -1319,11 +1319,12 @@ const checkFollowupRestriction = (): boolean => {
     const selectedDate = current.toDate();
     selectedDate.setHours(0, 0, 0, 0);
 
-    // 1) Disable past dates (before today)
+    // Today
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (selectedDate < today) {
+    // 1) ❌ Disable all past & future dates → Only Today Allowed
+    if (selectedDate.getTime() !== today.getTime()) {
       return true;
     }
 
@@ -1344,7 +1345,7 @@ const checkFollowupRestriction = (): boolean => {
       }
     }
 
-    return false; // allow all other dates
+    return false; // allow only today
   }}
   onChange={(date) => {
     handleDateTimeChange(date, "date");
@@ -1362,23 +1363,24 @@ const checkFollowupRestriction = (): boolean => {
   </div>
 </CustomCalendar>
 
-                            <span className="mx-2">|</span>
+<span className="mx-2">|</span>
 
-                            <CustomTimePicker
-                              value={data.noteTime}
-                              onChange={(time) => {
-                                handleDateTimeChange(time, "time");
-                              }}
-                            >
-                              {data.noteTime && data.noteTime.split(":").slice(0, 2).join(":")}
-                              <div className="flex items-center justify-center w-5 mx-1 h-5">
-                                <img
-                                  src={clock}
-                                  alt="clock"
-                                  className="w-full h-full cursor-pointer ml-2"
-                                />
-                              </div>
-                            </CustomTimePicker>
+<CustomTimePicker
+  value={data.noteTime}
+  onChange={(time) => {
+    handleDateTimeChange(time, "time");
+  }}
+>
+  {data.noteTime && data.noteTime.split(":").slice(0, 2).join(":")}
+  <div className="flex items-center justify-center w-5 mx-1 h-5">
+    <img
+      src={clock}
+      alt="clock"
+      className="w-full h-full cursor-pointer ml-2"
+    />
+  </div>
+</CustomTimePicker>
+
                           </div>
 
                           <div className="ml-8  w-[160px] min-w-[160px] z-30 gap-1 relative text-xs cursor-pointer flex items-center text-gray-500">
