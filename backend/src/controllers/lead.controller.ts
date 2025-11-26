@@ -103,8 +103,8 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
 
   const lead = await Lead.findOne({ _id: req.params.id });
   if (!lead) return next(new AppError('Please provide valid Lead ID', 400));
-  if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
-    return next(new AppError('Lead Already Admitted', 400));
+  // if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
+  //   return next(new AppError('Lead Already Admitted', 400));
 
   const patient = await Patient.create({
     firstName: lead.firstName,
@@ -202,8 +202,8 @@ export const updateSingleLead = catchAsync(
 
     const lead = await Lead.findOne({ _id: req.params.id });
     if (!lead) return next(new AppError('Please provide valid Lead ID', 400));
-    if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
-      return next(new AppError('Lead Already Admitted', 400));
+    // if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
+    //   return next(new AppError('Lead Already Admitted', 400));
 
     const data = await Lead.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -223,8 +223,8 @@ export const deleteSingleLead = catchAsync(
 
     const lead = await Lead.findOne({ _id: req.params.id });
     if (!lead) return next(new AppError('Please provide valid Lead ID', 400));
-    if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
-      return next(new AppError('Admitted Lead cannot be deleted.', 400));
+    // if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
+    //   return next(new AppError('Admitted Lead cannot be deleted.', 400));
 
     await Lead.findByIdAndDelete(req.params.id);
 

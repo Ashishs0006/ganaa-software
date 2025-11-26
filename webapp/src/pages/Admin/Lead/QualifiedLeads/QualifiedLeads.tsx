@@ -434,47 +434,20 @@ useEffect(() => {
                         <div className="flex items-center gap-5">
                           <img
                             src={eye}
-                            className={`${
-                              data?.progressStatus !== "Admit"
-                                ? "cursor-pointer"
-                                : "cursor-not-allowed opacity-45"
-                            }`}
-                            onClick={() => {
-                              if (data?.progressStatus !== "Admit") handleOpenMenu(data);
-                            }}
+                            className={`"cursor-pointer"`}
+                            onClick={() => {handleOpenMenu(data)}}
                           />
-                          {data?.progressStatus !== "Admit" ? (
                             <Link to={`/admin/lead/update-lead/${data?._id}`}>
                               <img
                                 src={edit}
-                                className={`${
-                                  data?.progressStatus !== "Admit"
-                                    ? "cursor-pointer"
-                                    : "cursor-not-allowed "
-                                }`}
+                                className={`"cursor-pointer"`}
                               />
                             </Link>
-                          ) : (
-                            <img
-                              src={edit}
-                              className={`${
-                                data?.progressStatus !== "Admit"
-                                  ? "cursor-pointer"
-                                  : "cursor-not-allowed opacity-45"
-                              }`}
-                            />
-                          )}
 
                           <img
                             src={bin}
-                            onClick={() => {
-                              if (data?.progressStatus !== "Admit") handleDelete(data?._id);
-                            }}
-                            className={` ${
-                              data?.progressStatus !== "Admit"
-                                ? "cursor-pointer"
-                                : "cursor-not-allowed opacity-45"
-                            }`}
+                            onClick={() => {handleDelete(data?._id)}}
+                            className={`"cursor-pointer"`}
                           />
                         </div>
                       </td>
