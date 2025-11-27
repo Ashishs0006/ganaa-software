@@ -105,6 +105,7 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
   if (!lead) return next(new AppError('Please provide valid Lead ID', 400));
   // if (lead.progressStatus === 'Admit' || lead.patientId || lead.patientAdmissionHistoryId)
   //   return next(new AppError('Lead Already Admitted', 400));
+  // now we can edit the lead
 
   const patient = await Patient.create({
     firstName: lead.firstName,

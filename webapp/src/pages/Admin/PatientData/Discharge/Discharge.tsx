@@ -900,7 +900,7 @@ const Discharge = () => {
     </div>
   </div>
 </div>
-
+{/* data handling  */}
 
             <div className="grid gap-[88px]">
               <RichTextEditor
