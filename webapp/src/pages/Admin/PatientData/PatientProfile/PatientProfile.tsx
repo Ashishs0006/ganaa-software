@@ -485,6 +485,24 @@ const PatientProfile = () => {
                 </Link>
               </RBACGuard>
             )}
+            {(state.currentStatus === "Discharged") && (
+  <RBACGuard resource={RESOURCES.FOLLOWUP} action="read">
+    <Link
+      to={`/admin/patients/all-patient/${id}/patient-followup/${aId}`}
+    >
+      <Button
+        type="submit"
+        name="save"
+        className="min-w-[150px]! font-bold! text-xs! px-[12px]! py-[8px]! rounded-xl! border-gray-300! text-black!"
+        variant="outlined"
+        size="base"
+      >
+        Patient Follow-Up
+      </Button>
+    </Link>
+  </RBACGuard>
+)}
+
 
             <RBACGuard resource={RESOURCES.AUDIT_LOG} action="read">
               <Link to={`/admin/patients/all-patient/${id}/audit/${aId}`}>
