@@ -50,6 +50,7 @@ import { RouteItem } from "@/router/type";
 import { RESOURCES, ROUTES } from "@/constants/resources";
 import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/FollowUp/PatientFollowUp";
 import PatientFollowup from "@/pages/Admin/Dashboard/Followup/Followup";
+import DoctorReferral from "@/pages/Admin/Dashboard/Doctor-referral/DoctorReferral";
 
 export const routes: RouteItem[] = [
   {
@@ -83,6 +84,10 @@ export const routes: RouteItem[] = [
               {
                 path: "user",
                 element: <User />
+              },
+              {
+                path: "doctor",
+                element: <DoctorReferral />
               }
             ]
           },

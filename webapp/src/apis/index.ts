@@ -31,6 +31,15 @@ export const deleteUser = (id: string, params?: unknown, headers?: AxiosHeaders)
 export const resetPassword = (id: string, params?: unknown, headers?: AxiosHeaders) => http.patch(`/user/manage/reset-password/${id}`, { params, headers });
 export const changePassword = (data: unknown, params?: unknown, headers?: AxiosHeaders) => http.patch(`/user/me/change-password`, data, { params, headers });
 
+// Doctor Referral
+export const meDoctor = (params?: unknown, headers?: AxiosHeaders) => http.get("/doctor/me", { params, headers });
+export const getAllDoctor = (params?: unknown, headers?: AxiosHeaders) => http.get("/doctor/basic", { params, headers });
+export const createDoctor = (data?: unknown, params?: unknown, headers?: AxiosHeaders) => http.post("/doctor/manage", data, { params, headers });
+export const updateDoctor = (id: string, data?: unknown, params?: unknown, headers?: AxiosHeaders) => http.patch(`/doctor/manage/${id}`, data, { params, headers });
+export const deleteDoctor = (id: string, params?: unknown, headers?: AxiosHeaders) => http.delete(`/doctor/manage/${id}`, { params, headers });
+export const resetDoctorPassword = (id: string, params?: unknown, headers?: AxiosHeaders) => http.patch(`/doctor/manage/reset-password/${id}`, { params, headers });
+export const changeDoctorPassword = (data: unknown, params?: unknown, headers?: AxiosHeaders) => http.patch(`/doctor/me/change-password`, data, { params, headers });
+
 // Role
 export const getAllRoles = (params?: unknown, headers?: AxiosHeaders) => http.get("/role", { params, headers });
 

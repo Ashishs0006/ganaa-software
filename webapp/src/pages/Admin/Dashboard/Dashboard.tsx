@@ -56,6 +56,19 @@ const Dashboard = () => {
                     User Management
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/admin/dashboard/doctor"
+                    className={`flex items-center gap-3 px-4 py-2 my-1 text-[14px] font-semibold rounded-lg ${
+                      currentPath === "/admin/dashboard/doctor"
+                        ? "text-[#3B4A0B] bg-[#E9F0C9]"
+                        : "text-[#5A5A5A] hover:text-[#1E1E1E]"
+                    }`}
+                  >
+                    <img src={user} alt="doctor" />
+                    Doctor Referal Management
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

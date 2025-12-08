@@ -49,6 +49,7 @@ class Collections {
   static feedbackQuestionnaire = new CollectionInfo('FeedbackQuestionnaire');
   static lead = new CollectionInfo('Lead');
   static user = new CollectionInfo('User');
+  static doctor = new CollectionInfo('Doctor');
   static role = new CollectionInfo('Role');
   static counter = new CollectionInfo('Counter');
   static commonFile = new CollectionInfo('CommonFile');

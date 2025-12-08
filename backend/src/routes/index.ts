@@ -3,6 +3,7 @@ import Env from '../constant/env';
 import leadRoutes from './lead.route';
 import roleRoutes from './role.route';
 import userRoutes from './user.route';
+import doctorRoutes from './doctor.route';
 import familyRoutes from './family.route';
 import patientRoute from './patient.route';
 import wellcomeRoute from './wellcome.route';
@@ -19,6 +20,7 @@ const router = express.Router();
 
 router.use('/role', roleRoutes);
 router.use('/user', userRoutes);
+router.use('/doctor', doctorRoutes);
 router.use('/lead', leadRoutes);
 router.use('/family', familyRoutes);
 router.use('/patient', patientRoute);
