@@ -524,7 +524,7 @@ const CreateLead = () => {
       await LeadValidation.validate(state, { abortEarly: false });
 
       if (state.referralTypeId.label === "Doctor") {
-        const response = await createDoctor({'firstName': state.referralDetails});
+        const response = await createDoctor({'firstName': state.referralDetails, 'email':state.referralDetails.toLowerCase()+'@ganaa.in'});
         console.log("✌️response --->", response);
       }
 

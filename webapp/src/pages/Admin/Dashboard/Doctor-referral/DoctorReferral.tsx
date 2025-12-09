@@ -378,7 +378,7 @@ const DoctorReferral = () => {
   return (
     <div>
       <div className="w-[1036px]!">
-        <div className=" bg-white w-full gap-6 flex-col rounded-xl flex items-start  p-4">
+        <div className=" bg-white w-full gap-6 flex-col rounded-xl flex items-start p-4 min-h-[500px]!">
           <div className="flex justify-between items-end w-full">
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Doctor Referral Management</p>
@@ -470,7 +470,7 @@ const DoctorReferral = () => {
                           >
                             <div
                               onClick={(e: SyntheticEvent) => toggleMenu(e, index)}
-                              className="bg-[#E5EBCD] relative flex w-5 h-7 items-center justify-center rounded-lg hover:bg-[#D4E299] cursor-pointer"
+                              className="bg-[#E5EBCD] flex w-5 h-7 items-center justify-center rounded-lg hover:bg-[#D4E299] cursor-pointer"
                             >
                               <img alt="icon" src={kabab} className="w-full h-full" />
                               {state.openMenuId === index.toString() && (
