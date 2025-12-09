@@ -51,6 +51,8 @@ import { RESOURCES, ROUTES } from "@/constants/resources";
 import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/FollowUp/PatientFollowUp";
 import PatientFollowup from "@/pages/Admin/Dashboard/Followup/Followup";
 import DoctorReferral from "@/pages/Admin/Dashboard/Doctor-referral/DoctorReferral";
+import DoctorDetail from "@/pages/Doctor/DoctorDetail/DoctorDetail";
+import Doctor from "@/pages/Doctor/Doctor";
 
 export const routes: RouteItem[] = [
   {
@@ -237,6 +239,17 @@ export const routes: RouteItem[] = [
             path: ROUTES.FAMILY_PORTAL,
             element: <FamilyDetail />,
             resource: RESOURCES.FAMILY_PORTAL
+          }
+        ]
+      },
+      {
+        path: ROUTES.DOCTOR,
+        element: <Doctor />,
+        children: [
+          {
+            path: ROUTES.DOCTOR_PORTAL,
+            element: <DoctorDetail />,
+            resource: RESOURCES.DOCTOR_PORTAL
           }
         ]
       },

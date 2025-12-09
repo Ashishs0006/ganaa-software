@@ -36,6 +36,7 @@ export const RESOURCES = {
   DISCHARGE: "Discharge",
 
   FAMILY_PORTAL: "Family Portal",
+  DOCTOR_PORTAL: "Doctor Portal",
   DOWNLOAD_SECTION: "Download Section",
   AUDIT_LOG: "Resource Audit Log"
 } as const;
@@ -82,6 +83,9 @@ export const ROUTES = {
 
   FAMILY: "family",
   FAMILY_PORTAL: "family-portal",
+
+  DOCTOR: "doctor",
+  DOCTOR_PORTAL: "doctor-portal",
 
   AUTH: "auth",
   LOGIN: "login",

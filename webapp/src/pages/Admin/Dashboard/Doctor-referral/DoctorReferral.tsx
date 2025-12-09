@@ -449,7 +449,7 @@ const DoctorReferral = () => {
                         </p>
                       </td>
                       <td className="py-3 px-3 w-1/7">{doctor.email}</td>
-                      <td className="py-3 px-3 w-1/7">{doctor?.phoneNumber || 9012929592}</td>
+                      <td className="py-3 px-3 w-1/7">{doctor?.phoneNumber}</td>
                       {/* <td className="py-3 px-3 w-1/7">{doctor.roleId?.name}</td>
                       <td className="py-3 px-3 w-1/7">
                         <div

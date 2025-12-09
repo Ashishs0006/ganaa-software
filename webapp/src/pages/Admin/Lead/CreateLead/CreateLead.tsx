@@ -32,6 +32,7 @@ import { LeadValidation } from "@/validations/Yup/LeadValidation";
 
 import {
   createComment,
+  createDoctor,
   createLead,
   existPatient,
   getAllUser,
@@ -97,6 +98,8 @@ const CreateLead = () => {
     nextFollowUpDate: "",
     centerVisitDateTime: ""
   });
+  console.log("✌️state --->", state);
+
   const [updateStatus, setUpdateStatus] = useState<boolean>(false);
   const [data, setData] = useState({ comment: "" });
 
@@ -519,6 +522,11 @@ const CreateLead = () => {
 
     try {
       await LeadValidation.validate(state, { abortEarly: false });
+
+      if (state.referralTypeId.label === "Doctor") {
+        const response = await createDoctor({'firstName': state.referralDetails});
+        console.log("✌️response --->", response);
+      }
 
       if (!id && state.dob && state.firstName && state.lastName && state.phoneNumber) {
         const existResponse = await existPatient({

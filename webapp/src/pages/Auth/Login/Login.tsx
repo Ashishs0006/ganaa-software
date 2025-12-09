@@ -38,6 +38,7 @@ const Login = () => {
 
     // if (accessible && accessible.includes(RESOURCES.DASHBOARD)) return "/dashboard";
     if (accessible && accessible.includes(RESOURCES.FAMILY_PORTAL)) return "/family/family-portal";
+    if (accessible && accessible.includes(RESOURCES.DOCTOR_PORTAL)) return "/doctor/doctor-portal";
     return "/admin";
   };
 
