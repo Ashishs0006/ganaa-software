@@ -44,15 +44,15 @@ import {
   PatientVitalsReport,
   TherapistWiseSession,
   BlackModalGoogleReview,
-  Reports
+  Reports,
+  DoctorDetail,
+  Doctor
 } from "@/pages";
 import { RouteItem } from "@/router/type";
 import { RESOURCES, ROUTES } from "@/constants/resources";
 import PatientFollowUp from "@/pages/Admin/PatientData/FollowUp/FollowUp/PatientFollowUp";
 import PatientFollowup from "@/pages/Admin/Dashboard/Followup/Followup";
 import DoctorReferral from "@/pages/Admin/Dashboard/Doctor-referral/DoctorReferral";
-import DoctorDetail from "@/pages/Doctor/DoctorDetail/DoctorDetail";
-import Doctor from "@/pages/Doctor/Doctor";
 
 export const routes: RouteItem[] = [
   {
@@ -248,9 +248,75 @@ export const routes: RouteItem[] = [
         children: [
           {
             path: ROUTES.DOCTOR_PORTAL,
-            element: <DoctorDetail />,
-            resource: RESOURCES.DOCTOR_PORTAL
-          }
+            element: <DoctorDetail />
+          },
+          {
+            path: ROUTES.PATIENT,
+            element: <PatientData />,
+            children: [
+              {
+                path: ROUTES.ALL_PATIENT,
+                element: <AllPatientData />,
+                resource: RESOURCES.ALL_PATIENT
+              },
+              {
+                path: ROUTES.PATIENT_FOLLOWUP,
+                element: <PatientFollowUp />,
+                resource: RESOURCES.DOCOTOR_NOTES
+              },
+              {
+                path: ROUTES.IN_PATIENT,
+                element: <InpatientData />,
+                resource: RESOURCES.IN_PATIENT
+              },
+              {
+                path: ROUTES.PATIENT_PROFILE,
+                element: <PatientProfile />,
+                resource: RESOURCES.ALL_PATIENT
+              },
+              {
+                resource: RESOURCES.AUDIT_LOG,
+                path: ROUTES.PATIENT_AUDIT_LOGS,
+                element: <AuditLogs />
+              },
+              {
+                path: ROUTES.DAILY_PROGRESS,
+                element: <DailyProgress />,
+                resource: RESOURCES.DAILY_PROGRESS
+              },
+              {
+                path: ROUTES.NURSE_NOTES,
+                element: <NurseNotes />,
+                resource: RESOURCES.NURSE_NOTES
+              },
+              {
+                path: ROUTES.THERAPIST_NOTES,
+                element: <TherapistNotes />,
+                resource: RESOURCES.THERAPIST_NOTES
+              },
+              {
+                path: ROUTES.CASE_HISTORY,
+                element: <CaseHistory />,
+                resource: RESOURCES.CASE_HISTORY
+              },
+              {
+                path: ROUTES.DOCTOR_NOTES,
+                element: <DoctorNotes />,
+                resource: RESOURCES.DOCOTOR_NOTES
+              },
+              {
+                path: ROUTES.DOCTOR_PRESCRIPTION,
+                element: <DoctorPrescription />,
+                resource: RESOURCES.DOCTOR_PRESCRIPTION
+              },
+              { path: ROUTES.DISCHARGE, element: <Discharge />, resource: RESOURCES.DISCHARGE },
+              {
+                path: ROUTES.GROUP_ACTIVITY,
+                element: <GroupActivity />,
+                resource: RESOURCES.GROUP_ACTIVITY
+              }
+            ]
+          },
         ]
       },
       {

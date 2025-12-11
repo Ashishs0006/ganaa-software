@@ -1,5 +1,5 @@
 import { Button, DateRange, EmptyRecord, Modal, Pagination } from "@/components";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import calendar from "@/assets/images/calender.svg";
 
 import logo from "@/assets/images/logo.png";
@@ -21,9 +21,8 @@ type ModalState = boolean;
 
 const DoctorDetail = () => {
   const isFirstRender = useRef(true);
-console.log('✌️isFirstRender --->', isFirstRender);
   const { logout } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [patientInfo, setPatientInfo] = useState<IPatientInfo>();
   const [nurseNote, setNurseNote] = useState<INurseNote>();
   const [groupActivityData, setGroupActivityData] = useState<IGroupActivity>();
@@ -43,183 +42,183 @@ console.log('✌️isFirstRender --->', isFirstRender);
     setModalOpen((prev) => !prev);
   };
 
-  const fetchFamilyDetails = async () => {
-    let response;
-    try {
-      setLoading(true);
-      response = await getFamilyDetails();
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      toast.error("Oops! Something went wrong. You've been logged out for your security.");
-      setTimeout(() => {
-        logout();
-      }, 1000);
-    }
-    if (response && response.status == 200) {
-      setPatientInfo(response?.data?.data);
+  // const fetchFamilyDetails = async () => {
+  //   let response;
+  //   try {
+  //     setLoading(true);
+  //     response = await getFamilyDetails();
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.log(error);
+  //     toast.error("Oops! Something went wrong. You've been logged out for your security.");
+  //     setTimeout(() => {
+  //       logout();
+  //     }, 1000);
+  //   }
+  //   if (response && response.status == 200) {
+  //     setPatientInfo(response?.data?.data);
 
-      try {
-        const currentPageGroup = searchParams.get("gpage") || "1";
-        const currentPageNurse = searchParams.get("page") || "1";
-        const startDate =
-          searchParams.get("startDate") ||
-          new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString();
-        const admissionDate =
-          response?.data?.data?.dateOfAdmission ||
-          new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString();
-        const query = {
-          limit: 5,
-          page:
-            groupActivityData?.pagination?.totalPages || 1 < +currentPageNurse
-              ? groupActivityData?.pagination?.totalPages || 1
-              : currentPageNurse,
-          sort: "-createdAt",
-          ...(startDate
-            ? {
-                "noteDateTime[gte]":
-                  admissionDate && new Date(admissionDate) < new Date(startDate)
-                    ? startDate
-                    : admissionDate
-              }
-            : { "noteDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString() }),
-          ...(searchParams.get("endDate")
-            ? {
-                "noteDateTime[lte]": searchParams.get("endDate")
-              }
-            : { "noteDateTime[lte]": new Date().toISOString() })
-        };
-        const nurseNote = await getAllFamilyNurseNotes(query);
+  //     try {
+  //       const currentPageGroup = searchParams.get("gpage") || "1";
+  //       const currentPageNurse = searchParams.get("page") || "1";
+  //       const startDate =
+  //         searchParams.get("startDate") ||
+  //         new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString();
+  //       const admissionDate =
+  //         response?.data?.data?.dateOfAdmission ||
+  //         new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString();
+  //       const query = {
+  //         limit: 5,
+  //         page:
+  //           groupActivityData?.pagination?.totalPages || 1 < +currentPageNurse
+  //             ? groupActivityData?.pagination?.totalPages || 1
+  //             : currentPageNurse,
+  //         sort: "-createdAt",
+  //         ...(startDate
+  //           ? {
+  //               "noteDateTime[gte]":
+  //                 admissionDate && new Date(admissionDate) < new Date(startDate)
+  //                   ? startDate
+  //                   : admissionDate
+  //             }
+  //           : { "noteDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString() }),
+  //         ...(searchParams.get("endDate")
+  //           ? {
+  //               "noteDateTime[lte]": searchParams.get("endDate")
+  //             }
+  //           : { "noteDateTime[lte]": new Date().toISOString() })
+  //       };
+  //       const nurseNote = await getAllFamilyNurseNotes(query);
 
-        if (nurseNote.status == 200) {
-          setNurseNote(nurseNote?.data);
-        }
+  //       if (nurseNote.status == 200) {
+  //         setNurseNote(nurseNote?.data);
+  //       }
 
-        const gquery = {
-          limit: 5,
-          page:
-            groupActivityData?.pagination?.totalPages || 1 < +currentPageGroup
-              ? groupActivityData?.pagination?.totalPages || 1
-              : currentPageGroup,
-          sort: "-createdAt",
-          ...(startDate
-            ? {
-                "activityDateTime[gte]":
-                  admissionDate && new Date(admissionDate) < new Date(startDate)
-                    ? startDate
-                    : admissionDate
-              }
-            : {
-                "activityDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
-              }),
-          ...(searchParams.get("endDate")
-            ? {
-                "activityDateTime[lte]": searchParams.get("endDate")
-              }
-            : {
-                "activityDateTime[lte]": new Date().toISOString()
-              })
-        };
-        const groupActivity = await getAllFamilyGroupAcitvity(gquery);
-        if (groupActivity.status == 200) {
-          setGroupActivityData(groupActivity?.data);
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.log(error);
-        // handleError(error);
-      }
-    } else {
-      setLoading(false);
-    }
-  };
+  //       const gquery = {
+  //         limit: 5,
+  //         page:
+  //           groupActivityData?.pagination?.totalPages || 1 < +currentPageGroup
+  //             ? groupActivityData?.pagination?.totalPages || 1
+  //             : currentPageGroup,
+  //         sort: "-createdAt",
+  //         ...(startDate
+  //           ? {
+  //               "activityDateTime[gte]":
+  //                 admissionDate && new Date(admissionDate) < new Date(startDate)
+  //                   ? startDate
+  //                   : admissionDate
+  //             }
+  //           : {
+  //               "activityDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
+  //             }),
+  //         ...(searchParams.get("endDate")
+  //           ? {
+  //               "activityDateTime[lte]": searchParams.get("endDate")
+  //             }
+  //           : {
+  //               "activityDateTime[lte]": new Date().toISOString()
+  //             })
+  //       };
+  //       const groupActivity = await getAllFamilyGroupAcitvity(gquery);
+  //       if (groupActivity.status == 200) {
+  //         setGroupActivityData(groupActivity?.data);
+  //       }
+  //       setLoading(false);
+  //     } catch (error) {
+  //       setLoading(false);
+  //       console.log(error);
+  //       // handleError(error);
+  //     }
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const fetchNurseNotes = async () => {
-    const currentPageNurse = searchParams.get("page") || "1";
-    const admissionDate = patientInfo?.dateOfAdmission;
-    const startDate = searchParams.get("startDate");
+  // const fetchNurseNotes = async () => {
+  //   const currentPageNurse = searchParams.get("page") || "1";
+  //   const admissionDate = patientInfo?.dateOfAdmission;
+  //   const startDate = searchParams.get("startDate");
 
-    const query = {
-      limit: 5,
-      page:
-        groupActivityData?.pagination?.totalPages || 1 < +currentPageNurse
-          ? groupActivityData?.pagination?.totalPages || 1
-          : currentPageNurse,
-      sort: "-createdAt",
-      ...(startDate
-        ? {
-            "noteDateTime[gte]":
-              admissionDate && new Date(admissionDate) < new Date(startDate)
-                ? startDate
-                : admissionDate
-          }
-        : { "noteDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString() }),
-      ...(searchParams.get("endDate")
-        ? {
-            "noteDateTime[lte]": searchParams.get("endDate")
-          }
-        : { "noteDateTime[lte]": new Date().toISOString() })
-    };
-    const nurseNote = await getAllFamilyNurseNotes(query);
-    if (nurseNote.status == 200) {
-      setNurseNote(nurseNote?.data);
-    }
-  };
+  //   const query = {
+  //     limit: 5,
+  //     page:
+  //       groupActivityData?.pagination?.totalPages || 1 < +currentPageNurse
+  //         ? groupActivityData?.pagination?.totalPages || 1
+  //         : currentPageNurse,
+  //     sort: "-createdAt",
+  //     ...(startDate
+  //       ? {
+  //           "noteDateTime[gte]":
+  //             admissionDate && new Date(admissionDate) < new Date(startDate)
+  //               ? startDate
+  //               : admissionDate
+  //         }
+  //       : { "noteDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString() }),
+  //     ...(searchParams.get("endDate")
+  //       ? {
+  //           "noteDateTime[lte]": searchParams.get("endDate")
+  //         }
+  //       : { "noteDateTime[lte]": new Date().toISOString() })
+  //   };
+  //   const nurseNote = await getAllFamilyNurseNotes(query);
+  //   if (nurseNote.status == 200) {
+  //     setNurseNote(nurseNote?.data);
+  //   }
+  // };
 
-  const fetchGroupActivity = async () => {
-    const currentPageGroup = searchParams.get("gpage") || "1";
-    const startDate = searchParams.get("startDate");
-    const admissionDate = patientInfo?.dateOfAdmission;
+  // const fetchGroupActivity = async () => {
+  //   const currentPageGroup = searchParams.get("gpage") || "1";
+  //   const startDate = searchParams.get("startDate");
+  //   const admissionDate = patientInfo?.dateOfAdmission;
 
-    const query = {
-      limit: 5,
-      page:
-        groupActivityData?.pagination?.totalPages || 1 < +currentPageGroup
-          ? groupActivityData?.pagination?.totalPages || 1
-          : currentPageGroup,
-      sort: "-createdAt",
-      ...(startDate
-        ? {
-            "activityDateTime[gte]":
-              admissionDate && new Date(admissionDate) < new Date(startDate)
-                ? startDate
-                : admissionDate
-          }
-        : {
-            "activityDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
-          }),
-      ...(searchParams.get("endDate")
-        ? {
-            "activityDateTime[lte]": searchParams.get("endDate")
-          }
-        : {
-            "activityDateTime[lte]": new Date().toISOString()
-          })
-    };
+  //   const query = {
+  //     limit: 5,
+  //     page:
+  //       groupActivityData?.pagination?.totalPages || 1 < +currentPageGroup
+  //         ? groupActivityData?.pagination?.totalPages || 1
+  //         : currentPageGroup,
+  //     sort: "-createdAt",
+  //     ...(startDate
+  //       ? {
+  //           "activityDateTime[gte]":
+  //             admissionDate && new Date(admissionDate) < new Date(startDate)
+  //               ? startDate
+  //               : admissionDate
+  //         }
+  //       : {
+  //           "activityDateTime[gte]": new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
+  //         }),
+  //     ...(searchParams.get("endDate")
+  //       ? {
+  //           "activityDateTime[lte]": searchParams.get("endDate")
+  //         }
+  //       : {
+  //           "activityDateTime[lte]": new Date().toISOString()
+  //         })
+  //   };
 
-    const groupActivity = await getAllFamilyGroupAcitvity(query);
-    if (groupActivity.status == 200) {
-      setGroupActivityData(groupActivity?.data);
-    }
-  };
+  //   const groupActivity = await getAllFamilyGroupAcitvity(query);
+  //   if (groupActivity.status == 200) {
+  //     setGroupActivityData(groupActivity?.data);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (isFirstRender.current) return;
-    fetchNurseNotes();
-  }, [searchParams.get("page"), searchParams.get("startDate"), searchParams.get("endDate")]);
+  // useEffect(() => {
+  //   if (isFirstRender.current) return;
+  //   fetchNurseNotes();
+  // }, [searchParams.get("page"), searchParams.get("startDate"), searchParams.get("endDate")]);
 
-  useEffect(() => {
-    if (isFirstRender.current) return;
-    fetchGroupActivity();
-  }, [searchParams.get("gpage"), searchParams.get("startDate"), searchParams.get("endDate")]);
+  // useEffect(() => {
+  //   if (isFirstRender.current) return;
+  //   fetchGroupActivity();
+  // }, [searchParams.get("gpage"), searchParams.get("startDate"), searchParams.get("endDate")]);
 
-  useEffect(() => {
-    // This runs on initial load
-    fetchFamilyDetails();
-    // After first mount, mark that component has mounted
-    isFirstRender.current = false;
-  }, []);
+  // useEffect(() => {
+  //   // This runs on initial load
+  //   fetchFamilyDetails();
+  //   // After first mount, mark that component has mounted
+  //   isFirstRender.current = false;
+  // }, []);
 
   return (
     <div className="bg-[#F4F2F0] min-h-screens">
@@ -580,6 +579,7 @@ console.log('✌️isFirstRender --->', isFirstRender);
           </div>
         </div>
       </Modal>
+      <Outlet />
     </div>
   );
 };

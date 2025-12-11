@@ -39,7 +39,7 @@ const AllPatientData = () => {
   });
 
   const patientData = useSelector((store: RootState) => store.patient);
-console.log('✌️patientData --->', patientData);
+console.log('patientData ---===>', patientData);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);

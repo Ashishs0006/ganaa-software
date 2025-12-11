@@ -5,6 +5,7 @@ export { default as Select } from "@/components/Select/Select";
 export { default as Button } from "@/components/Button/Button";
 export { default as Loader } from "@/components/Loader/Loader";
 export { default as Header } from "@/components/Header/Header";
+export {default as Doctor_Header } from "@/components/Doctor_Header/Doctor_Header";
 export { default as InputRef } from "@/components/Input/InputRef";
 export { default as Stepper } from "@/components/Stepper/Stepper";
 export { default as DateTime } from "@/components/Datetime/Datetime";

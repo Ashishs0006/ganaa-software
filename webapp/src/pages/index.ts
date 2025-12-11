@@ -66,5 +66,9 @@ export { default as PatientVitalsReport } from "@/pages/Admin/Dashboard/PatientV
 export { default as Family } from "@/pages/Family/Family";
 export { default as FamilyDetail } from "@/pages/Family/FamilyDetail/FamilyDetail";
 
+//doctor dashboard
+export { default as Doctor } from "@/pages/Doctor/Doctor";
+export { default as DoctorDetail } from "@/pages/Doctor/DoctorDetail/DoctorDetail";
+
 // Reports
 export { default as Reports } from "@/pages/Reports/Reports";

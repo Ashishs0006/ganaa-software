@@ -5,6 +5,7 @@ import { useAuth } from "@/providers/AuthProvider";
 
 export const ProtectedRoute = ({ resource, action = "read", children }: Props) => {
   const { auth, hasAccess } = useAuth();
+console.log('✌️auth --->', auth);
 
   const canAccess = hasAccess(resource, action);
   if (!canAccess && auth.user.roleId.permissions) {
