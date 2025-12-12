@@ -152,6 +152,7 @@ const InpatientData = () => {
         ...(searchParams.get("admissionType") && {
           admissionType: searchParams.get("admissionType")
         }),
+        ...(auth.user.roleId.name === "Doctor" && { createdBy: auth.user._id }),
         ...(searchParams.get("illnessType") && { illnessType: searchParams.get("illnessType") }),
         ...(searchParams.get("gender") && { gender: searchParams.get("gender") }),
         ...(searchParams.get("hyperTension") && { hyperTension: searchParams.get("hyperTension") }),

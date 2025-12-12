@@ -248,7 +248,8 @@ export const routes: RouteItem[] = [
         children: [
           {
             path: ROUTES.DOCTOR_PORTAL,
-            element: <DoctorDetail />
+            // element: <DoctorDetail />
+            element: <Welcome />
             // resource: RESOURCES.DOCTOR_PORTAL
           },
           {
@@ -318,6 +319,32 @@ export const routes: RouteItem[] = [
               }
             ]
           },
+          {
+            path: ROUTES.LEAD,
+            element: <Lead />,
+            children: [
+              {
+                path: ROUTES.CREATE_LEAD,
+                element: <CreateLead key="new" />,
+                resource: RESOURCES.CREATE_LEAD
+              },
+              {
+                path: ROUTES.UPDATE_LEAD,
+                element: <CreateLead key="edit" />,
+                resource: RESOURCES.CREATE_LEAD
+              },
+              {
+                path: ROUTES.QUALIFIED_LEAD,
+                element: <QualifiedLeads />,
+                resource: RESOURCES.QUALIFIED_LEAD
+              },
+              {
+                path: ROUTES.DISQUALIFIED_LEAD,
+                element: <DisQualifiedLeads />,
+                resource: RESOURCES.DISQUALIFIED_LEAD
+              }
+            ]
+          }
         ]
       },
       {

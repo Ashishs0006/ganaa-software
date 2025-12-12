@@ -183,12 +183,13 @@ export const getAllUsers = catchAsync(
 
 export const createNewUsers = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
+    if(req.doctor && !req.doctor){
     if (!req.body.roleId) return next(new AppError('Name is Mandatory', 400));
     if (!req.body.firstName) return next(new AppError('Name is Mandatory', 400));
     if (!req.body.lastName) return next(new AppError('Name is Mandatory', 400));
     if (!req.body.dob) return next(new AppError('Name is Mandatory', 400));
     if (!req.body.email) return next(new AppError('Name is Mandatory', 400));
-
+    }
     // Filter Request Body
     let filteredBody = new FilterObject(
       req.body,

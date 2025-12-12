@@ -32,12 +32,13 @@ import { LeadValidation } from "@/validations/Yup/LeadValidation";
 
 import {
   createComment,
-  createDoctor,
   createLead,
+  createUser,
   existPatient,
   getAllUser,
   getSingleLead,
-  updateLead
+  updateLead,
+  updateUser
 } from "@/apis";
 
 import handleError from "@/utils/handleError";
@@ -98,7 +99,6 @@ const CreateLead = () => {
     nextFollowUpDate: "",
     centerVisitDateTime: ""
   });
-  console.log("✌️state --->", state);
 
   const [updateStatus, setUpdateStatus] = useState<boolean>(false);
   const [data, setData] = useState({ comment: "" });
@@ -327,6 +327,8 @@ const CreateLead = () => {
         sort: "-leadDateTime",
         roles: "admin,sales,admission manager,Therapist+AM,ROM+AM" //doctor
       });
+// console.log('data of users--->', data);
+
       setAllDoctors(
         data.data.map((data: { _id: string; firstName: string; lastName: string }) => ({
           label: `${data.firstName} ${data.lastName}`,
@@ -523,10 +525,39 @@ const CreateLead = () => {
     try {
       await LeadValidation.validate(state, { abortEarly: false });
 
-      if (state.referralTypeId.label === "Doctor") {
-        const response = await createDoctor({'firstName': state.referralDetails, 'email':state.referralDetails.toLowerCase()+'@ganaa.in'});
-        console.log("✌️response --->", response);
+      const { data: userData } = await getAllUser(
+        {
+        roles: "doctor" //doctor
       }
+      )
+      const existingDoctor = userData.data.filter((user:any) => user.email === state.referralDetails.toLowerCase() + "@ganaa.in");
+console.log('existingDoctor --->', existingDoctor);
+     // ---------------------------------------------------
+    // CREATE USER only when creating a new lead
+    // ---------------------------------------------------
+    if (!id && existingDoctor.length === 0 && state.referralTypeId.label === "Doctor") {
+      const response = await createUser({
+        firstName: state.referralDetails,
+        email: state.referralDetails.toLowerCase() + "@ganaa.in",
+        roleId: "680f31dba2b081859068d77f",
+        centerId:['6790ce379190a101547a3130'],
+        doctor: true
+      });
+      console.log("✌️ USER CREATED", response);
+    }
+
+    // ---------------------------------------------------
+    // UPDATE USER only when updating an existing lead
+    // ---------------------------------------------------
+    if (id && existingDoctor.length === 0 && state.referralTypeId.label === "Doctor") {
+      const response = await updateUser(id, {
+        firstName: state.referralDetails,
+        email: state.referralDetails.toLowerCase() + "@ganaa.in",
+        roleId: "680f31dba2b081859068d77f",
+        doctor: true
+      });
+      console.log("✌️ USER UPDATED", response);
+    }
 
       if (!id && state.dob && state.firstName && state.lastName && state.phoneNumber) {
         const existResponse = await existPatient({

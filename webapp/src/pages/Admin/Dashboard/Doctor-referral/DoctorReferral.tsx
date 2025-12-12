@@ -4,17 +4,18 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
+  useMemo
 } from "react";
 import moment from "moment";
 import toast from "react-hot-toast";
 import { IData, IState } from "./types";
 import { RootState } from "@/redux/store/store";
-import { updateDoctor, createDoctor, getAllDoctor, deleteDoctor, resetDoctorPassword } from "@/apis";
+import { updateDoctor, createDoctor, getAllDoctor, deleteDoctor, resetDoctorPassword, createUser, updateUser, getAllUser, deleteUser } from "@/apis";
 import kabab from "@/assets/images/kebab-menu.svg";
 import calender from "@/assets/images/calender.svg";
 import { useDispatch, useSelector } from "react-redux";
-// import { ISelectOption } from "@/components/Select/types";
+import { ISelectOption } from "@/components/Select/types";
 import { convertDate } from "@/components/BasicDetaills/utils";
 import {
   Button,
@@ -24,6 +25,7 @@ import {
   Input,
   Loader,
   Modal,
+  Multiselected,
   Pagination,
   Select
 } from "@/components";
@@ -49,10 +51,11 @@ const DoctorReferral = () => {
     phoneNumber: "",
     email: "",
     profilePic: "",
-    // role: { label: "Select", value: "" },
+    role: { label: "Select", value: "" },
     gender: "Male",
     // centerId: []
   });
+console.log('✌️data --->', data);
 
   const [dataToCheck, setDataToCheck] = useState<IData>({
     _id: "",
@@ -63,14 +66,14 @@ const DoctorReferral = () => {
     phoneNumber: "",
     email: "",
     profilePic: "",
-    // role: { label: "Select", value: "" },
+    role: { label: "Select", value: "" },
     gender: "Male",
     // centerId: []
   });
 
   const doctorsData = useSelector((store: RootState) => store.doctors);
   // const dropdown = useSelector((store: RootState) => store.dropdown);
-  // const roles = useSelector((store: RootState) => store.roles);
+  const roles = useSelector((store: RootState) => store.roles);
 
   const [state, setState] = useState<IState>({
     openMenuId: null,
@@ -82,15 +85,15 @@ const DoctorReferral = () => {
     isDeleteModal: false
   });
 
-  // const rolesData = useMemo<ISelectOption[]>(() => {
-  //   if (roles.loading) return [];
-  //   const roleList = [{ label: "Select", value: "" }];
-  //   roles.data.forEach((role) => {
-  //     roleList.push({ label: role.name || "", value: role._id || "" });
-  //   });
+  const rolesData = useMemo<ISelectOption[]>(() => {
+    if (roles.loading) return [];
+    const roleList = [{ label: "Select", value: "" }];
+    roles.data.forEach((role) => {
+      roleList.push({ label: role.name || "", value: role._id || "" });
+    });
 
-  //   return roleList;
-  // }, [roles.data, roles.loading]);
+    return roleList;
+  }, [roles.data, roles.loading]);
 
   const handleChange = (event: React.SyntheticEvent) => {
     const { name, value, type, files } = event.target as HTMLInputElement;
@@ -122,9 +125,9 @@ const DoctorReferral = () => {
     }
   };
 
-  // const handleSelect = (key: string, value: ISelectOption) => {
-  //   setData((prev) => ({ ...prev, [key]: value }));
-  // };
+  const handleSelect = (key: string, value: ISelectOption) => {
+    setData((prev) => ({ ...prev, [key]: value }));
+  };
   // const handleMultiSelect = (value: string[]) => {
   //   setData((prev) => ({ ...prev, centerId: value }));
   // };
@@ -140,10 +143,10 @@ const DoctorReferral = () => {
   const getAllUsersFunction = async () => {
     try {
       const page = searchParams.get("page") || 1;
-      const response = await getAllDoctor({
+      const response = await getAllUser({
         limit: 10,
         page,
-        // roles: "doctor,therapist,admin,sales,finance,admission manager,Therapist+AM,ROM+AM,IT"
+        roles: "doctor"
       });
       if (response.data.status == "success") {
         dispatch(setDoctors(response?.data));
@@ -166,7 +169,7 @@ const DoctorReferral = () => {
         phoneNumber: user.phoneNumber ?? "",
         email: user.email ?? "",
         profilePic: user.profilePic ?? "",
-        // role: { label: user.roleId?.name ?? "Select", value: user.roleId?._id ?? "" },
+        role: { label: user.roleId?.name ?? "Select", value: user.roleId?._id ?? "" },
         // centerId: user.centerId.map((data) => data._id || ""),
         isDeleted: user?.isDeleted || false
       }));
@@ -181,7 +184,7 @@ const DoctorReferral = () => {
         phoneNumber: user.phoneNumber ?? "",
         email: user.email ?? "",
         profilePic: user.profilePic ?? "",
-        // role: { label: user.roleId?.name ?? "Select", value: user.roleId?._id ?? "" },
+        role: { label: user.roleId?.name ?? "Select", value: user.roleId?._id ?? "" },
         isDeleted: user?.isDeleted || false
       }));
       toggleModal();
@@ -204,10 +207,11 @@ const DoctorReferral = () => {
 
     const body = {
       ...data,
-      // roleId: data.role?.value,
-      // centerId: data.centerId
+      doctor: true,
+      roleId: "680f31dba2b081859068d77f",
+      centerId:['6790ce379190a101547a3130'],
     };
-    // delete body.role;
+    delete body.role;
 
     if (body.email === dataToCheck.email) {
       delete (body as { email?: string }).email;
@@ -250,9 +254,9 @@ const DoctorReferral = () => {
 
       if (data._id) {
         delete body._id;
-        response = await updateDoctor(data._id, formData);
+        response = await updateUser(data._id, formData);
       } else {
-        response = await createDoctor(formData);
+        response = await createUser(formData);
       }
 
       // Reset form
@@ -264,7 +268,7 @@ const DoctorReferral = () => {
         phoneNumberCountryCode: { label: "Select", value: "" },
         phoneNumber: "",
         email: "",
-        // role: { label: "Select", value: "" },
+        role: { label: "Select", value: "" },
         gender: "Male",
         // centerId: [],
         profilePic: null
@@ -285,7 +289,7 @@ const DoctorReferral = () => {
   const deleteUserFunction = async (id: string, confirm: boolean = false) => {
     try {
       if (confirm) {
-        const response = await deleteDoctor(id);
+        const response = await deleteUser(id);
         if (response.data.status == "success") {
           setData((prev) => ({ ...prev, _id: "" }));
           toast.success("User Deleted");
@@ -570,7 +574,7 @@ const DoctorReferral = () => {
             phoneNumber: "",
             email: "",
             profilePic: "",
-            // role: { label: "Select", value: "" },
+            role: { label: "Select", value: "" },
             gender: "Male",
             // centerId: []
           });
@@ -709,9 +713,9 @@ const DoctorReferral = () => {
                 // className="bg-[#F4F2F0]! border-[#DEDEDE]!"
                 value={data.centerId || []}
                 onChange={handleMultiSelect}
-              />
+              /> */}
 
-              <Select
+              {/* <Select
                 label="Role Type"
                 required
                 options={rolesData}

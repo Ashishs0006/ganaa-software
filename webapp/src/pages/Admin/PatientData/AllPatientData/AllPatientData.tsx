@@ -82,7 +82,7 @@ const AllPatientData = () => {
           admissionType: searchParams.get("admissionType")
         }),
         // 🔥 Filter only patients created by this doctor
-        ...(auth.user.roleId.name === "Doctor" && { createdBy: auth.user._id }),
+        // ...(auth.user.roleId.name === "Doctor" && { createdBy: auth.user._id }),
         ...(searchParams.get("illnessType") && { illnessType: searchParams.get("illnessType") }),
         ...(searchParams.get("gender") && { gender: searchParams.get("gender") }),
         ...(searchParams.get("hyperTension") && { hyperTension: searchParams.get("hyperTension") }),

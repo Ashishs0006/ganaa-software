@@ -35,6 +35,7 @@ const Login = () => {
 
   const resolveDashboard = (user: IUser) => {
     const accessible = user?.roleId?.permissions?.map((p) => p.resource);
+console.log('✌️accessible --->', accessible);
 
     // if (accessible && accessible.includes(RESOURCES.DASHBOARD)) return "/dashboard";
     if (accessible && accessible.includes(RESOURCES.FAMILY_PORTAL)) return "/family/family-portal";

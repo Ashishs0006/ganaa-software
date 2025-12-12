@@ -17,7 +17,7 @@ export interface IData {
   phoneNumber: string;
   email: string;
   profilePic?: File | null | string;
-  // role?: { label: string; value: string };
+  role?: { label: string; value: string };
   gender: string;
   // centerId:string[];
 }
