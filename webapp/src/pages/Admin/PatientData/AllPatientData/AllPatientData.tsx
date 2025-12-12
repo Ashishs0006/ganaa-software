@@ -26,6 +26,7 @@ import { useAuth } from "@/providers/AuthProvider";
 
 const AllPatientData = () => {
   const navigate = useNavigate();
+
   // const [selected, setSelected] = useState("All");
   const [searchParams, _setSearchParams] = useSearchParams();
 
@@ -39,7 +40,7 @@ const AllPatientData = () => {
   });
 
   const patientData = useSelector((store: RootState) => store.patient);
-console.log('patientData ---===>', patientData);
+  console.log("patientData ---===>", patientData);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -50,6 +51,7 @@ console.log('patientData ---===>', patientData);
   >([]);
 
   const { auth } = useAuth();
+  console.log("✌️auth --->", auth);
 
   const fetchAllPatient = async () => {
     // Get query parameters
@@ -79,6 +81,8 @@ console.log('patientData ---===>', patientData);
         ...(searchParams.get("admissionType") && {
           admissionType: searchParams.get("admissionType")
         }),
+        // 🔥 Filter only patients created by this doctor
+        ...(auth.user.roleId.name === "Doctor" && { createdBy: auth.user._id }),
         ...(searchParams.get("illnessType") && { illnessType: searchParams.get("illnessType") }),
         ...(searchParams.get("gender") && { gender: searchParams.get("gender") }),
         ...(searchParams.get("hyperTension") && { hyperTension: searchParams.get("hyperTension") }),
@@ -91,6 +95,8 @@ console.log('patientData ---===>', patientData);
         ...(searchParams.get("search") && { searchField: "firstName,lastName" }),
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
+
+      console.log("✌️response --->", response);
 
       dispatch(setAllPatient(response?.data));
       setTimeout(() => {
@@ -459,18 +465,21 @@ console.log('patientData ---===>', patientData);
                                   <p>{patient?.patientHistory?.currentStatus}</p>
                                 </div>
                               )}
-                          {checkRegPending(patient).isValid ? (
-  <div className="w-fit rounded-[5px] bg-[#D1FADF] gap-1 text-[10px] 
-                  font-semibold px-[5px] py-[3px] flex items-center">
-    <p className="text-[#0F5132]">Reg. Completed</p>
-  </div>
-) : (
-  <div className="w-fit rounded-[5px] bg-[#FFEDD5] gap-1 text-[10px] 
-                  font-semibold px-[5px] py-[3px] flex items-center">
-    <p className="text-[#B74F00]">Reg. Incomplete</p>
-  </div>
-)}
-
+                              {checkRegPending(patient).isValid ? (
+                                <div
+                                  className="w-fit rounded-[5px] bg-[#D1FADF] gap-1 text-[10px] 
+                  font-semibold px-[5px] py-[3px] flex items-center"
+                                >
+                                  <p className="text-[#0F5132]">Reg. Completed</p>
+                                </div>
+                              ) : (
+                                <div
+                                  className="w-fit rounded-[5px] bg-[#FFEDD5] gap-1 text-[10px] 
+                  font-semibold px-[5px] py-[3px] flex items-center"
+                                >
+                                  <p className="text-[#B74F00]">Reg. Incomplete</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -541,49 +550,49 @@ console.log('patientData ---===>', patientData);
                                 <div className="p-2  text-nowrap whitespace-nowrap gap-2 flex-col flex justify-center items-start bg-white shadow-lg rounded-lg w-fit">
                                   {/* {patient?.patientHistory?.patientReport?.previousTreatmentRecord
                                     ?.length < 0 ? ( */}
-                                    <>
-                                      <div
-                                        onClick={() => {
-                                          setPreviousTreatMentRecord(
-                                            patient?.patientHistory?.patientReport
-                                              ?.previousTreatmentRecord
-                                          );
-                                          setDisplayModal(true);
-                                        }}
-                                        className="text-xs font-semibold cursor-pointer p-2 text-nowrap whitespace-nowrap"
+                                  <>
+                                    <div
+                                      onClick={() => {
+                                        setPreviousTreatMentRecord(
+                                          patient?.patientHistory?.patientReport
+                                            ?.previousTreatmentRecord
+                                        );
+                                        setDisplayModal(true);
+                                      }}
+                                      className="text-xs font-semibold cursor-pointer p-2 text-nowrap whitespace-nowrap"
+                                    >
+                                      <div className="flex items-center gap-2 cursor-pointer">
+                                        <div className="bg-gray-200 rounded-full p-2 w-7 h-7 flex items-center justify-center ">
+                                          <LuFileText />
+                                        </div>
+                                        <div>
+                                          <p className="">View Test Report</p>
+                                          <p className="text-xs text-[#636363]">
+                                            Check Test Report
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {patient?.patientHistory?.currentStatus === "Discharged" && (
+                                      <Link
+                                        to={`/admin/patients/all-patient/${patient?._id}/patient-followup/${patient?.patientHistory?._id}`}
+                                        className="text-xs cursor-pointer font-semibold p-2 "
                                       >
                                         <div className="flex items-center gap-2 cursor-pointer">
                                           <div className="bg-gray-200 rounded-full p-2 w-7 h-7 flex items-center justify-center ">
                                             <LuFileText />
                                           </div>
                                           <div>
-                                            <p className="">View Test Report</p>
+                                            <p className="">Patient Follow-up</p>
                                             <p className="text-xs text-[#636363]">
-                                              Check Test Report
+                                              Update Patient Detail
                                             </p>
                                           </div>
                                         </div>
-                                      </div>
-
-                                      {patient?.patientHistory?.currentStatus === "Discharged" && (
-                                        <Link
-                                          to={`/admin/patients/all-patient/${patient?._id}/patient-followup/${patient?.patientHistory?._id}`}
-                                          className="text-xs cursor-pointer font-semibold p-2 "
-                                        >
-                                          <div className="flex items-center gap-2 cursor-pointer">
-                                            <div className="bg-gray-200 rounded-full p-2 w-7 h-7 flex items-center justify-center ">
-                                              <LuFileText />
-                                            </div>
-                                            <div>
-                                              <p className="">Patient Follow-up</p>
-                                              <p className="text-xs text-[#636363]">
-                                            Update Patient Detail
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </Link>
-                                      )}
-                                    </>
+                                      </Link>
+                                    )}
+                                  </>
                                   {/* ) : (
                                     <>
                                       <div

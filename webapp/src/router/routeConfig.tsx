@@ -249,6 +249,7 @@ export const routes: RouteItem[] = [
           {
             path: ROUTES.DOCTOR_PORTAL,
             element: <DoctorDetail />
+            // resource: RESOURCES.DOCTOR_PORTAL
           },
           {
             path: ROUTES.PATIENT,

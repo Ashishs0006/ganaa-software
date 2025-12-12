@@ -65,6 +65,11 @@ export const uploadPatientFiles = multer({
  */
 export const getAllPatient = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
+    // 1. Doctor-specific filtering
+    console.log('✌️req.user --->', req?.user);
+    if (req.user?._id && req?.user?.roleId?.name !== 'Admin') {
+      req.query.createdBy = req.user._id.toString();
+    }
     // Filtering Based on Center & Status
     const filterIds = await _buildPatientFilterQuery(req.query);
     if (filterIds.length > 0) req.query._id = { in: filterIds };
