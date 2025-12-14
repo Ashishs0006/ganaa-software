@@ -192,6 +192,11 @@ const patientSchema = new mongoose.Schema<IPatient>({
   referralDetails: {
     type: String,
   },
+  referredDoctorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    index: true,
+  },
 
   // Demographics
   education: {

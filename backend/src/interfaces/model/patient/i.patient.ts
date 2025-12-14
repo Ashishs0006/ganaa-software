@@ -28,7 +28,7 @@ export interface IPatient extends mongoose.Document {
   // Reference
   referredTypeId: ObjectId | IReferredType;
   referralDetails: string;
-
+referredDoctorId?: ObjectId | IUser;
   // Demographics
   education: string;
   area: 'Urban' | 'Rural';

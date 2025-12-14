@@ -27,6 +27,7 @@ import PatientCaseHistory from '../../models/patient/patient.case.history.model'
 import { IPatientRevision } from '../../interfaces/model/patient/i.patient.revision';
 import { IPatientDischarge } from '../../interfaces/model/patient/i.patient.discharge';
 import PatientAdmissionHistory from '../../models/patient/patient.admission.history.model';
+import { Types } from 'mongoose';
 
 // const upload = multer({
 //   storage: multer.memoryStorage(),
@@ -63,16 +64,91 @@ export const uploadPatientFiles = multer({
 /**
  * Controllers
  */
+// export const getAllPatient = catchAsync(
+//   async (req: UserRequest, res: Response, next: NextFunction) => {
+//     // 1. Doctor-specific filtering
+//     console.log('✌️req.user --->', req.query);
+//      // 🔐 BASE QUERY (SECURITY FIRST)
+//     const baseQuery: any = {};
+//     if (req.user?._id && req.user?.roleId?.name === 'Doctor') {
+//       baseQuery.referredDoctorId = req.user._id.toString();
+//     }
+//     console.log('baseQuery --->', baseQuery);
+//     // Filtering Based on Center & Status
+//     const filterIds = await _buildPatientFilterQuery(req.query);
+//     if (filterIds.length > 0) req.query._id = { in: filterIds };
+//     if (filterIds.length < 1 && req.query.isStatusAndFilterQuery) {
+//       return res.status(200).json({
+//         status: 'success',
+//         pagination: null,
+//         data: [],
+//       });
+//     }
+
+//     if (req.query.isStatusAndFilterQuery) delete req.query.isStatusAndFilterQuery;
+//     if (req.query.status) delete req.query.status;
+//     if (req.query.centers) delete req.query.centers;
+//     if (req.query.admissionType) delete req.query.admissionType;
+//     if (req.query.illnessType) delete req.query.illnessType;
+//     if (req.query.hyperTension) delete req.query.hyperTension;
+//     if (req.query.heartDisease) delete req.query.heartDisease;
+//     if (req.query.levelOfRisk) delete req.query.levelOfRisk;
+//     if (req.query.leadType) delete req.query.leadType;
+
+//     let onlyPatient = false;
+//     if (req.query.onlyPatient && req.query.onlyPatient === 'true') {
+//       onlyPatient = true;
+//       delete req.query.onlyPatient;
+//     } else {
+//       delete req.query.onlyPatient;
+//     }
+
+//     const features = new APIFeatures<IPatient>(
+//       Patient.find().setOptions({ skipResAllPopulate: onlyPatient }),
+//       req.query
+//     )
+//       .filter()
+//       .search()
+//       .sort()
+//       .limitFields()
+//       .paginate();
+
+//     const rawQuery = features.rawQuery();
+//     const data = await features.query.lean();
+//     const patientIds = data.map((el) => el._id as ObjectId);
+
+//     const paginationInfo = await PaginationInfo.exec(Patient.countDocuments(), req.query, rawQuery);
+
+//     if (onlyPatient) {
+//       return res.status(200).json({
+//         status: 'success',
+//         pagination: paginationInfo,
+//         data: data,
+//       });
+//     }
+//     const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
+//     const enrichedData = data.map((record) => ({
+//       ...record,
+//       patientHistory: admissionHistoryMap[record._id?.toString()!],
+//     }));
+
+//     res.status(200).json({
+//       status: 'success',
+//       pagination: paginationInfo,
+//       data: enrichedData,
+//     });
+//   }
+// );
+
 export const getAllPatient = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    // 1. Doctor-specific filtering
-    console.log('✌️req.user --->', req?.user);
-    // if (req.user?._id && req?.user?.roleId?.name !== 'Admin') {
-    //   req.query.createdBy = req.user._id.toString();
-    // }
-    // Filtering Based on Center & Status
-    const filterIds = await _buildPatientFilterQuery(req.query);
-    if (filterIds.length > 0) req.query._id = { in: filterIds };
+    console.log('✌️req.user role --->', req?.user?.roleId?.name);
+    console.log('✌️req.user _id --->', req?.user?._id);
+
+    // Filtering Based on Center & Status with Doctor filter
+    const filterIds = await _buildPatientFilterQuery(req.query, req.user);
+    console.log('🔍 filterIds from _buildPatientFilterQuery:', filterIds);
+
     if (filterIds.length < 1 && req.query.isStatusAndFilterQuery) {
       return res.status(200).json({
         status: 'success',
@@ -81,27 +157,47 @@ export const getAllPatient = catchAsync(
       });
     }
 
-    if (req.query.isStatusAndFilterQuery) delete req.query.isStatusAndFilterQuery;
-    if (req.query.status) delete req.query.status;
-    if (req.query.centers) delete req.query.centers;
-    if (req.query.admissionType) delete req.query.admissionType;
-    if (req.query.illnessType) delete req.query.illnessType;
-    if (req.query.hyperTension) delete req.query.hyperTension;
-    if (req.query.heartDisease) delete req.query.heartDisease;
-    if (req.query.levelOfRisk) delete req.query.levelOfRisk;
-    if (req.query.leadType) delete req.query.leadType;
+    // Clean up query params
+    const cleanQuery = { ...req.query };
+    if (cleanQuery.isStatusAndFilterQuery) delete cleanQuery.isStatusAndFilterQuery;
+    if (cleanQuery.status) delete cleanQuery.status;
+    if (cleanQuery.centers) delete cleanQuery.centers;
+    if (cleanQuery.admissionType) delete cleanQuery.admissionType;
+    if (cleanQuery.illnessType) delete cleanQuery.illnessType;
+    if (cleanQuery.hyperTension) delete cleanQuery.hyperTension;
+    if (cleanQuery.heartDisease) delete cleanQuery.heartDisease;
+    if (cleanQuery.levelOfRisk) delete cleanQuery.levelOfRisk;
+    if (cleanQuery.leadType) delete cleanQuery.leadType;
 
     let onlyPatient = false;
-    if (req.query.onlyPatient && req.query.onlyPatient === 'true') {
+    if (cleanQuery.onlyPatient && cleanQuery.onlyPatient === 'true') {
       onlyPatient = true;
-      delete req.query.onlyPatient;
+      delete cleanQuery.onlyPatient;
     } else {
-      delete req.query.onlyPatient;
+      delete cleanQuery.onlyPatient;
     }
 
+    // 🔥 Build base query with filters
+    let baseQuery: any = {};
+    
+    // Add filterIds if they exist
+    if (filterIds.length > 0) {
+      baseQuery._id = { $in: filterIds };
+    }
+    
+    // If doctor is logged in but filterIds is empty (no patients match other filters)
+    // We still need to apply doctor filter directly to Patient model
+    if (req?.user?._id && req?.user?.roleId?.name === 'Doctor' && filterIds.length === 0) {
+      baseQuery.referredDoctorId = req.user._id;
+      console.log('🔍 Applying doctor filter directly to Patient query');
+    }
+
+    console.log('🔍 Final baseQuery:', baseQuery);
+
+    // Use APIFeatures with the base query
     const features = new APIFeatures<IPatient>(
-      Patient.find().setOptions({ skipResAllPopulate: onlyPatient }),
-      req.query
+      Patient.find(baseQuery).setOptions({ skipResAllPopulate: onlyPatient }),
+      cleanQuery
     )
       .filter()
       .search()
@@ -111,9 +207,28 @@ export const getAllPatient = catchAsync(
 
     const rawQuery = features.rawQuery();
     const data = await features.query.lean();
+    console.log('🔍 Patients found:', data.length);
+    
     const patientIds = data.map((el) => el._id as ObjectId);
 
-    const paginationInfo = await PaginationInfo.exec(Patient.countDocuments(), req.query, rawQuery);
+    // 🔥 FIX: Call PaginationInfo.exec correctly
+    // First param: Query object (not count)
+    // Third param: rawQuery from features
+    
+    // Create a count query with the same base conditions
+    const countQuery = Patient.find(baseQuery);
+    
+    // Apply search to count query if it exists in features
+    // You might need to check how APIFeatures applies search
+    // This is a simplified version - adjust based on your actual APIFeatures implementation
+    
+    const paginationInfo = await PaginationInfo.exec(
+      countQuery,      // First param: Query object
+      cleanQuery,      // Second param: query string
+      rawQuery         // Third param: raw query
+    );
+
+    console.log('🔍 Pagination info:', paginationInfo);
 
     if (onlyPatient) {
       return res.status(200).json({
@@ -122,6 +237,7 @@ export const getAllPatient = catchAsync(
         data: data,
       });
     }
+    
     const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
     const enrichedData = data.map((record) => ({
       ...record,
@@ -903,13 +1019,125 @@ export const reAdmitPatient = catchAsync(
 /**
  * Helper Functions
  */
-const _buildPatientFilterQuery = async (queryObj: IBasicObj) => {
+// const _buildPatientFilterQuery = async (queryObj: IBasicObj) => {
+//   let query: IBasicObj = {
+//     $and: [],
+//   };
+//   let leadQuery: IBasicObj = {
+//     $and: [],
+//   };
+
+//   if (queryObj.hasOwnProperty('status') && queryObj.status !== 'All') {
+//     let status = (queryObj.status as string).split(',');
+//     if (status.includes('All')) status = status.filter((s) => s !== 'All');
+//     query['$and'].push({ currentStatus: status.length > 1 ? { $in: status } : status[0] });
+//   }
+
+//   if (queryObj.hasOwnProperty('centers')) {
+//     let centers = (queryObj.centers as string).split(',');
+//     query['$and'].push({
+//       'resourceAllocation.centerId':
+//         centers.length > 1
+//           ? { $exists: true, $in: centers }
+//           : { $exists: true, $ne: null, $eq: centers[0] },
+//     });
+//   }
+
+//   // Admission Type Filter
+//   if (queryObj.hasOwnProperty('admissionType')) {
+//     let admissionTypes = queryObj.admissionType as string;
+//     query['$and'].push({
+//       admissionType: admissionTypes,
+//     });
+//   }
+//   // Illness Type Filter
+//   if (queryObj.hasOwnProperty('illnessType')) {
+//     let illnessTypes = queryObj.illnessType as string;
+//     query['$and'].push({
+//       illnessType: illnessTypes,
+//     });
+//   }
+
+//   // Hyper Tension Filter
+//   if (queryObj.hasOwnProperty('hyperTension')) {
+//     let hyperTensions = queryObj.hyperTension as string;
+//     query['$and'].push({
+//       'patientReport.hyperTension': hyperTensions,
+//     });
+//   }
+
+//   // Heart Disease Filter
+//   if (queryObj.hasOwnProperty('heartDisease')) {
+//     let heartDiseases = queryObj.heartDisease as string;
+//     query['$and'].push({
+//       'patientReport.heartDisease': heartDiseases,
+//     });
+//   }
+
+//   // Level Of Risk Filter
+//   if (queryObj.hasOwnProperty('levelOfRisk')) {
+//     let levelOfRisk = queryObj.levelOfRisk as string;
+//     query['$and'].push({
+//       'patientReport.levelOfRisk': levelOfRisk,
+//     });
+//   }
+
+//   // New Lead / Old Lead
+//   if (queryObj.hasOwnProperty('leadType')) {
+//     let isNewLead = false;
+//     if (queryObj.leadType === 'NEW') isNewLead = true;
+//     if (queryObj.leadType === 'OLD') isNewLead = false;
+
+//     const leadsIds = await Lead.find({
+//       isNewLead: isNewLead,
+//       patientId: { $exists: true, $ne: null },
+//     })
+//       .setOptions({
+//         skipReferralTypePopulate: true,
+//         skipCenterPopulate: true,
+//       })
+//       .select('patientId')
+//       .lean();
+//     const patientIds = Array.from(new Set(leadsIds.map((el) => el.patientId?.toString())));
+
+//     query['$and'].push({
+//       patientId: { $in: patientIds },
+//     });
+//   }
+
+//   if (Object.keys(query['$and']).length > 0) {
+//     const patientIds = await PatientAdmissionHistory.find(query)
+//       .setOptions({ skipResAllPopulate: true })
+//       .select('patientId resourceAllocation')
+//       .setOptions({
+//         skipResAllPopulate: true,
+//         skipUrlGeneration: true,
+//         populateUser: true,
+//         populateFeedback: false,
+//       })
+//       .select('patientId')
+//       .sort('-_id')
+//       .lean();
+
+//     return Array.from(new Set(patientIds.map((id) => id.patientId?.toString())));
+//   }
+
+//   return [];
+// };
+
+const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
   let query: IBasicObj = {
     $and: [],
   };
   let leadQuery: IBasicObj = {
     $and: [],
   };
+
+  // 🔥 ADD DOCTOR FILTER HERE
+  if (user?._id && user?.roleId?.name === 'Doctor') {
+    query['$and'].push({ referredDoctorId: user._id });
+    console.log('🔍 Adding doctor filter to query:', { referredDoctorId: user._id });
+  }
 
   if (queryObj.hasOwnProperty('status') && queryObj.status !== 'All') {
     let status = (queryObj.status as string).split(',');
@@ -989,26 +1217,26 @@ const _buildPatientFilterQuery = async (queryObj: IBasicObj) => {
     });
   }
 
-  if (Object.keys(query['$and']).length > 0) {
-    const patientIds = await PatientAdmissionHistory.find(query)
-      .setOptions({ skipResAllPopulate: true })
-      .select('patientId resourceAllocation')
-      .setOptions({
-        skipResAllPopulate: true,
-        skipUrlGeneration: true,
-        populateUser: true,
-        populateFeedback: false,
-      })
-      .select('patientId')
-      .sort('-_id')
-      .lean();
-
-    return Array.from(new Set(patientIds.map((id) => id.patientId?.toString())));
+  // If no filters applied (empty $and), return empty array
+  if (query['$and'].length === 0) {
+    return [];
   }
 
-  return [];
-};
+  const patientIds = await PatientAdmissionHistory.find(query)
+    .setOptions({ skipResAllPopulate: true })
+    .select('patientId resourceAllocation')
+    .setOptions({
+      skipResAllPopulate: true,
+      skipUrlGeneration: true,
+      populateUser: true,
+      populateFeedback: false,
+    })
+    .select('patientId')
+    .sort('-_id')
+    .lean();
 
+  return Array.from(new Set(patientIds.map((id) => id.patientId?.toString())));
+};
 const _createPatientRevision = async (previousData: IPatient) => {
   const revisionNumber = await PatientRevision.countDocuments({ originalId: previousData._id });
 

@@ -327,7 +327,7 @@ const CreateLead = () => {
         sort: "-leadDateTime",
         roles: "admin,sales,admission manager,Therapist+AM,ROM+AM" //doctor
       });
-// console.log('data of users--->', data);
+      // console.log('data of users--->', data);
 
       setAllDoctors(
         data.data.map((data: { _id: string; firstName: string; lastName: string }) => ({
@@ -455,18 +455,80 @@ const CreateLead = () => {
     [dispatch, stepperData.discardModal.isFormChanged]
   );
 
-  const handleApi = () => {
+  // const handleApi = () => {
+  //   const payload: { [key: string]: unknown } = {};
+  //   if (id) {
+  //     const states = compareObjects(leadData?.lead, state, true);
+  //     if (Object.keys(states).length === 0) {
+  //       return;
+  //     }
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     const extractValue = (val: any) => {
+  //       if (val && typeof val === "object" && "value" in val) return val.value;
+  //       return val;
+  //     };
+
+  //     Object.keys(states).forEach((key) => {
+  //       const val = extractValue(states[key as keyof typeof states]);
+  //       if (val !== "" && val !== null && val !== undefined) {
+  //         payload[key] = String(val);
+  //       }
+  //     });
+  //     if (states.firstName !== undefined) {
+  //       payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
+  //     }
+  //     if (states.lastName !== undefined) {
+  //       payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
+  //     }
+  //     if (states.leadDate !== undefined || states.leadTime !== undefined) {
+  //       const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
+  //       const formattedDateTime = new Date(combinedDateTime).toISOString();
+  //       payload.leadDateTime = formattedDateTime;
+  //     }
+  //     return updateLead(id, payload);
+  //   } else {
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     const extractValue = (val: any) => {
+  //       if (val && typeof val === "object" && "value" in val) return val.value;
+  //       return val;
+  //     };
+
+  //     Object.keys(state).forEach((key) => {
+  //       const val = extractValue(state[key as keyof typeof state]);
+  //       if (val !== "" && val !== null && val !== undefined) {
+  //         payload[key] = String(val);
+  //       }
+  //     });
+  //     const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
+  //     const formattedDateTime = new Date(combinedDateTime).toISOString();
+  //     payload.leadDateTime = formattedDateTime;
+  //     if (state.firstName.trim()) {
+  //       payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
+  //     }
+  //     if (state.lastName.trim()) {
+  //       payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
+  //     }
+  //     return createLead(payload);
+  //   }
+  // };
+
+  const handleApi = (extraPayload?: Record<string, unknown>) => {
     const payload: { [key: string]: unknown } = {};
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extractValue = (val: any) => {
+      if (val && typeof val === "object" && "value" in val) return val.value;
+      return val;
+    };
+
     if (id) {
+      // -------------------------------
+      // UPDATE FLOW
+      // -------------------------------
       const states = compareObjects(leadData?.lead, state, true);
-      if (Object.keys(states).length === 0) {
+      if (Object.keys(states).length === 0 && !extraPayload) {
         return;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const extractValue = (val: any) => {
-        if (val && typeof val === "object" && "value" in val) return val.value;
-        return val;
-      };
 
       Object.keys(states).forEach((key) => {
         const val = extractValue(states[key as keyof typeof states]);
@@ -474,40 +536,53 @@ const CreateLead = () => {
           payload[key] = String(val);
         }
       });
+
       if (states.firstName !== undefined) {
         payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
       }
+
       if (states.lastName !== undefined) {
         payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
       }
+
       if (states.leadDate !== undefined || states.leadTime !== undefined) {
         const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
-        const formattedDateTime = new Date(combinedDateTime).toISOString();
-        payload.leadDateTime = formattedDateTime;
+        payload.leadDateTime = new Date(combinedDateTime).toISOString();
       }
+
+      // ✅ Inject referredDoctorId
+      if (extraPayload) {
+        Object.assign(payload, extraPayload);
+      }
+
       return updateLead(id, payload);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const extractValue = (val: any) => {
-        if (val && typeof val === "object" && "value" in val) return val.value;
-        return val;
-      };
-
+      // -------------------------------
+      // CREATE FLOW
+      // -------------------------------
       Object.keys(state).forEach((key) => {
         const val = extractValue(state[key as keyof typeof state]);
         if (val !== "" && val !== null && val !== undefined) {
           payload[key] = String(val);
         }
       });
+
       const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
-      const formattedDateTime = new Date(combinedDateTime).toISOString();
-      payload.leadDateTime = formattedDateTime;
+      payload.leadDateTime = new Date(combinedDateTime).toISOString();
+
       if (state.firstName.trim()) {
         payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
       }
+
       if (state.lastName.trim()) {
         payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
       }
+
+      // ✅ Inject referredDoctorId
+      if (extraPayload) {
+        Object.assign(payload, extraPayload);
+      }
+
       return createLead(payload);
     }
   };
@@ -525,40 +600,38 @@ const CreateLead = () => {
     try {
       await LeadValidation.validate(state, { abortEarly: false });
 
-      const { data: userData } = await getAllUser(
-        {
-        roles: "doctor" //doctor
+      let referredDoctorId: string | null = null;
+
+      // ---------------------------------------------------
+      // 1. Resolve Doctor (Find or Create)
+      // ---------------------------------------------------
+      if (state.referralTypeId.label === "Doctor") {
+        const { data: userData } = await getAllUser({ roles: "doctor" });
+
+        console.log("✌️userData --->", `${state.referralDetails.toLowerCase()}@ganaa.in`);
+        const existingDoctor = userData.data.find(
+          (user: any) => user.email === `${state.referralDetails.toLowerCase()}@ganaa.in`
+        );
+        console.log("✌️existingDoctor --->", existingDoctor);
+
+        // Create doctor only if not exists
+        if (!existingDoctor) {
+          const response = await createUser({
+            firstName: state.referralDetails,
+            email: `${state.referralDetails.toLowerCase()}@ganaa.in`,
+            roleId: "680f31dba2b081859068d77f",
+            centerId: ["6790ce379190a101547a3130"],
+            doctor: true
+          });
+          referredDoctorId = response?.data?.data?._id;
+        } else {
+          referredDoctorId = existingDoctor._id;
+        }
       }
-      )
-      const existingDoctor = userData.data.filter((user:any) => user.email === state.referralDetails.toLowerCase() + "@ganaa.in");
-console.log('existingDoctor --->', existingDoctor);
-     // ---------------------------------------------------
-    // CREATE USER only when creating a new lead
-    // ---------------------------------------------------
-    if (!id && existingDoctor.length === 0 && state.referralTypeId.label === "Doctor") {
-      const response = await createUser({
-        firstName: state.referralDetails,
-        email: state.referralDetails.toLowerCase() + "@ganaa.in",
-        roleId: "680f31dba2b081859068d77f",
-        centerId:['6790ce379190a101547a3130'],
-        doctor: true
-      });
-      console.log("✌️ USER CREATED", response);
-    }
 
-    // ---------------------------------------------------
-    // UPDATE USER only when updating an existing lead
-    // ---------------------------------------------------
-    if (id && existingDoctor.length === 0 && state.referralTypeId.label === "Doctor") {
-      const response = await updateUser(id, {
-        firstName: state.referralDetails,
-        email: state.referralDetails.toLowerCase() + "@ganaa.in",
-        roleId: "680f31dba2b081859068d77f",
-        doctor: true
-      });
-      console.log("✌️ USER UPDATED", response);
-    }
-
+      // ---------------------------------------------------
+      // 2. Check Existing Patient (Before Create)
+      // ---------------------------------------------------
       if (!id && state.dob && state.firstName && state.lastName && state.phoneNumber) {
         const existResponse = await existPatient({
           lastName: state.lastName,
@@ -566,6 +639,7 @@ console.log('existingDoctor --->', existingDoctor);
           dob: state.dob,
           phoneNumber: state.phoneNumber
         });
+
         if (existResponse?.data?.data?.isExist) {
           setExistModal(true);
           setLoading(false);
@@ -575,8 +649,14 @@ console.log('existingDoctor --->', existingDoctor);
         }
       }
 
+      // ---------------------------------------------------
+      // 3. Create / Update Patient
+      // ---------------------------------------------------
       setErrors({});
-      const response = await handleApi();
+
+      // const response = await handleApi();
+      const response = await handleApi(referredDoctorId ? { referredDoctorId } : undefined);
+
       if (response && response?.status == 200 && response?.data?.data?._id) {
         if (data.comment.trim()) {
           await createComment(response?.data?.data?._id, data);

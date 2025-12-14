@@ -45,7 +45,6 @@ import {
   TherapistWiseSession,
   BlackModalGoogleReview,
   Reports,
-  DoctorDetail,
   Doctor
 } from "@/pages";
 import { RouteItem } from "@/router/type";
@@ -344,7 +343,65 @@ export const routes: RouteItem[] = [
                 resource: RESOURCES.DISQUALIFIED_LEAD
               }
             ]
-          }
+          },
+          // {
+          //   path: ROUTES.DASHBOARD,
+          //   element: <Dashboard />,
+          //   children: [
+          //     {
+          //       path: "center",
+          //       element: <Center />
+          //     },
+          //     {
+          //       path: "center/:centerId",
+          //       element: <Center />
+          //     },
+          //     {
+          //       path: "allergy-medicine",
+          //       element: <Allergy />
+          //     },
+          //     {
+          //       path: "user",
+          //       element: <User />
+          //     },
+          //     {
+          //       path: "doctor",
+          //       element: <DoctorReferral />
+          //     }
+          //   ]
+          // },
+          // {
+          //   path: ROUTES.WEEKLY_REPORT,
+          //   element: <WeeklyReport />,
+          //   resource: RESOURCES.WEEKLY_REPORT
+          // },
+          // {
+          //   path: ROUTES.THERAPIST_WISE_SESSION,
+          //   element: <TherapistWiseSession />,
+          //   // resource: RESOURCES.THERAPIST_WISE_SESSION
+          // },
+          // {
+          //   path: ROUTES.FOLLOWUP,
+          //   element: <PatientFollowup />,
+          //   resource: RESOURCES.FOLLOWUP
+          // },
+          // {
+          //   path: ROUTES.DOCTOR_WISE_SESSION,
+          //   element: <DoctorWiseSession />,
+          //   // resource: RESOURCES.DOCTOR_WISE_SESSION
+          // },
+          // {
+          //   path: ROUTES.PATIENT_VITAL_REPORT,
+          //   element: <PatientVitalsReport />,
+          //   // resource: RESOURCES.PATIENT_VITAL_REPORT
+          // },
+          // {
+          //   path: ROUTES.DAILY_REPORT,
+          //   element: <DailyReport />
+          //   // resource: RESOURCES.DAILY_REPORT
+          // },
+          // { path: ROUTES.REPORTS, element: <Reports /> },
+          // { path: ROUTES.INSIGHTS, element: <Insights />, resource: RESOURCES.INSIGHTS }
         ]
       },
       {

@@ -10,6 +10,7 @@ import PatientCaseHistory from '../models/patient/patient.case.history.model';
 import PatientFamilyDetails from '../models/patient/patient.family.details.model';
 import PatientAdmissionHistory from '../models/patient/patient.admission.history.model';
 import { normalizeAndTitleCase } from '../utils/helper';
+import User from '../models/user.model';
 
 
 
@@ -107,6 +108,24 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
   //   return next(new AppError('Lead Already Admitted', 400));
   // now we can edit the lead
 
+  // ---------------------------------------------------
+  // 🔥 RESOLVE REFERRED DOCTOR ID (NEW LOGIC)
+  // ---------------------------------------------------
+  let referredDoctorId = null;
+
+  if (lead.referralDetails && lead.referralTypeId) {
+    const doctor = await User.findOne({
+      roleId: '680f31dba2b081859068d77f', // OR Doctor ObjectId
+      firstName: new RegExp(`^${lead.referralDetails}$`, 'i'),
+      isDeleted: false,
+    }).select('_id');
+
+    if (doctor) {
+      referredDoctorId = doctor._id;
+    }
+  }
+  console.log('✌️referredDoctorId --->', referredDoctorId);
+
   const patient = await Patient.create({
     firstName: lead.firstName,
     lastName: lead.lastName,
@@ -122,6 +141,8 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
     fullAddress: lead.fullAddress,
     referredTypeId: lead.referralTypeId,
     referralDetails: lead.referralDetails,
+     // 🔥 NEW FIELD
+    referredDoctorId: referredDoctorId,
     createdBy: req.user?._id,
   });
 
