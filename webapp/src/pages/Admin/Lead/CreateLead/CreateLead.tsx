@@ -38,7 +38,6 @@ import {
   getAllUser,
   getSingleLead,
   updateLead,
-  updateUser
 } from "@/apis";
 
 import handleError from "@/utils/handleError";

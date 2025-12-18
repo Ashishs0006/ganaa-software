@@ -5,17 +5,16 @@ import {
   useEffect,
   useRef,
   useState,
-  useMemo
+
 } from "react";
 import moment from "moment";
 import toast from "react-hot-toast";
 import { IData, IState } from "./types";
 import { RootState } from "@/redux/store/store";
-import { updateDoctor, createDoctor, getAllDoctor, deleteDoctor, resetDoctorPassword, createUser, updateUser, getAllUser, deleteUser } from "@/apis";
+import { resetDoctorPassword, createUser, updateUser, getAllUser, deleteUser } from "@/apis";
 import kabab from "@/assets/images/kebab-menu.svg";
 import calender from "@/assets/images/calender.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { ISelectOption } from "@/components/Select/types";
 import { convertDate } from "@/components/BasicDetaills/utils";
 import {
   Button,
@@ -25,7 +24,6 @@ import {
   Input,
   Loader,
   Modal,
-  Multiselected,
   Pagination,
   Select
 } from "@/components";
@@ -73,7 +71,7 @@ console.log('✌️data --->', data);
 
   const doctorsData = useSelector((store: RootState) => store.doctors);
   // const dropdown = useSelector((store: RootState) => store.dropdown);
-  const roles = useSelector((store: RootState) => store.roles);
+  // const roles = useSelector((store: RootState) => store.roles);
 
   const [state, setState] = useState<IState>({
     openMenuId: null,
@@ -85,15 +83,15 @@ console.log('✌️data --->', data);
     isDeleteModal: false
   });
 
-  const rolesData = useMemo<ISelectOption[]>(() => {
-    if (roles.loading) return [];
-    const roleList = [{ label: "Select", value: "" }];
-    roles.data.forEach((role) => {
-      roleList.push({ label: role.name || "", value: role._id || "" });
-    });
+  // const rolesData = useMemo<ISelectOption[]>(() => {
+  //   if (roles.loading) return [];
+  //   const roleList = [{ label: "Select", value: "" }];
+  //   roles.data.forEach((role) => {
+  //     roleList.push({ label: role.name || "", value: role._id || "" });
+  //   });
 
-    return roleList;
-  }, [roles.data, roles.loading]);
+  //   return roleList;
+  // }, [roles.data, roles.loading]);
 
   const handleChange = (event: React.SyntheticEvent) => {
     const { name, value, type, files } = event.target as HTMLInputElement;
@@ -125,9 +123,9 @@ console.log('✌️data --->', data);
     }
   };
 
-  const handleSelect = (key: string, value: ISelectOption) => {
-    setData((prev) => ({ ...prev, [key]: value }));
-  };
+  // const handleSelect = (key: string, value: ISelectOption) => {
+  //   setData((prev) => ({ ...prev, [key]: value }));
+  // };
   // const handleMultiSelect = (value: string[]) => {
   //   setData((prev) => ({ ...prev, centerId: value }));
   // };
