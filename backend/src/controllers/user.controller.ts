@@ -112,6 +112,7 @@ export const getAllBasicUsers = catchAsync(
     let rolesToSerach: string[] = [];
     const validRoles = [
       'doctor',
+      'DoctorReferral',
       'therapist',
       'admin',
       'sales',

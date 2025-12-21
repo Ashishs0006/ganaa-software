@@ -257,7 +257,7 @@ const DailyProgress = () => {
                 to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`}
                 className=" font-semibold px-3! py-2! text-nowrap whitespace-nowrap  text-[#575F4A] items-center flex   bg-[#F0F5DB]  rounded-[9px]!  border border-[#575F4A]"
               >
-                Doctor Notes
+                Doctor Notes  
               </Link>
               <Link
                 to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/therapist`}

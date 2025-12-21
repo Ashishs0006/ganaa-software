@@ -115,7 +115,7 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
 
   if (lead.referralDetails && lead.referralTypeId) {
     const doctor = await User.findOne({
-      roleId: '680f31dba2b081859068d77f', // OR Doctor ObjectId
+      roleId: '69477cd67a68a9b80fbee63a', // OR Doctor ObjectId
       firstName: new RegExp(`^${lead.referralDetails}$`, 'i'),
       isDeleted: false,
     }).select('_id');

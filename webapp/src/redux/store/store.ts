@@ -7,6 +7,7 @@ import noteReducer from "@/redux/slice/noteSlice";
 import leadReducer from "@/redux/slice/LeadSlice";
 import UserReducer from "@/redux/slice/userSlice";
 import doctorReducer from "@/redux/slice/doctorSlice";
+import doctorReferralReducer from "@/redux/slice/doctorReferralSlice";
 import rolesReducer from "@/redux/slice/roleSlice";
 export const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ export const store = configureStore({
     leads: leadReducer,
     users: UserReducer,
     roles: rolesReducer,
-    doctors: doctorReducer
+    doctors: doctorReducer,
+    doctorReferral: doctorReferralReducer
   }
 });
 

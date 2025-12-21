@@ -30,7 +30,7 @@ import {
 import { LuUserRound } from "react-icons/lu";
 import handleError from "@/utils/handleError";
 import { useSearchParams } from "react-router-dom";
-import { IDoctor, resetDoctors, setDoctors } from "@/redux/slice/doctorSlice";
+import { IDoctor, resetDoctorReferral, setDoctorReferral } from "@/redux/slice/doctorReferralSlice";
 
 const DoctorReferral = () => {
   const [searchParams] = useSearchParams();
@@ -69,7 +69,8 @@ console.log('✌️data --->', data);
     // centerId: []
   });
 
-  const doctorsData = useSelector((store: RootState) => store.doctors);
+  const doctorsData = useSelector((store: RootState) => store.doctorReferral);
+console.log('✌️doctorsData --->', doctorsData);
   // const dropdown = useSelector((store: RootState) => store.dropdown);
   // const roles = useSelector((store: RootState) => store.roles);
 
@@ -144,10 +145,10 @@ console.log('✌️data --->', data);
       const response = await getAllUser({
         limit: 10,
         page,
-        roles: "doctor"
+        roles: "DoctorReferral"
       });
       if (response.data.status == "success") {
-        dispatch(setDoctors(response?.data));
+        dispatch(setDoctorReferral(response?.data));
         console.log(response.data);
       }
     } catch (error) {
@@ -206,7 +207,7 @@ console.log('✌️data --->', data);
     const body = {
       ...data,
       doctor: true,
-      roleId: "680f31dba2b081859068d77f",
+      roleId: "69477cd67a68a9b80fbee63a",
       centerId:['6790ce379190a101547a3130'],
     };
     delete body.role;
@@ -373,7 +374,7 @@ console.log('✌️data --->', data);
 
   useEffect(() => {
     return () => {
-      dispatch(resetDoctors());
+      dispatch(resetDoctorReferral());
     };
   }, []);
 

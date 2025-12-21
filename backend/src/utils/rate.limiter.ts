@@ -3,7 +3,7 @@ import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 export default class RateLimiter {
   static login: RateLimitRequestHandler = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 login attempts per window
+    max: 50, // Limit each IP to 5 login attempts per window
     standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
     message: {

@@ -187,7 +187,7 @@ export const getAllPatient = catchAsync(
     
     // If doctor is logged in but filterIds is empty (no patients match other filters)
     // We still need to apply doctor filter directly to Patient model
-    if (req?.user?._id && req?.user?.roleId?.name === 'Doctor' && filterIds.length === 0) {
+    if (req?.user?._id && req?.user?.roleId?.name === "DoctorReferral" && filterIds.length === 0) {
       baseQuery.referredDoctorId = req.user._id;
       console.log('🔍 Applying doctor filter directly to Patient query');
     }
@@ -1134,7 +1134,7 @@ const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
   };
 
   // 🔥 ADD DOCTOR FILTER HERE
-  if (user?._id && user?.roleId?.name === 'Doctor') {
+  if (user?._id && user?.roleId?.name === "DoctorReferral") {
     query['$and'].push({ referredDoctorId: user._id });
     console.log('🔍 Adding doctor filter to query:', { referredDoctorId: user._id });
   }
@@ -1237,6 +1237,7 @@ const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
 
   return Array.from(new Set(patientIds.map((id) => id.patientId?.toString())));
 };
+
 const _createPatientRevision = async (previousData: IPatient) => {
   const revisionNumber = await PatientRevision.countDocuments({ originalId: previousData._id });
 

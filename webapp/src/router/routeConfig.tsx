@@ -272,8 +272,8 @@ export const routes: RouteItem[] = [
               },
               {
                 path: ROUTES.PATIENT_PROFILE,
-                element: <PatientProfile />,
-                resource: RESOURCES.ALL_PATIENT
+                element: <PatientProfile />
+                // resource: RESOURCES.ALL_PATIENT
               },
               {
                 resource: RESOURCES.AUDIT_LOG,
@@ -282,13 +282,13 @@ export const routes: RouteItem[] = [
               },
               {
                 path: ROUTES.DAILY_PROGRESS,
-                element: <DailyProgress />,
-                resource: RESOURCES.DAILY_PROGRESS
+                element: <DailyProgress />
+                // resource: RESOURCES.DAILY_PROGRESS
               },
               {
                 path: ROUTES.NURSE_NOTES,
-                element: <NurseNotes />,
-                resource: RESOURCES.NURSE_NOTES
+                element: <NurseNotes />
+                // resource: RESOURCES.NURSE_NOTES
               },
               {
                 path: ROUTES.THERAPIST_NOTES,
@@ -315,9 +315,15 @@ export const routes: RouteItem[] = [
                 path: ROUTES.GROUP_ACTIVITY,
                 element: <GroupActivity />,
                 resource: RESOURCES.GROUP_ACTIVITY
-              }
+              },
+              
             ]
           },
+{
+                path: ROUTES.UPDATE_REGISTRATION,
+                element: <Registration key="update" />
+                // resource: RESOURCES.NEW_REGISTRATION
+              },
           {
             path: ROUTES.LEAD,
             element: <Lead />,
@@ -343,7 +349,7 @@ export const routes: RouteItem[] = [
                 resource: RESOURCES.DISQUALIFIED_LEAD
               }
             ]
-          },
+          }
           // {
           //   path: ROUTES.DASHBOARD,
           //   element: <Dashboard />,

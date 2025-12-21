@@ -32,8 +32,8 @@ import Filter from "@/components/Filter/Filter";
 const GroupActivity = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-  
+  const [searchParams] = useSearchParams();
+
   // Get selected from URL params, default to "All"
   const selected = searchParams.get("filter") || "All";
   const { auth } = useAuth();
@@ -164,13 +164,20 @@ const GroupActivity = () => {
 
       settabData({ _id: tabsResponseId, tabInfo: [...updatedtabs] });
 
-      const response = await getAllPatient({
-        status: "Inpatient,Discharge Initiated",
-        isStatusAndFilterQuery: true,
-        onlyPatient: true,
-        centers: centers.join(","),
-        fields: "_id firstName lastName patientPic gender uhid"
-      });
+      const response =
+        auth.user?.roleId?.name !== "DoctorReferral"
+          ? await getAllPatient({
+              status: "All",
+              isStatusAndFilterQuery: true,
+              onlyPatient: true,
+              centers: centers.join(","),
+              fields: "_id firstName lastName patientPic gender uhid"
+            })
+          : await getAllPatient({
+              status: "All",
+              centers: centers.join(","),
+              fields: "_id firstName lastName patientPic gender uhid"
+            });
 
       console.log("response --->", response);
       const data = response?.data?.data?.length
@@ -229,24 +236,24 @@ const GroupActivity = () => {
             //     existing.activity.push({ ...act, note: notePrefix, isSelected: !!act.note });
             //   }
             // });
-           p.activity?.forEach((act: IActivity) => {
-  const existingAct = existing.activity.find((a: IActivity) => a.name === act.name);
-  const notePrefix = act.note ? `${centerName}: ${act.note}` : "";
+            p.activity?.forEach((act: IActivity) => {
+              const existingAct = existing.activity.find((a: IActivity) => a.name === act.name);
+              const notePrefix = act.note ? `${centerName}: ${act.note}` : "";
 
-  if (existingAct) {
-    // append notes if both exist
-    existingAct.note = [existingAct.note, notePrefix].filter(Boolean).join("\n");
-    // ✅ FIX: use isSelected from backend instead of note existence
-    existingAct.isSelected = existingAct.isSelected || Boolean(act.isSelected);
-  } else {
-    // ✅ FIX: preserve checkbox even if note is empty
-    existing.activity.push({
-      ...act,
-      note: notePrefix,
-      isSelected: Boolean(act.isSelected),
-    });
-  }
-});
+              if (existingAct) {
+                // append notes if both exist
+                existingAct.note = [existingAct.note, notePrefix].filter(Boolean).join("\n");
+                // ✅ FIX: use isSelected from backend instead of note existence
+                existingAct.isSelected = existingAct.isSelected || Boolean(act.isSelected);
+              } else {
+                // ✅ FIX: preserve checkbox even if note is empty
+                existing.activity.push({
+                  ...act,
+                  note: notePrefix,
+                  isSelected: Boolean(act.isSelected)
+                });
+              }
+            });
 
             mergedGroupMap.set(key, existing as IData);
           });
@@ -357,44 +364,44 @@ const GroupActivity = () => {
   //     }); // Open note popup
   //   }
   // };
-const handleCheckboxChange = async (
-  rowIdx: number,
-  colIdx: number,
-  patient: IData,
-  cell: IActivity
-) => {
-  console.log('cell', cell);
-  const updatedData = [...data];
-  const current = updatedData[rowIdx];
-  if (!current.activity || !current.activity[colIdx]) return;
+  const handleCheckboxChange = async (
+    rowIdx: number,
+    colIdx: number,
+    patient: IData,
+    cell: IActivity
+  ) => {
+    console.log("cell", cell);
+    const updatedData = [...data];
+    const current = updatedData[rowIdx];
+    if (!current.activity || !current.activity[colIdx]) return;
 
-  const activityItem = current.activity[colIdx];
-  const wasSelected = activityItem.isSelected;
+    const activityItem = current.activity[colIdx];
+    const wasSelected = activityItem.isSelected;
 
-  // Toggle selection
-  activityItem.isSelected = !wasSelected;
+    // Toggle selection
+    activityItem.isSelected = !wasSelected;
 
-  // If unchecked → clear note
-  if (!activityItem.isSelected) {
-    activityItem.note = "";
-  }
+    // If unchecked → clear note
+    if (!activityItem.isSelected) {
+      activityItem.note = "";
+    }
 
-  setData(updatedData);
+    setData(updatedData);
 
-  // ✅ Always submit updated state
-  await handleSubmit(patient?.patientId);
+    // ✅ Always submit updated state
+    await handleSubmit(patient?.patientId);
 
-  // ✅ Don't open popup anymore
-  // ❌ remove or comment out this part:
-  // setHoveredIndex({
-  //   row: patient.patientId || "",
-  //   col: cell.name || "",
-  //   state: ""
-  // });
+    // ✅ Don't open popup anymore
+    // ❌ remove or comment out this part:
+    // setHoveredIndex({
+    //   row: patient.patientId || "",
+    //   col: cell.name || "",
+    //   state: ""
+    // });
 
-  // Just ensure popup closes if it was open
-  setHoveredIndex(null);
-};
+    // Just ensure popup closes if it was open
+    setHoveredIndex(null);
+  };
 
   const handleDelete = async (rowIdx: number, colIdx: number, patient: IData) => {
     const updatedData = [...data];
@@ -453,14 +460,12 @@ const handleCheckboxChange = async (
       // const spaceAbove = rect.top;
       // const spaceRight = window.innerWidth - rect.left;
       // const spaceLeft = rect.right;
-
       // Vertical position
       // if (spaceBelow < 500 && spaceAbove > spaceBelow) {
       //   setPosition("top");
       // } else {
       //   setPosition("bottom");
       // }
-
       // Horizontal position
       // if (spaceRight < 550 && spaceLeft > spaceRight) {
       //   setHorizontalPosition("right");
@@ -482,65 +487,64 @@ const handleCheckboxChange = async (
       })
     }));
   };
-const handleSubmit = async (id: string | undefined) => {
-  if (id === undefined) return;
-  try {
-    const filterData = data?.filter((value) => value.patientId === id);
+  const handleSubmit = async (id: string | undefined) => {
+    if (id === undefined) return;
+    try {
+      const filterData = data?.filter((value) => value.patientId === id);
 
-    if (filterData[0]._id) {
-      const payload = filterData.map((value) => ({
-        patientId: value?.patientId,
-        activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
-        _id: value._id,
-        activity: value?.activity
-          ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
-          .map((item) => ({
-            name: item.name,
-            note: item.note,
-            isSelected: item.isSelected,
-          })),
-      }));
+      if (filterData[0]._id) {
+        const payload = filterData.map((value) => ({
+          patientId: value?.patientId,
+          activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
+          _id: value._id,
+          activity: value?.activity
+            ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
+            .map((item) => ({
+              name: item.name,
+              note: item.note,
+              isSelected: item.isSelected
+            }))
+        }));
 
-      const response = await updateNewGroupActivity(filterData[0]._id, payload[0]);
+        const response = await updateNewGroupActivity(filterData[0]._id, payload[0]);
 
-      if (response.data.status === "success") {
-        const incomingObj = response?.data?.data;
-        const updated = data.map((item) =>
-          item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
-        );
-        setData(updated);
-        toast.success("Group activity updated successfully");
+        if (response.data.status === "success") {
+          const incomingObj = response?.data?.data;
+          const updated = data.map((item) =>
+            item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
+          );
+          setData(updated);
+          toast.success("Group activity updated successfully");
+        }
+      } else {
+        const payload = filterData?.map((value) => ({
+          patientId: value?.patientId,
+          activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
+          activity: value?.activity
+            ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
+            .map((item) => ({
+              name: item.name,
+              note: item.note,
+              isSelected: item.isSelected
+            }))
+        }));
+
+        const response = await createNewGroupActivity(payload[0]);
+        if (response.data.status === "success") {
+          const incomingObj = response?.data?.data;
+          const updated = data.map((item) =>
+            item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
+          );
+          setData(updated);
+          toast.success("Group activity added successfully");
+        }
       }
-    } else {
-      const payload = filterData?.map((value) => ({
-        patientId: value?.patientId,
-        activityDateTime: new Date(`${state.activityDateTime} ${"00:00"}`).toISOString(),
-        activity: value?.activity
-          ?.filter((item) => item.isSelected || item.note?.trim()) // ✅ FIXED
-          .map((item) => ({
-            name: item.name,
-            note: item.note,
-            isSelected: item.isSelected,
-          })),
-      }));
 
-      const response = await createNewGroupActivity(payload[0]);
-      if (response.data.status === "success") {
-        const incomingObj = response?.data?.data;
-        const updated = data.map((item) =>
-          item.patientId === incomingObj.patientId ? { ...item, _id: incomingObj._id } : item
-        );
-        setData(updated);
-        toast.success("Group activity added successfully");
-      }
+      setHoveredIndex(null);
+    } catch (error) {
+      handleError(error);
     }
-
-    setHoveredIndex(null);
-  } catch (error) {
-    handleError(error);
-  }
-};
-
+  };
 
   const handleSubmitTab = async () => {
     try {
@@ -765,7 +769,7 @@ const handleSubmit = async (id: string | undefined) => {
                 </CustomCalendar>
               </div>
               {/* <div className="flex ">GDL2</div> */}
-              <Filter  />
+              <Filter />
             </div>
           </div>
           {state.loading && (
@@ -778,459 +782,451 @@ const handleSubmit = async (id: string | undefined) => {
               </div>
             </div>
           )}
-        {!state.loading && (
-  <div className="bg-white h-[70vh] overflow-y-auto rounded-2xl">
-    {data.length ? (
-      <div className="font-sans rounded-xl text-[13px] leading-[18px] text-[#1a1a1a]">
-        <div className="overflow-x-auto h-[70vh] scrollbar-hidden">
-          <table className="min-w-[1328px] border-collapse">
-            {/* ===== TABLE HEADER ===== */}
-            <thead className="z-30 sticky top-0">
-              <tr className="rounded-t-md border-b py-3 bg-[#E9E8E5] select-none">
-                <th className="sticky left-0 z-10 bg-[#E9E8E5] px-3 py-4 text-left text-[12px] leading-[15px] font-semibold text-[#505050]">
-                  <span className="text-center">S.No</span>
-                </th>
-                <th className="sticky w-[200px] left-12 z-10 bg-[#E9E8E5] px-4 py-4 text-left text-[12px] leading-[15px] font-semibold text-[#505050]">
-                  <span className="min-w-[150px]">Patient Name</span>
-                </th>
+          {!state.loading && (
+            <div className="bg-white h-[70vh] overflow-y-auto rounded-2xl">
+              {data.length ? (
+                <div className="font-sans rounded-xl text-[13px] leading-[18px] text-[#1a1a1a]">
+                  <div className="overflow-x-auto h-[70vh] scrollbar-hidden">
+                    <table className="min-w-[1328px] border-collapse">
+                      {/* ===== TABLE HEADER ===== */}
+                      <thead className="z-30 sticky top-0">
+                        <tr className="rounded-t-md border-b py-3 bg-[#E9E8E5] select-none">
+                          <th className="sticky left-0 z-10 bg-[#E9E8E5] px-3 py-4 text-left text-[12px] leading-[15px] font-semibold text-[#505050]">
+                            <span className="text-center">S.No</span>
+                          </th>
+                          <th className="sticky w-[200px] left-12 z-10 bg-[#E9E8E5] px-4 py-4 text-left text-[12px] leading-[15px] font-semibold text-[#505050]">
+                            <span className="min-w-[150px]">Patient Name</span>
+                          </th>
 
-                {tabdata?.tabInfo?.map((data) => {
-                  if (!headerTextAreaRefs.current[data.name]) {
-                    headerTextAreaRefs.current[data.name] =
-                      React.createRef<HTMLTextAreaElement>();
-                  }
-                  return (
-                    <th
-                      key={data.name}
-                      className="text-nowrap z-0 min-w-[170px] py-3 text-center text-[12px] leading-[15px] font-semibold text-[#505050]"
-                    >
-                      <div className="relative min-w-[170px] gap-1 mx-auto flex items-center justify-center">
-                        <p>{data.name}</p>
-                        <div>
-                          <div className="relative w-full">
-                            {/* NOTE ICON (disabled click when selected == All) */}
-                            <img
-                              onClick={() => {
-                                // if (selected === "All") return; 
-                                if (data.note.trim()) {
-                                  setRememberstringTab(data.note);
-                                  setHoveredIndexTab({
-                                    col: data?.name || "",
-                                    state: "yes"
-                                  });
-                                } else {
-                                  setHoveredIndexTab({
-                                    col: data?.name || "",
-                                    state: "no"
-                                  });
-                                }
-                              }}
-                              src={messageIcon}
-                              className={`w-4 h-4 text-[#505050] ${
-                                selected === "All"
-                                  ? "cursor-not-allowed opacity-60"
-                                  : "cursor-pointer"
-                              }`}
-                            />
-                            {data.note && (
-                              <div className="absolute p-1 top-[-10%] right-[-10%] rounded-full bg-red-500"></div>
-                            )}
-                          </div>
-
-                          {/* HEADER NOTE POPUP */}
-                          {hoveredIndexTab?.col == data.name && (
-                            <div
-                              ref={inputBoxTabRef}
-                              className="absolute z-100 w-[305px] p-0.5 border rounded-lg bg-[#F2F2F2] shadow-mg top-[-10] right-0"
-                            >
-                              {selected === "All" ? (
-                                // ---- READ-ONLY MODE ----
-                                <div className="bg-[#F2F2F2] rounded-sm">
-                                  <div className="bg-white p-2 rounded-sm border-2 h-[100px] overflow-y-auto">
-                                    {data.note
-                                      .split("\n")
-                                      .filter(Boolean)
-                                      .map((line, idx, arr) => (
-                                        <div
-                                          key={idx}
-                                          className={`text-xs text-start text-gray-700 font-semibold py-1 px-2 ${
-                                            idx !== arr.length - 1
-                                              ? "border-b border-gray-300"
-                                              : ""
-                                          }`}
-                                        >
-                                          {line}
-                                        </div>
-                                      ))}
-                                  </div>
-                                </div>
-                              ) : hoveredIndexTab?.state == "no" ? (
-                                // ---- EDITABLE MODE ----
-                                <div className="bg-[#F2F2F2] rounded-lg">
-                                  <textarea
-                                    ref={headerTextAreaRefs.current[data.name]}
-                                    value={data?.note}
-                                    onChange={(e) =>
-                                      handleNoteChange1(data.name, e.target.value)
-                                    }
-                                    placeholder="Enter note..."
-                                    className="text-xs border-black bg-white p-2 h-[100px] resize-none border-2 focus:outline-none focus:border-primary-dark rounded-lg w-full"
-                                  ></textarea>
-                                  <RBACGuard
-                                    resource={RESOURCES.GROUP_ACTIVITY}
-                                    action="write"
-                                  >
-                                    <div className="flex justify-end py-1 space-x-4 text-[14px]">
-                                      <button
-                                        onClick={closePopUpFunctionTab}
-                                        className="text-gray-700 cursor-pointer mx-2 font-normal"
-                                      >
-                                        Cancel
-                                      </button>
-                                      {data.note.trim() ? (
-                                        <Button
-                                          name="save"
-                                          onClick={() => handleSubmitTab()}
-                                          className="text-xs! bg-[#323E2A]! px-[15px]! py-[4px]! rounded-lg!"
-                                          variant="contained"
-                                          size="base"
-                                        >
-                                          Save
-                                        </Button>
-                                      ) : (
-                                        <Button
-                                          className="text-xs! cursor-not-allowed bg-gray-400! px-[15px]! py-[4px]! rounded-lg!"
-                                          variant="contained"
-                                          size="base"
-                                        >
-                                          Save
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </RBACGuard>
-                                </div>
-                              ) : (
-                                // ---- EXISTING NOTE (VIEW) ----
-                                <div className="bg-[#F2F2F2] rounded-sm">
-                                  <div className="bg-white p-2 rounded-sm border-2 h-[100px] overflow-y-auto">
-                                    {data.note
-                                      .split("\n")
-                                      .filter(Boolean)
-                                      .map((line, idx, arr) => (
-                                        <div
-                                          key={idx}
-                                          className={`text-xs text-start text-gray-700 font-semibold py-1 px-2 ${
-                                            idx !== arr.length - 1
-                                              ? "border-b border-gray-300"
-                                              : ""
-                                          }`}
-                                        >
-                                          {line}
-                                        </div>
-                                      ))}
-                                  </div>
-                                  {selected !== "All" && (
-                                    <RBACGuard
-                                      resource={RESOURCES.GROUP_ACTIVITY}
-                                      action="write"
-                                    >
-                                      <div className="flex justify-end py-1 space-x-4 text-[14px]">
-                                        <button
-                                          onClick={() => handleDeleteTab(data.name)}
-                                          className="text-gray-700 mx-2 cursor-pointer font-normal"
-                                        >
-                                          Delete
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            setRememberstringTab(data?.note || "");
+                          {tabdata?.tabInfo?.map((data) => {
+                            if (!headerTextAreaRefs.current[data.name]) {
+                              headerTextAreaRefs.current[data.name] =
+                                React.createRef<HTMLTextAreaElement>();
+                            }
+                            return (
+                              <th
+                                key={data.name}
+                                className="text-nowrap z-0 min-w-[170px] py-3 text-center text-[12px] leading-[15px] font-semibold text-[#505050]"
+                              >
+                                <div className="relative min-w-[170px] gap-1 mx-auto flex items-center justify-center">
+                                  <p>{data.name}</p>
+                                  <div>
+                                    <div className="relative w-full">
+                                      {/* NOTE ICON (disabled click when selected == All) */}
+                                      <img
+                                        onClick={() => {
+                                          // if (selected === "All") return;
+                                          if (data.note.trim()) {
+                                            setRememberstringTab(data.note);
                                             setHoveredIndexTab({
-                                              col: hoveredIndexTab?.col || "",
+                                              col: data?.name || "",
+                                              state: "yes"
+                                            });
+                                          } else {
+                                            setHoveredIndexTab({
+                                              col: data?.name || "",
                                               state: "no"
                                             });
-                                          }}
-                                          className="text-[#7C8E30] cursor-pointer mx-2 font-semibold underline"
-                                        >
-                                          Edit
-                                        </button>
-                                      </div>
-                                    </RBACGuard>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-
-            {/* ===== TABLE BODY ===== */}
-            <tbody>
-              {data?.map((patient: IData, index: number) => (
-                <tr key={patient?.patientId} className="border-b border-[#d9d4c9]">
-                  {/* S.No */}
-                  <td className="py-2 sticky left-0 z-10 bg-white px-3">
-                    <span className="text-xs text-center">{index + 1}</span>
-                  </td>
-
-                  {/* Patient Name */}
-                  <td className="py-2 sticky left-12 z-10 bg-white px-4 min-w-[240px]">
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`flex rounded-full border-2 ${
-                            patient?.gender === "Male"
-                              ? "border-[#00685F]"
-                              : patient?.gender === "Female"
-                              ? "border-[#F14E9A]"
-                              : "border-gray-500"
-                          } overflow-hidden w-[40px] h-[40px] items-center justify-center`}
-                        >
-                          <div className="flex rounded-full w-full h-full bg-[#C1D1A8] border border-white overflow-hidden items-center justify-center">
-                            {patient?.patientPicUrl ? (
-                              <img
-                                src={patient?.patientPicUrl}
-                                alt="profile"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="uppercase text-sm font-medium">
-                                {patient?.firstName?.trim().slice(0, 1)}
-                                {patient?.lastName?.trim().slice(0, 1)}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start">
-                          <p
-                            className="text-xs font-semibold"
-                            title={`${patient?.firstName || ""} ${
-                              patient?.lastName || ""
-                            }`}
-                          >
-                            {capitalizeFirstLetter(patient.firstName || "")}{" "}
-                            {capitalizeFirstLetter(patient.lastName || "")}
-                            <br />
-                            {formatId(patient?.uhid)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* ===== ACTIVITY CELLS ===== */}
-                  {patient.activity?.map((cell, colIdx) => {
-                    const uniqueKey = `${patient.patientId}-${cell.name}`;
-                    if (!textAreaRefs.current[uniqueKey]) {
-                      textAreaRefs.current[uniqueKey] =
-                        React.createRef<HTMLTextAreaElement>();
-                    }
-
-                    return (
-                      <td
-                        key={colIdx}
-                        className="py-3 px-3 min-w-[100px] text-center font-bold"
-                      >
-                        {patient.patientId && loaData.includes(patient.patientId) ? (
-                          <div
-                            title="The patient is on LOA today."
-                            className="relative w-fit gap-2 mx-auto flex items-center justify-center"
-                          >
-                            <div className="bg-gray-200 rounded-xs w-4 h-4"></div>
-                            <img
-                              src={messageIcondisbale}
-                              className="w-[20px] h-[20px] text-gray-200"
-                            />
-                          </div>
-                        ) : (
-                          <div className="relative w-fit gap-1 mx-auto flex items-center justify-center">
-                            {/* ---- Checkbox ---- */}
- <Input
-  type="checkbox"
-  checked={cell?.isSelected}
-  onChange={() => {
-    if (selected === "All") return; // stop interaction when "All"
-    handleCheckboxChange(index, colIdx, patient, cell);
-  }}
-  className={`accent-[#323E2A] h-4 cursor-pointer
-    ${selected === "All"
-      ? "cursor-not-allowed"
-      : "cursor-pointer"}
-    ${selected === "All" && !cell?.isSelected ? "opacity-60" : "opacity-100"}`}
-/>
-
-
-                            {/* ---- Note Icon ---- */}
-                            <div>
-                              <div className="relative w-full">
-                                <img
-                                  onClick={() => {
-                                    if (selected === "All") return; // disable click
-                                  if (cell.note) {
-        // If note exists → open in view mode
-        setRememberstring(cell?.note);
-        setHoveredIndex({
-          row: patient?.patientId || "",
-          col: cell?.name || "",
-          state: "hey",
-        });
-      } else {
-        // If no note → open editable popup
-        setHoveredIndex({
-          row: patient?.patientId || "",
-          col: cell?.name || "",
-          state: "",
-        });
-      }
-                        }}                    src={messageIcon}
-                                  className={`w-8 h-8 ${
-                                    selected === "All"
-                                      ? "cursor-not-allowed opacity-60"
-                                      : "cursor-pointer"
-                                  }`}
-                                />
-                                {cell.note && (
-                                  <div className="absolute p-1 top-[15%] right-0 rounded-full bg-red-500"></div>
-                                )}
-                              </div>
-
-
-
-
-
-
-
-
-
-
-                              {/* ---- POPUP ---- */}
-                              {hoveredIndex?.row === patient.patientId &&
-                                hoveredIndex?.col === cell.name && (
-                                  <div
-                                    ref={inputBoxRef}
-                                    className="absolute z-100 w-[305px] p-0.5 border rounded-lg bg-[#F2F2F2] shadow-mg top-full mt-2 right-0"
-                                  >
-                                    {selected === "All" ? (
-                                      // READ-ONLY
-                                      <div className="bg-[#F2F2F2] rounded-sm">
-                                        <textarea
-                                          disabled
-                                          className="resize-none text-gray-700 p-3 h-[100px] rounded-sm border-2 bg-white text-xs leading-5 w-full"
-                                          value={cell.note}
-                                        ></textarea>
-                                      </div>
-                                    ) : hoveredIndex?.state !== "hey" ? (
-                                      // EDITABLE
-                                      <div className="bg-[#F2F2F2] rounded-lg">
-                                        <textarea
-                                          value={cell?.note}
-                                          ref={textAreaRefs.current[uniqueKey]}
-                                          placeholder="Enter note..."
-                                          onChange={(e) =>
-                                            handleNoteChange(index, colIdx, e.target.value)
                                           }
-                                          className="text-xs border-black bg-white p-2 h-[100px] resize-none border-2 focus:outline-none focus:border-primary-dark rounded-lg w-full"
-                                        ></textarea>
+                                        }}
+                                        src={messageIcon}
+                                        className={`w-4 h-4 text-[#505050] ${
+                                          selected === "All"
+                                            ? "cursor-not-allowed opacity-60"
+                                            : "cursor-pointer"
+                                        }`}
+                                      />
+                                      {data.note && (
+                                        <div className="absolute p-1 top-[-10%] right-[-10%] rounded-full bg-red-500"></div>
+                                      )}
+                                    </div>
 
-                                        <RBACGuard
-                                          resource={RESOURCES.GROUP_ACTIVITY}
-                                          action="write"
-                                        >
-                                          <div className="flex justify-end py-1 space-x-4 text-[14px]">
-                                            <button
-                                              onClick={closePopUpFunction}
-                                              className="text-gray-700 cursor-pointer mx-2 font-normal"
+                                    {/* HEADER NOTE POPUP */}
+                                    {hoveredIndexTab?.col == data.name && (
+                                      <div
+                                        ref={inputBoxTabRef}
+                                        className="absolute z-100 w-[305px] p-0.5 border rounded-lg bg-[#F2F2F2] shadow-mg top-[-10] right-0"
+                                      >
+                                        {selected === "All" ? (
+                                          // ---- READ-ONLY MODE ----
+                                          <div className="bg-[#F2F2F2] rounded-sm">
+                                            <div className="bg-white p-2 rounded-sm border-2 h-[100px] overflow-y-auto">
+                                              {data.note
+                                                .split("\n")
+                                                .filter(Boolean)
+                                                .map((line, idx, arr) => (
+                                                  <div
+                                                    key={idx}
+                                                    className={`text-xs text-start text-gray-700 font-semibold py-1 px-2 ${
+                                                      idx !== arr.length - 1
+                                                        ? "border-b border-gray-300"
+                                                        : ""
+                                                    }`}
+                                                  >
+                                                    {line}
+                                                  </div>
+                                                ))}
+                                            </div>
+                                          </div>
+                                        ) : hoveredIndexTab?.state == "no" ? (
+                                          // ---- EDITABLE MODE ----
+                                          <div className="bg-[#F2F2F2] rounded-lg">
+                                            <textarea
+                                              ref={headerTextAreaRefs.current[data.name]}
+                                              value={data?.note}
+                                              onChange={(e) =>
+                                                handleNoteChange1(data.name, e.target.value)
+                                              }
+                                              placeholder="Enter note..."
+                                              className="text-xs border-black bg-white p-2 h-[100px] resize-none border-2 focus:outline-none focus:border-primary-dark rounded-lg w-full"
+                                            ></textarea>
+                                            <RBACGuard
+                                              resource={RESOURCES.GROUP_ACTIVITY}
+                                              action="write"
                                             >
-                                              Cancel
-                                            </button>
-                                            {cell.note?.trim() ? (
-                                              <Button
-                                                name="save"
-                                                onClick={() =>
-                                                  handleSubmit(patient?.patientId)
-                                                }
-                                                className="text-xs! bg-[#323E2A]! px-[15px]! py-[4px]! rounded-lg!"
-                                                variant="contained"
-                                                size="base"
+                                              <div className="flex justify-end py-1 space-x-4 text-[14px]">
+                                                <button
+                                                  onClick={closePopUpFunctionTab}
+                                                  className="text-gray-700 cursor-pointer mx-2 font-normal"
+                                                >
+                                                  Cancel
+                                                </button>
+                                                {data.note.trim() ? (
+                                                  <Button
+                                                    name="save"
+                                                    onClick={() => handleSubmitTab()}
+                                                    className="text-xs! bg-[#323E2A]! px-[15px]! py-[4px]! rounded-lg!"
+                                                    variant="contained"
+                                                    size="base"
+                                                  >
+                                                    Save
+                                                  </Button>
+                                                ) : (
+                                                  <Button
+                                                    className="text-xs! cursor-not-allowed bg-gray-400! px-[15px]! py-[4px]! rounded-lg!"
+                                                    variant="contained"
+                                                    size="base"
+                                                  >
+                                                    Save
+                                                  </Button>
+                                                )}
+                                              </div>
+                                            </RBACGuard>
+                                          </div>
+                                        ) : (
+                                          // ---- EXISTING NOTE (VIEW) ----
+                                          <div className="bg-[#F2F2F2] rounded-sm">
+                                            <div className="bg-white p-2 rounded-sm border-2 h-[100px] overflow-y-auto">
+                                              {data.note
+                                                .split("\n")
+                                                .filter(Boolean)
+                                                .map((line, idx, arr) => (
+                                                  <div
+                                                    key={idx}
+                                                    className={`text-xs text-start text-gray-700 font-semibold py-1 px-2 ${
+                                                      idx !== arr.length - 1
+                                                        ? "border-b border-gray-300"
+                                                        : ""
+                                                    }`}
+                                                  >
+                                                    {line}
+                                                  </div>
+                                                ))}
+                                            </div>
+                                            {selected !== "All" && (
+                                              <RBACGuard
+                                                resource={RESOURCES.GROUP_ACTIVITY}
+                                                action="write"
                                               >
-                                                Save
-                                              </Button>
-                                            ) : (
-                                              <Button
-                                                className="text-xs! cursor-not-allowed bg-gray-400! px-[15px]! py-[4px]! rounded-lg!"
-                                                variant="contained"
-                                                size="base"
-                                              >
-                                                Save
-                                              </Button>
+                                                <div className="flex justify-end py-1 space-x-4 text-[14px]">
+                                                  <button
+                                                    onClick={() => handleDeleteTab(data.name)}
+                                                    className="text-gray-700 mx-2 cursor-pointer font-normal"
+                                                  >
+                                                    Delete
+                                                  </button>
+                                                  <button
+                                                    onClick={() => {
+                                                      setRememberstringTab(data?.note || "");
+                                                      setHoveredIndexTab({
+                                                        col: hoveredIndexTab?.col || "",
+                                                        state: "no"
+                                                      });
+                                                    }}
+                                                    className="text-[#7C8E30] cursor-pointer mx-2 font-semibold underline"
+                                                  >
+                                                    Edit
+                                                  </button>
+                                                </div>
+                                              </RBACGuard>
                                             )}
                                           </div>
-                                        </RBACGuard>
-                                      </div>
-                                    ) : (
-                                      // EXISTING NOTE (VIEW)
-                                      <div className="bg-[#F2F2F2] rounded-sm">
-                                        <textarea
-                                          disabled
-                                          className="resize-none text-gray-700 p-3 h-[100px] rounded-sm border-2 bg-white text-xs leading-5 w-full"
-                                          value={cell.note}
-                                        ></textarea>
-                                        {selected !== "All" && (
-                                          <RBACGuard
-                                            resource={RESOURCES.GROUP_ACTIVITY}
-                                            action="write"
-                                          >
-                                            <div className="flex justify-end py-1 space-x-4 text-[14px]">
-                                              <button
-                                                onClick={() =>
-                                                  handleDelete(index, colIdx, patient)
-                                                }
-                                                className="text-gray-700 mx-2 cursor-pointer font-normal"
-                                              >
-                                                Delete
-                                              </button>
-                                              <button
-                                                onClick={() => {
-                                                  setRememberstring(cell?.note || "");
-                                                  setHoveredIndex({
-                                                    row: hoveredIndex.row,
-                                                    col: hoveredIndex.col,
-                                                    state: ""
-                                                  });
-                                                }}
-                                                className="text-[#7C8E30] cursor-pointer mx-2 font-semibold underline"
-                                              >
-                                                Edit
-                                              </button>
-                                            </div>
-                                          </RBACGuard>
                                         )}
                                       </div>
                                     )}
                                   </div>
-                                )}
-                            </div>
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    ) : (
-      <EmptyPage links="/admin/registration" hidden title="No Patient Found" />
-    )}
-  </div>
-)}
+                                </div>
+                              </th>
+                            );
+                          })}
+                        </tr>
+                      </thead>
 
+                      {/* ===== TABLE BODY ===== */}
+                      <tbody>
+                        {data?.map((patient: IData, index: number) => (
+                          <tr key={patient?.patientId} className="border-b border-[#d9d4c9]">
+                            {/* S.No */}
+                            <td className="py-2 sticky left-0 z-10 bg-white px-3">
+                              <span className="text-xs text-center">{index + 1}</span>
+                            </td>
+
+                            {/* Patient Name */}
+                            <td className="py-2 sticky left-12 z-10 bg-white px-4 min-w-[240px]">
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`flex rounded-full border-2 ${
+                                      patient?.gender === "Male"
+                                        ? "border-[#00685F]"
+                                        : patient?.gender === "Female"
+                                        ? "border-[#F14E9A]"
+                                        : "border-gray-500"
+                                    } overflow-hidden w-[40px] h-[40px] items-center justify-center`}
+                                  >
+                                    <div className="flex rounded-full w-full h-full bg-[#C1D1A8] border border-white overflow-hidden items-center justify-center">
+                                      {patient?.patientPicUrl ? (
+                                        <img
+                                          src={patient?.patientPicUrl}
+                                          alt="profile"
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <div className="uppercase text-sm font-medium">
+                                          {patient?.firstName?.trim().slice(0, 1)}
+                                          {patient?.lastName?.trim().slice(0, 1)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-start">
+                                    <p
+                                      className="text-xs font-semibold"
+                                      title={`${patient?.firstName || ""} ${
+                                        patient?.lastName || ""
+                                      }`}
+                                    >
+                                      {capitalizeFirstLetter(patient.firstName || "")}{" "}
+                                      {capitalizeFirstLetter(patient.lastName || "")}
+                                      <br />
+                                      {formatId(patient?.uhid)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* ===== ACTIVITY CELLS ===== */}
+                            {patient.activity?.map((cell, colIdx) => {
+                              const uniqueKey = `${patient.patientId}-${cell.name}`;
+                              if (!textAreaRefs.current[uniqueKey]) {
+                                textAreaRefs.current[uniqueKey] =
+                                  React.createRef<HTMLTextAreaElement>();
+                              }
+
+                              return (
+                                <td
+                                  key={colIdx}
+                                  className="py-3 px-3 min-w-[100px] text-center font-bold"
+                                >
+                                  {patient.patientId && loaData.includes(patient.patientId) ? (
+                                    <div
+                                      title="The patient is on LOA today."
+                                      className="relative w-fit gap-2 mx-auto flex items-center justify-center"
+                                    >
+                                      <div className="bg-gray-200 rounded-xs w-4 h-4"></div>
+                                      <img
+                                        src={messageIcondisbale}
+                                        className="w-[20px] h-[20px] text-gray-200"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="relative w-fit gap-1 mx-auto flex items-center justify-center">
+                                      {/* ---- Checkbox ---- */}
+                                      <Input
+                                        type="checkbox"
+                                        checked={cell?.isSelected}
+                                        onChange={() => {
+                                          if (selected === "All") return; // stop interaction when "All"
+                                          handleCheckboxChange(index, colIdx, patient, cell);
+                                        }}
+                                        className={`accent-[#323E2A] h-4 cursor-pointer
+    ${selected === "All" ? "cursor-not-allowed" : "cursor-pointer"}
+    ${selected === "All" && !cell?.isSelected ? "opacity-60" : "opacity-100"}`}
+                                      />
+
+                                      {/* ---- Note Icon ---- */}
+                                      <div>
+                                        <div className="relative w-full">
+                                          <img
+                                            onClick={() => {
+                                              if (selected === "All") return; // disable click
+                                              if (cell.note) {
+                                                // If note exists → open in view mode
+                                                setRememberstring(cell?.note);
+                                                setHoveredIndex({
+                                                  row: patient?.patientId || "",
+                                                  col: cell?.name || "",
+                                                  state: "hey"
+                                                });
+                                              } else {
+                                                // If no note → open editable popup
+                                                setHoveredIndex({
+                                                  row: patient?.patientId || "",
+                                                  col: cell?.name || "",
+                                                  state: ""
+                                                });
+                                              }
+                                            }}
+                                            src={messageIcon}
+                                            className={`w-8 h-8 ${
+                                              selected === "All"
+                                                ? "cursor-not-allowed opacity-60"
+                                                : "cursor-pointer"
+                                            }`}
+                                          />
+                                          {cell.note && (
+                                            <div className="absolute p-1 top-[15%] right-0 rounded-full bg-red-500"></div>
+                                          )}
+                                        </div>
+
+                                        {/* ---- POPUP ---- */}
+                                        {hoveredIndex?.row === patient.patientId &&
+                                          hoveredIndex?.col === cell.name && (
+                                            <div
+                                              ref={inputBoxRef}
+                                              className="absolute z-100 w-[305px] p-0.5 border rounded-lg bg-[#F2F2F2] shadow-mg top-full mt-2 right-0"
+                                            >
+                                              {selected === "All" ? (
+                                                // READ-ONLY
+                                                <div className="bg-[#F2F2F2] rounded-sm">
+                                                  <textarea
+                                                    disabled
+                                                    className="resize-none text-gray-700 p-3 h-[100px] rounded-sm border-2 bg-white text-xs leading-5 w-full"
+                                                    value={cell.note}
+                                                  ></textarea>
+                                                </div>
+                                              ) : hoveredIndex?.state !== "hey" ? (
+                                                // EDITABLE
+                                                <div className="bg-[#F2F2F2] rounded-lg">
+                                                  <textarea
+                                                    value={cell?.note}
+                                                    ref={textAreaRefs.current[uniqueKey]}
+                                                    placeholder="Enter note..."
+                                                    onChange={(e) =>
+                                                      handleNoteChange(
+                                                        index,
+                                                        colIdx,
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                    className="text-xs border-black bg-white p-2 h-[100px] resize-none border-2 focus:outline-none focus:border-primary-dark rounded-lg w-full"
+                                                  ></textarea>
+
+                                                  <RBACGuard
+                                                    resource={RESOURCES.GROUP_ACTIVITY}
+                                                    action="write"
+                                                  >
+                                                    <div className="flex justify-end py-1 space-x-4 text-[14px]">
+                                                      <button
+                                                        onClick={closePopUpFunction}
+                                                        className="text-gray-700 cursor-pointer mx-2 font-normal"
+                                                      >
+                                                        Cancel
+                                                      </button>
+                                                      {cell.note?.trim() ? (
+                                                        <Button
+                                                          name="save"
+                                                          onClick={() =>
+                                                            handleSubmit(patient?.patientId)
+                                                          }
+                                                          className="text-xs! bg-[#323E2A]! px-[15px]! py-[4px]! rounded-lg!"
+                                                          variant="contained"
+                                                          size="base"
+                                                        >
+                                                          Save
+                                                        </Button>
+                                                      ) : (
+                                                        <Button
+                                                          className="text-xs! cursor-not-allowed bg-gray-400! px-[15px]! py-[4px]! rounded-lg!"
+                                                          variant="contained"
+                                                          size="base"
+                                                        >
+                                                          Save
+                                                        </Button>
+                                                      )}
+                                                    </div>
+                                                  </RBACGuard>
+                                                </div>
+                                              ) : (
+                                                // EXISTING NOTE (VIEW)
+                                                <div className="bg-[#F2F2F2] rounded-sm">
+                                                  <textarea
+                                                    disabled
+                                                    className="resize-none text-gray-700 p-3 h-[100px] rounded-sm border-2 bg-white text-xs leading-5 w-full"
+                                                    value={cell.note}
+                                                  ></textarea>
+                                                  {selected !== "All" && (
+                                                    <RBACGuard
+                                                      resource={RESOURCES.GROUP_ACTIVITY}
+                                                      action="write"
+                                                    >
+                                                      <div className="flex justify-end py-1 space-x-4 text-[14px]">
+                                                        <button
+                                                          onClick={() =>
+                                                            handleDelete(index, colIdx, patient)
+                                                          }
+                                                          className="text-gray-700 mx-2 cursor-pointer font-normal"
+                                                        >
+                                                          Delete
+                                                        </button>
+                                                        <button
+                                                          onClick={() => {
+                                                            setRememberstring(cell?.note || "");
+                                                            setHoveredIndex({
+                                                              row: hoveredIndex.row,
+                                                              col: hoveredIndex.col,
+                                                              state: ""
+                                                            });
+                                                          }}
+                                                          className="text-[#7C8E30] cursor-pointer mx-2 font-semibold underline"
+                                                        >
+                                                          Edit
+                                                        </button>
+                                                      </div>
+                                                    </RBACGuard>
+                                                  )}
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <EmptyPage links="/admin/registration" hidden title="No Patient Found" />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
