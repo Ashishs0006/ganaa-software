@@ -26,6 +26,7 @@ import globalErrorHandler from './controllers/error.controller';
 import { buildWeeklyReport } from './jobs/download.weekly.report';
 import { generateDailyResourceAllocationReport } from './jobs/daily.resource.allocation.report';
 import { updatePatientAdmissionHistoryStatus } from './jobs/update.patient.admission.history.status';
+import { seedRoles } from './utils/seedRoles';
 
 // Config ENV
 const envValidationStatus = Env.validateEnv();
@@ -166,7 +167,7 @@ server.headersTimeout = 65000; // 65 seconds (must be > keepAliveTimeout)
 
 
 // 🔥 ONE-TIME FIX FUNCTION — RUN AND REMOVE 🔥
-
+seedRoles()
 
 
 server.listen(port, host, () => {
