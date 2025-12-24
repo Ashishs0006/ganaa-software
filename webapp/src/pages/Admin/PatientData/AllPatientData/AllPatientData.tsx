@@ -524,7 +524,7 @@ const AllPatientData = () => {
                               <MdKeyboardArrowRight size={15} />
                             </Link>
                           ) : (
-                            <Link
+                            auth.user.roleId.name !== "DoctorReferral" && <Link
                               to={`/admin/update-patient/${patient?._id}/${patient?.patientHistory?._id}`}
                               className="px-[5px] py-[7px] min-w-[91px] flex items-center justify-center cursor-pointer text-xs rounded-lg border border-[#DEDEDE] hover:border-[#636363]"
                             >
@@ -641,7 +641,7 @@ const AllPatientData = () => {
                                   )}
                                   {patient?.patientHistory?.currentStatus != "Discharged" && (
                                     <Link
-                                      to={`/admin/patients/all-patient/${patient?._id}/profile/${patient?.patientHistory?._id}`}
+                                      to={auth.user.roleId.name === "DoctorReferral" ? `/doctor/patients/all-patient/${patient?._id}/profile/${patient?.patientHistory?._id}` : `/admin/patients/all-patient/${patient?._id}/profile/${patient?.patientHistory?._id}`}
                                       className="text-xs cursor-pointer font-semibold p-2 "
                                     >
                                       <div className="flex items-center gap-2">

@@ -248,8 +248,8 @@ export const routes: RouteItem[] = [
           {
             path: ROUTES.DOCTOR_PORTAL,
             // element: <DoctorDetail />
-            element: <Welcome />
-            // resource: RESOURCES.DOCTOR_PORTAL
+            element: <Welcome />,
+            resource: RESOURCES.DOCTOR_PORTAL
           },
           {
             path: ROUTES.PATIENT,
@@ -272,8 +272,8 @@ export const routes: RouteItem[] = [
               },
               {
                 path: ROUTES.PATIENT_PROFILE,
-                element: <PatientProfile />
-                // resource: RESOURCES.ALL_PATIENT
+                element: <PatientProfile />,
+                resource: RESOURCES.ALL_PATIENT
               },
               {
                 resource: RESOURCES.AUDIT_LOG,
@@ -282,8 +282,8 @@ export const routes: RouteItem[] = [
               },
               {
                 path: ROUTES.DAILY_PROGRESS,
-                element: <DailyProgress />
-                // resource: RESOURCES.DAILY_PROGRESS
+                element: <DailyProgress />,
+                resource: RESOURCES.DAILY_PROGRESS
               },
               {
                 path: ROUTES.NURSE_NOTES,
@@ -315,15 +315,14 @@ export const routes: RouteItem[] = [
                 path: ROUTES.GROUP_ACTIVITY,
                 element: <GroupActivity />,
                 resource: RESOURCES.GROUP_ACTIVITY
-              },
-              
+              }
             ]
           },
-{
-                path: ROUTES.UPDATE_REGISTRATION,
-                element: <Registration key="update" />
-                // resource: RESOURCES.NEW_REGISTRATION
-              },
+          {
+            path: ROUTES.UPDATE_REGISTRATION,
+            element: <Registration key="update" />,
+            resource: RESOURCES.NEW_REGISTRATION
+          },
           {
             path: ROUTES.LEAD,
             element: <Lead />,

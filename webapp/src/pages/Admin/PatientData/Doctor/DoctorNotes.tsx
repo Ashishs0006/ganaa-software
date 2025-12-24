@@ -488,13 +488,13 @@ const DoctorNotes = () => {
           </div>
           <div className="flex  justify-between border-b border-gray-500 ">
             <Link
-              to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`}
+              to={auth.user.roleId.name === "DoctorReferral" ? `/doctor/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes` : `/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`}
               className="px-8 font-bold text-sm border-b cursor-pointer border-black py-3"
             >
               Notes
             </Link>
             <Link
-              to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/prescription`}
+              to={auth.user.roleId.name === "DoctorReferral" ? `/doctor/patients/in-patient/${id}/daily-progress/${aId}/doctor/prescription` : `/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/prescription`}
               className="px-8 text-sm py-3 cursor-pointer"
             >
               Prescription
@@ -841,7 +841,7 @@ const DoctorNotes = () => {
                   )}
                 </div>
 
-                {auth?.user.roleId.name !== "DoctorReferral" && <div
+                <div
                   className={`${
                     dropDownsState.displayAddForm ? "hidden" : "grid"
                   } pb-5 grid-cols-1 px-5 py-1 items-center`}
@@ -856,7 +856,7 @@ const DoctorNotes = () => {
                     value={data.note}
                     onChange={handleChangeQuill}
                   />
-                </div>}
+                </div>
               </div>
             </div>
           ) : (

@@ -542,14 +542,14 @@ const InpatientData = () => {
                         <div className="w-full text-nowrap whitespace-nowrap flex items-center gap-3">
                           <RBACGuard resource={RESOURCES.DAILY_PROGRESS} action="read">
                             <Link
-                              to={`/admin/patients/in-patient/${patient?._id}/daily-progress/${patient?.patientHistory?._id}`}
+                              to={auth.user.roleId.name === "DoctorReferral" ? `/doctor/patients/in-patient/${patient?._id}/daily-progress/${patient?.patientHistory?._id}` : `/admin/patients/in-patient/${patient?._id}/daily-progress/${patient?.patientHistory?._id}`}
                               className="px-[9px] py-[7px] flex items-center cursor-pointer text-xs rounded-lg border border-[#DEDEDE] hover:border-[#636363]"
                             >
                               <p>Daily Progress</p>
                               <MdKeyboardArrowRight size={15} />
                             </Link>
                           </RBACGuard>
-                          <RBACGuardArray
+                         {auth.user.roleId.name !== "DoctorReferral" && <RBACGuardArray
                             resource={[
                               { resource: `${RESOURCES.NEW_REGISTRATION}`, action: "write" },
                               { resource: `${RESOURCES.CASE_HISTORY}`, action: "read" },
@@ -718,7 +718,7 @@ const InpatientData = () => {
                                 </div>
                               )}
                             </div>
-                          </RBACGuardArray>
+                          </RBACGuardArray>}
                         </div>
                       </td>
                     </tr>

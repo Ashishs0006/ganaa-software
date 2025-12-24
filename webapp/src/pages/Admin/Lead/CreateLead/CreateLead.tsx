@@ -37,7 +37,7 @@ import {
   existPatient,
   getAllUser,
   getSingleLead,
-  updateLead,
+  updateLead
 } from "@/apis";
 
 import handleError from "@/utils/handleError";
@@ -605,19 +605,26 @@ const CreateLead = () => {
       // 1. Resolve Doctor (Find or Create)
       // ---------------------------------------------------
       if (state.referralTypeId.label === "Doctor") {
-        const { data: userData } = await getAllUser({ roles: "doctor" });
+        const normalizeEmailName = (name: string) =>
+          name
+            .toLowerCase()
+            .replace(/^dr[.\s]*/i, "")
+            .trim()
+            .replace(/\s+/g, ".");
 
-        console.log("✌️userData --->", `${state.referralDetails.toLowerCase()}@ganaa.in`);
+        const email = `${normalizeEmailName(state.referralDetails)}@ganaa.in`;
+
+        const { data: userData } = await getAllUser({ roles: "DoctorReferral" });
+
         const existingDoctor = userData.data.find(
-          (user: any) => user.email === `${state.referralDetails.toLowerCase()}@ganaa.in`
+          (user: any) => user.email === email
         );
-        console.log("✌️existingDoctor --->", existingDoctor);
 
         // Create doctor only if not exists
         if (!existingDoctor) {
           const response = await createUser({
             firstName: state.referralDetails,
-            email: `${state.referralDetails.toLowerCase()}@ganaa.in`,
+            email:email,
             roleId: "69477cd67a68a9b80fbee63a",
             centerId: ["6790ce379190a101547a3130"],
             doctor: true

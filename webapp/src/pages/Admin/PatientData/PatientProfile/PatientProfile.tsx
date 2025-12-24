@@ -24,9 +24,12 @@ import { ProfileShimmer } from "@/components/Shimmer/Shimmer";
 import { calculateBMI } from "@/utils/calculateBMI";
 import { RESOURCES } from "@/constants/resources";
 import { RBACGuard } from "@/components/RBACGuard/RBACGuard";
+import { useAuth } from "@/providers/AuthProvider";
 
 const PatientProfile = () => {
   const { id, aId } = useParams();
+
+  const { auth } = useAuth();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -485,27 +488,30 @@ const PatientProfile = () => {
                 </Link>
               </RBACGuard>
             )}
-            {(state.currentStatus === "Discharged") && (
-  <RBACGuard resource={RESOURCES.FOLLOWUP} action="read">
-    <Link
-      to={`/admin/patients/all-patient/${id}/patient-followup/${aId}`}
-    >
-      <Button
-        type="submit"
-        name="save"
-        className="min-w-[150px]! font-bold! text-xs! px-[12px]! py-[8px]! rounded-xl! border-gray-300! text-black!"
-        variant="outlined"
-        size="base"
-      >
-        Patient Follow-Up
-      </Button>
-    </Link>
-  </RBACGuard>
-)}
-
+            {state.currentStatus === "Discharged" && (
+              <RBACGuard resource={RESOURCES.FOLLOWUP} action="read">
+                <Link to={`/admin/patients/all-patient/${id}/patient-followup/${aId}`}>
+                  <Button
+                    type="submit"
+                    name="save"
+                    className="min-w-[150px]! font-bold! text-xs! px-[12px]! py-[8px]! rounded-xl! border-gray-300! text-black!"
+                    variant="outlined"
+                    size="base"
+                  >
+                    Patient Follow-Up
+                  </Button>
+                </Link>
+              </RBACGuard>
+            )}
 
             <RBACGuard resource={RESOURCES.AUDIT_LOG} action="read">
-              <Link to={`/admin/patients/all-patient/${id}/audit/${aId}`}>
+              <Link
+                to={
+                  auth.user.roleId.name === "DoctorReferral"
+                    ? `/doctor/patients/all-patient/${id}/audit/${aId}`
+                    : `/admin/patients/all-patient/${id}/audit/${aId}`
+                }
+              >
                 <Button
                   type="submit"
                   name="save"
@@ -519,210 +525,215 @@ const PatientProfile = () => {
             </RBACGuard>
           </div>
 
-          <div className="border break-all grid gap-5 mt-5 md:grid-cols-1 h-fit lg:grid-cols-4 border-[#DEDEDE] bg-[#F4F2F0]  w-full px-[18px] py-[18px] rounded-[21px]">
-            <div className="col-span-3 col-start-1 flex flex-col gap-5">
-              <div className="flex flex-col gap-[13px] h-fit  rounded-xl bg-white p-5">
-                <h1 className="text-[15px] font-bold">Patient Details</h1>
-                <h2 className="text-[13px] font-bold">Basic Details</h2>
-                <h2 className="text-[10px] font-medium uppercase">Patient Details</h2>
-                <div className="grid grid-cols-1 gap-x-10 gap-y-5 text-wrap sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Date of Birth</p>
-                    <p className="font-semibold text-[13px]">
-                      {(state.dateOfBirth && formatDate(state.dateOfBirth)) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Age</p>
-                    <p className="font-semibold text-[13px]">{state.age}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs  font-medium">Email</p>
-                    <p title={state.email} className="font-semibold text-[13px] w-[80%] truncate">
-                      {state.email || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Mobile No.</p>
-                    <p className="font-semibold text-[13px]">{state.mobileNo}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Alternate Mobile No.</p>
-                    <p className="font-semibold text-[13px]">{state.alternateMobileNo || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Gender</p>
-                    <p className="font-semibold text-[13px]">{state.gender}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Identification mark</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.identificationMark) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Country</p>
-                    <p className="font-semibold text-[13px]">{state.country || "--"}</p>
-                  </div>
-                  <div className="text-wrap col-span-1">
-                    <p className="text-gray-500 text-xs font-medium">Address</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.address) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Area</p>
-                    <p className="font-semibold text-[13px]">{state.area || "--"}</p>
-                  </div>
-                </div>
-
-                <h2 className="text-[10px] mt-8 font-medium uppercase">Referral</h2>
-                <div className="grid sm:grid-cols-2 grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500 text-xs">Referral Type</p>
-                    <p className="font-semibold text-[13px]">{state.refferalType || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs">Referred Details</p>
-                    <p className="font-semibold text-[13px]">
-                      {state.referralDetails ? capitalizeFirstLetter(state.referralDetails) : "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs">Admission Type</p>
-                    <p className="font-semibold text-[13px]">
-                      {state.involuntary
-                        ? `${state.involuntary}${
-                            state.involuntary !== "Voluntary"
-                              ? ` - ${state?.involuntaryAdmissionType}`
-                              : ""
-                          }`
-                        : "--"}
-                    </p>
-                  </div>
-                </div>
-                <hr className=" border-1 my-5" />
-                <h2 className="text-[13px] font-bold">Profile & Contacts</h2>
-                <h2 className="text-[10px] font-medium uppercase">EDUCATION & PERSONAL DETAILS</h2>
-                <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Education</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state?.education) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Family Income</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.familyIncome)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs  font-medium">Religion</p>
-                    <p className="font-semibold text-[13px] w-[80%] truncate">
-                      {capitalizeFirstLetter(state.religion) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Language</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.language) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Married</p>
-                    <p className="font-semibold text-[13px]">{state.married || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Number of children</p>
-                    <p className="font-semibold text-[13px]">{state.numberOfChildren || "--"}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Occupation</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.occupation) || "--"}
-                    </p>
-                  </div>
-                </div>
-
-                {familyDetails.length > 0 && (
-                  <h2 className="text-[10px] mt-8 font-medium uppercase">Family Details</h2>
-                )}
-                {familyDetails?.map((data: IFamilyDetails, index: number) => (
-                  <div
-                    key={data?._id}
-                    className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4"
-                  >
+          {auth.user.roleId.name !== "DoctorReferral" && (
+            <div className="border break-all grid gap-5 mt-5 md:grid-cols-1 h-fit lg:grid-cols-4 border-[#DEDEDE] bg-[#F4F2F0]  w-full px-[18px] py-[18px] rounded-[21px]">
+              <div className="col-span-3 col-start-1 flex flex-col gap-5">
+                <div className="flex flex-col gap-[13px] h-fit  rounded-xl bg-white p-5">
+                  <h1 className="text-[15px] font-bold">Patient Details</h1>
+                  <h2 className="text-[13px] font-bold">Basic Details</h2>
+                  <h2 className="text-[10px] font-medium uppercase">Patient Details</h2>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-5 text-wrap sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
                     <div>
-                      <p className="text-gray-500 text-xs font-medium">Type</p>
+                      <p className="text-gray-500 text-xs font-medium">Date of Birth</p>
                       <p className="font-semibold text-[13px]">
-                        {data?.infoType.join(",") || "--"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-xs font-medium">Name</p>
-                      <p className="font-semibold text-[13px]">
-                        {data?.relationshipId?.shortName && data?.name
-                          ? `${data?.relationshipId?.shortName} ${capitalizeFirstLetter(
-                              data?.name
-                            )}`
-                          : "--"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-xs  font-medium">Mobile no.</p>
-                      <p className="font-semibold text-[13px] w-[80%] truncate">
-                        {data?.phoneNumberCountryCode && data?.phoneNumber
-                          ? `${data?.phoneNumberCountryCode} ${data?.phoneNumber}`
-                          : "--"}
+                        {(state.dateOfBirth && formatDate(state.dateOfBirth)) || "--"}
                       </p>
                     </div>
                     <div>
                       <p className="text-gray-500 text-xs font-medium">Age</p>
-                      <p className="font-semibold text-[13px]">{data?.age || "--"}</p>
+                      <p className="font-semibold text-[13px]">{state.age}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs font-medium">Address</p>
-                      <p className="font-semibold text-[13px]">
-                        {capitalizeFirstLetter(data?.address)}
+                      <p className="text-gray-500 text-xs  font-medium">Email</p>
+                      <p title={state.email} className="font-semibold text-[13px] w-[80%] truncate">
+                        {state.email || "--"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs font-medium">ID Proof</p>
-                      <p className="font-semibold text-[13px]">{data?.idProffType}</p>
+                      <p className="text-gray-500 text-xs font-medium">Mobile No.</p>
+                      <p className="font-semibold text-[13px]">{state.mobileNo}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Alternate Mobile No.</p>
+                      <p className="font-semibold text-[13px]">{state.alternateMobileNo || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Gender</p>
+                      <p className="font-semibold text-[13px]">{state.gender}</p>
                     </div>
 
                     <div>
-                      <p className="text-gray-500 text-xs font-medium">ID Number</p>
-                      <p className="font-semibold text-[13px]">{data?.idProffNumber}</p>
+                      <p className="text-gray-500 text-xs font-medium">Identification mark</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.identificationMark) || "--"}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs font-medium">ID Proof</p>
-                      {data?.idProofUrl ? (
-                        <View
-                          data={[
-                            {
-                              fileUrl: data?.idProofUrl,
-                              filePath: "",
-                              fileName: `${data?.idProffType || "id"}-${data?.name || "name"}`
-                            }
-                          ]}
-                        />
-                      ) : (
-                        <p className="font-semibold text-[13px]">--</p>
-                      )}
+                      <p className="text-gray-500 text-xs font-medium">Country</p>
+                      <p className="font-semibold text-[13px]">{state.country || "--"}</p>
                     </div>
-                    {familyDetails.length - 1 !== index && <hr className="col-span-4" />}
+                    <div className="text-wrap col-span-1">
+                      <p className="text-gray-500 text-xs font-medium">Address</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.address) || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Area</p>
+                      <p className="font-semibold text-[13px]">{state.area || "--"}</p>
+                    </div>
                   </div>
-                ))}
 
-                <hr className=" border-1 my-5" />
-                <h2 className="text-[13px] font-bold">Admission Checklist</h2>
-                <h2 className="text-[10px] font-medium uppercase">Checklist</h2>
-                <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-                  {/* <div>
+                  <h2 className="text-[10px] mt-8 font-medium uppercase">Referral</h2>
+                  <div className="grid sm:grid-cols-2 grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="text-gray-500 text-xs">Referral Type</p>
+                      <p className="font-semibold text-[13px]">{state.refferalType || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">Referred Details</p>
+                      <p className="font-semibold text-[13px]">
+                        {state.referralDetails
+                          ? capitalizeFirstLetter(state.referralDetails)
+                          : "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">Admission Type</p>
+                      <p className="font-semibold text-[13px]">
+                        {state.involuntary
+                          ? `${state.involuntary}${
+                              state.involuntary !== "Voluntary"
+                                ? ` - ${state?.involuntaryAdmissionType}`
+                                : ""
+                            }`
+                          : "--"}
+                      </p>
+                    </div>
+                  </div>
+                  <hr className=" border-1 my-5" />
+                  <h2 className="text-[13px] font-bold">Profile & Contacts</h2>
+                  <h2 className="text-[10px] font-medium uppercase">
+                    EDUCATION & PERSONAL DETAILS
+                  </h2>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Education</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state?.education) || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Family Income</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.familyIncome)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs  font-medium">Religion</p>
+                      <p className="font-semibold text-[13px] w-[80%] truncate">
+                        {capitalizeFirstLetter(state.religion) || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Language</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.language) || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Married</p>
+                      <p className="font-semibold text-[13px]">{state.married || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Number of children</p>
+                      <p className="font-semibold text-[13px]">{state.numberOfChildren || "--"}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Occupation</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.occupation) || "--"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {familyDetails.length > 0 && (
+                    <h2 className="text-[10px] mt-8 font-medium uppercase">Family Details</h2>
+                  )}
+                  {familyDetails?.map((data: IFamilyDetails, index: number) => (
+                    <div
+                      key={data?._id}
+                      className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4"
+                    >
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">Type</p>
+                        <p className="font-semibold text-[13px]">
+                          {data?.infoType.join(",") || "--"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">Name</p>
+                        <p className="font-semibold text-[13px]">
+                          {data?.relationshipId?.shortName && data?.name
+                            ? `${data?.relationshipId?.shortName} ${capitalizeFirstLetter(
+                                data?.name
+                              )}`
+                            : "--"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs  font-medium">Mobile no.</p>
+                        <p className="font-semibold text-[13px] w-[80%] truncate">
+                          {data?.phoneNumberCountryCode && data?.phoneNumber
+                            ? `${data?.phoneNumberCountryCode} ${data?.phoneNumber}`
+                            : "--"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">Age</p>
+                        <p className="font-semibold text-[13px]">{data?.age || "--"}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">Address</p>
+                        <p className="font-semibold text-[13px]">
+                          {capitalizeFirstLetter(data?.address)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">ID Proof</p>
+                        <p className="font-semibold text-[13px]">{data?.idProffType}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">ID Number</p>
+                        <p className="font-semibold text-[13px]">{data?.idProffNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-medium">ID Proof</p>
+                        {data?.idProofUrl ? (
+                          <View
+                            data={[
+                              {
+                                fileUrl: data?.idProofUrl,
+                                filePath: "",
+                                fileName: `${data?.idProffType || "id"}-${data?.name || "name"}`
+                              }
+                            ]}
+                          />
+                        ) : (
+                          <p className="font-semibold text-[13px]">--</p>
+                        )}
+                      </div>
+                      {familyDetails.length - 1 !== index && <hr className="col-span-4" />}
+                    </div>
+                  ))}
+
+                  <hr className=" border-1 my-5" />
+                  <h2 className="text-[13px] font-bold">Admission Checklist</h2>
+                  <h2 className="text-[10px] font-medium uppercase">Checklist</h2>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                    {/* <div>
                     <p className="text-gray-500 text-xs font-medium">Continuous admission form</p>
                     {(state?.applicationForAdmission ?? [])?.length <= 0 ? (
                       <p className="font-semibold text-[13px]">--</p>
@@ -730,31 +741,33 @@ const PatientProfile = () => {
                       <View data={state?.applicationForAdmission} />
                     )}
                   </div> */}
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Voluntry admission form</p>
-                    {(state?.voluntaryAdmissionForm ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.voluntaryAdmissionForm} />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs  font-medium">Involuntary admission form</p>
-                    {(state?.inVoluntaryAdmissionForm ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.inVoluntaryAdmissionForm} />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Minor admission form</p>
-                    {(state?.minorAdmissionForm ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.minorAdmissionForm} />
-                    )}
-                  </div>
-                  {/* <div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Voluntry admission form</p>
+                      {(state?.voluntaryAdmissionForm ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.voluntaryAdmissionForm} />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs  font-medium">
+                        Involuntary admission form
+                      </p>
+                      {(state?.inVoluntaryAdmissionForm ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.inVoluntaryAdmissionForm} />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Minor admission form</p>
+                      {(state?.minorAdmissionForm ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.minorAdmissionForm} />
+                      )}
+                    </div>
+                    {/* <div>
                     <p className="text-gray-500 text-xs font-medium">Form 90</p>
                     {(state?.form90 ?? [])?.length <= 0 ? (
                       <p className="font-semibold text-[13px]">--</p>
@@ -762,35 +775,35 @@ const PatientProfile = () => {
                       <View data={state?.form90} />
                     )}
                   </div> */}
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Family declaration</p>
-                    {(state?.familyDeclaration ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.familyDeclaration} />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Section 94</p>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Family declaration</p>
+                      {(state?.familyDeclaration ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.familyDeclaration} />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Section 94</p>
 
-                    {(state?.section94 ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.section94} />
-                    )}
-                  </div>
+                      {(state?.section94 ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.section94} />
+                      )}
+                    </div>
 
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Capacity assessment</p>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Capacity assessment</p>
 
-                    {(state?.capacityAssessment ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.capacityAssessment} />
-                    )}
-                  </div>
-                  {/* TODO: this will comment in sprint-5 */}
-                  {/* <div>
+                      {(state?.capacityAssessment ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.capacityAssessment} />
+                      )}
+                    </div>
+                    {/* TODO: this will comment in sprint-5 */}
+                    {/* <div>
                     <p className="text-gray-500 text-xs font-medium">Hospital guidelines form</p>
                     {(state?.hospitalGuidelineForm ?? [])?.length <= 0 ? (
                       <p className="font-semibold text-[13px]">--</p>
@@ -798,320 +811,328 @@ const PatientProfile = () => {
                       <View data={state?.hospitalGuidelineForm} />
                     )}
                   </div> */}
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Financial counselling</p>
-                    {(state?.finacialCounselling ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.finacialCounselling} />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Orientation of family Done</p>
-                    <p className="font-semibold text-[13px]">{state.orientationOfFamily}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Orientation of patient Done</p>
-                    <p className="font-semibold text-[13px]">{state.orientationOfPatient}</p>
-                  </div>
-                </div>
-                <h2 className="text-[10px] mt-8 font-medium uppercase">Insurance</h2>
-                <div className="grid sm:grid-cols-2 grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Insured</p>
-                    <p className="font-semibold text-[13px]">{state.isInsured || "--"} </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Insured Details</p>
-                    <p className="font-semibold text-[13px]">
-                      {state.isInsured === "Yes"
-                        ? capitalizeFirstLetter(state.insuredDetail)
-                        : "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Insured File</p>
-                    {state.insuredFile.length <= 0 || state.isInsured !== "Yes" ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state.insuredFile} />
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-xl w-full col-start-1 col-span-3 flex flex-col gap-[13px] p-5 bg-white">
-                <h1 className="text-[15px] font-bold">Medical Summary</h1>
-                <h2 className="text-[10px] font-medium uppercase">Patient Assessment</h2>
-                <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-                  {state?.patientReport?.injuriesDetails?.map(
-                    (data: IinjuriesDetails, index: number) => (
-                      <div className="grid grid-cols-2 gap-x-10 gap-y-5 w-full col-span-2">
-                        <div>
-                          <p className="text-gray-500 text-xs font-medium">
-                            Injury Details {index + 1}
-                          </p>
-                          <p className="font-semibold text-[13px]">
-                            {capitalizeFirstLetter(data?.injuryName)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-500 text-xs font-medium">Files</p>
-                          {(data?.fileUrls ?? []).length <= 0 ? (
-                            <p className="font-semibold text-[13px]">--</p>
-                          ) : (
-                            <View data={data?.fileUrls} />
-                          )}
-                        </div>
-                      </div>
-                    )
-                  )}
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Allergies</p>
-                    <p className="font-semibold text-[13px] break-words whitespace-normal">
-                      {state?.patientReport?.allergiesNames
-                        ?.map((data: { name: string }) => data.name)
-                        .join(", ") || "--"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Files</p>
-                    {(state?.patientReport?.allergiesFiles ?? []).length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.patientReport?.allergiesFiles} />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Diabetes Status</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.patientReport?.diabeticStatus || "--"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Hypertension</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.patientReport?.hyperTension || "--"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Heart Disease</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.patientReport?.heartDisease || "--"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Heart Disease Detail</p>
-                    <p
-                      className={`font-semibold ${
-                        isExpanded.heartDiseaseDetail ? "" : ""
-                      } text-[13px] h-auto max-h-40`}
-                    >
-                      {isExpanded.heartDiseaseDetail
-                        ? capitalizeFirstLetter(state?.patientReport?.heartDiseaseDescription) ||
-                          "--"
-                        : (
-                            capitalizeFirstLetter(state?.patientReport?.heartDiseaseDescription) ||
-                            "--"
-                          ).slice(0, MAX_LENGTH) +
-                          ((
-                            capitalizeFirstLetter(state?.patientReport?.heartDiseaseDescription) ??
-                            ""
-                          ).length > MAX_LENGTH
-                            ? "..."
-                            : "")}
-                    </p>
-
-                    {(state?.patientReport?.heartDiseaseDescription ?? "").length > MAX_LENGTH && (
-                      <button
-                        className="text-blue-500 text-xs mt-1 cursor-pointer font-medium"
-                        onClick={() => toggleExpand("heartDiseaseDetail")}
-                      >
-                        {isExpanded.heartDiseaseDetail ? "Show Less" : "Show More"}
-                      </button>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Level of Risk</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.patientReport?.levelOfRisk || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Risk Details</p>
-                    <p
-                      className={`font-semibold ${
-                        isExpanded.riskDetails ? "overflow-y-scroll" : ""
-                      } text-[13px] h-auto max-h-40`}
-                    >
-                      {capitalizeFirstLetter(
-                        isExpanded.riskDetails
-                          ? state?.patientReport?.levelOfRiskDescription || "--"
-                          : (state?.patientReport?.levelOfRiskDescription || "--").slice(
-                              0,
-                              MAX_LENGTH
-                            ) +
-                              ((state?.patientReport?.levelOfRiskDescription ?? "").length >
-                              MAX_LENGTH
-                                ? "..."
-                                : "")
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Financial counselling</p>
+                      {(state?.finacialCounselling ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.finacialCounselling} />
                       )}
-                    </p>
+                    </div>
 
-                    {(state?.patientReport?.levelOfRiskDescription ?? "").length > MAX_LENGTH && (
-                      <button
-                        className="text-blue-500 text-xs mt-1 cursor-pointer font-medium"
-                        onClick={() => toggleExpand("riskDetails")}
-                      >
-                        {isExpanded.riskDetails ? "Show Less" : "Show More"}
-                      </button>
-                    )}
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">
+                        Orientation of family Done
+                      </p>
+                      <p className="font-semibold text-[13px]">{state.orientationOfFamily}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">
+                        Orientation of patient Done
+                      </p>
+                      <p className="font-semibold text-[13px]">{state.orientationOfPatient}</p>
+                    </div>
                   </div>
+                  <h2 className="text-[10px] mt-8 font-medium uppercase">Insurance</h2>
+                  <div className="grid sm:grid-cols-2 grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Insured</p>
+                      <p className="font-semibold text-[13px]">{state.isInsured || "--"} </p>
+                    </div>
 
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Illness Type</p>
-                    <p className="font-semibold text-[13px]">{state.illnessType || "--"}</p>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Insured Details</p>
+                      <p className="font-semibold text-[13px]">
+                        {state.isInsured === "Yes"
+                          ? capitalizeFirstLetter(state.insuredDetail)
+                          : "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Insured File</p>
+                      {state.insuredFile.length <= 0 || state.isInsured !== "Yes" ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state.insuredFile} />
+                      )}
+                    </div>
                   </div>
                 </div>
+                <div className="rounded-xl w-full col-start-1 col-span-3 flex flex-col gap-[13px] p-5 bg-white">
+                  <h1 className="text-[15px] font-bold">Medical Summary</h1>
+                  <h2 className="text-[10px] font-medium uppercase">Patient Assessment</h2>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                    {state?.patientReport?.injuriesDetails?.map(
+                      (data: IinjuriesDetails, index: number) => (
+                        <div className="grid grid-cols-2 gap-x-10 gap-y-5 w-full col-span-2">
+                          <div>
+                            <p className="text-gray-500 text-xs font-medium">
+                              Injury Details {index + 1}
+                            </p>
+                            <p className="font-semibold text-[13px]">
+                              {capitalizeFirstLetter(data?.injuryName)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs font-medium">Files</p>
+                            {(data?.fileUrls ?? []).length <= 0 ? (
+                              <p className="font-semibold text-[13px]">--</p>
+                            ) : (
+                              <View data={data?.fileUrls} />
+                            )}
+                          </div>
+                        </div>
+                      )
+                    )}
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Allergies</p>
+                      <p className="font-semibold text-[13px] break-words whitespace-normal">
+                        {state?.patientReport?.allergiesNames
+                          ?.map((data: { name: string }) => data.name)
+                          .join(", ") || "--"}
+                      </p>
+                    </div>
 
-                <h2 className="text-[10px] font-medium uppercase">Vitals</h2>
-                <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">B.P (mm Hg)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.bp || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Pulse (bpm)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.pulse || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Temperature (°F)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.temperature || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">SP02 (%)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.spo2 || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Weight (kg)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.weight || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">R.B.S (mg/dl)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.rbs || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Height (cm)</p>
-                    <p className="font-semibold text-[13px]">{nurseData.height || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">BMI</p>
-                    <p className="font-semibold text-[13px]">
-                      {calculateBMI(nurseData.weight, nurseData.height) || "--"}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-gray-500 text-xs font-medium">Notes</p>
-                    <p
-                      className={`font-semibold ${
-                        isExpanded.notes ? "overflow-y-scroll" : ""
-                      } text-[13px] h-auto max-h-40`}
-                      dangerouslySetInnerHTML={{
-                        __html: isExpanded.notes
-                          ? nurseData?.note || "--"
-                          : (nurseData?.note || "--").slice(0, MAX_LENGTH) +
-                            (nurseData?.note.length > MAX_LENGTH ? "..." : "")
-                      }}
-                    ></p>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Files</p>
+                      {(state?.patientReport?.allergiesFiles ?? []).length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.patientReport?.allergiesFiles} />
+                      )}
+                    </div>
 
-                    {nurseData?.note.length > MAX_LENGTH && (
-                      <button
-                        className="text-blue-500 cursor-pointer text-xs mt-1 font-medium"
-                        onClick={() => {
-                          toggleExpand("notes");
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Diabetes Status</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.patientReport?.diabeticStatus || "--"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Hypertension</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.patientReport?.hyperTension || "--"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Heart Disease</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.patientReport?.heartDisease || "--"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Heart Disease Detail</p>
+                      <p
+                        className={`font-semibold ${
+                          isExpanded.heartDiseaseDetail ? "" : ""
+                        } text-[13px] h-auto max-h-40`}
+                      >
+                        {isExpanded.heartDiseaseDetail
+                          ? capitalizeFirstLetter(state?.patientReport?.heartDiseaseDescription) ||
+                            "--"
+                          : (
+                              capitalizeFirstLetter(
+                                state?.patientReport?.heartDiseaseDescription
+                              ) || "--"
+                            ).slice(0, MAX_LENGTH) +
+                            ((
+                              capitalizeFirstLetter(
+                                state?.patientReport?.heartDiseaseDescription
+                              ) ?? ""
+                            ).length > MAX_LENGTH
+                              ? "..."
+                              : "")}
+                      </p>
+
+                      {(state?.patientReport?.heartDiseaseDescription ?? "").length >
+                        MAX_LENGTH && (
+                        <button
+                          className="text-blue-500 text-xs mt-1 cursor-pointer font-medium"
+                          onClick={() => toggleExpand("heartDiseaseDetail")}
+                        >
+                          {isExpanded.heartDiseaseDetail ? "Show Less" : "Show More"}
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Level of Risk</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.patientReport?.levelOfRisk || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Risk Details</p>
+                      <p
+                        className={`font-semibold ${
+                          isExpanded.riskDetails ? "overflow-y-scroll" : ""
+                        } text-[13px] h-auto max-h-40`}
+                      >
+                        {capitalizeFirstLetter(
+                          isExpanded.riskDetails
+                            ? state?.patientReport?.levelOfRiskDescription || "--"
+                            : (state?.patientReport?.levelOfRiskDescription || "--").slice(
+                                0,
+                                MAX_LENGTH
+                              ) +
+                                ((state?.patientReport?.levelOfRiskDescription ?? "").length >
+                                MAX_LENGTH
+                                  ? "..."
+                                  : "")
+                        )}
+                      </p>
+
+                      {(state?.patientReport?.levelOfRiskDescription ?? "").length > MAX_LENGTH && (
+                        <button
+                          className="text-blue-500 text-xs mt-1 cursor-pointer font-medium"
+                          onClick={() => toggleExpand("riskDetails")}
+                        >
+                          {isExpanded.riskDetails ? "Show Less" : "Show More"}
+                        </button>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Illness Type</p>
+                      <p className="font-semibold text-[13px]">{state.illnessType || "--"}</p>
+                    </div>
+                  </div>
+
+                  <h2 className="text-[10px] font-medium uppercase">Vitals</h2>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">B.P (mm Hg)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.bp || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Pulse (bpm)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.pulse || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Temperature (°F)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.temperature || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">SP02 (%)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.spo2 || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Weight (kg)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.weight || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">R.B.S (mg/dl)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.rbs || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Height (cm)</p>
+                      <p className="font-semibold text-[13px]">{nurseData.height || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">BMI</p>
+                      <p className="font-semibold text-[13px]">
+                        {calculateBMI(nurseData.weight, nurseData.height) || "--"}
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-gray-500 text-xs font-medium">Notes</p>
+                      <p
+                        className={`font-semibold ${
+                          isExpanded.notes ? "overflow-y-scroll" : ""
+                        } text-[13px] h-auto max-h-40`}
+                        dangerouslySetInnerHTML={{
+                          __html: isExpanded.notes
+                            ? nurseData?.note || "--"
+                            : (nurseData?.note || "--").slice(0, MAX_LENGTH) +
+                              (nurseData?.note.length > MAX_LENGTH ? "..." : "")
                         }}
-                      >
-                        {isExpanded.notes ? "Show Less" : "Show More"}
-                      </button>
-                    )}
+                      ></p>
+
+                      {nurseData?.note.length > MAX_LENGTH && (
+                        <button
+                          className="text-blue-500 cursor-pointer text-xs mt-1 font-medium"
+                          onClick={() => {
+                            toggleExpand("notes");
+                          }}
+                        >
+                          {isExpanded.notes ? "Show Less" : "Show More"}
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs text-nowrap whitespace-nowrap font-medium">
+                        Previous Treatment Record (Including Lab Test)
+                      </p>
+                      {(state?.patientReport?.previousTreatmentRecord ?? [])?.length <= 0 ? (
+                        <p className="font-semibold text-[13px]">--</p>
+                      ) : (
+                        <View data={state?.patientReport?.previousTreatmentRecord} />
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-500 text-xs text-nowrap whitespace-nowrap font-medium">
-                      Previous Treatment Record (Including Lab Test)
-                    </p>
-                    {(state?.patientReport?.previousTreatmentRecord ?? [])?.length <= 0 ? (
-                      <p className="font-semibold text-[13px]">--</p>
-                    ) : (
-                      <View data={state?.patientReport?.previousTreatmentRecord} />
-                    )}
+                </div>
+              </div>
+
+              <div className="md:col-span-3 lg:col-span-1  sm:col-span-3 sm:col-start-1 h-fit col-start-3 grid lg:grid-cols-1 sm:grid-cols-1 gap-5">
+                <div className="h-fit rounded-xl bg-white p-5 flex flex-col  items-start">
+                  <p className="text-[15px] font-bold mb-5">Resource Allocation</p>
+                  <p className="text-[13px] font-bold mb-5 uppercase">Assigned Resources</p>
+
+                  <div className="grid sm:grid-cols-2 grid-cols-1 w-full gap-5 md:grid-cols-2 lg:grid-cols-2">
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Center</p>
+                      <p className="font-semibold text-[13px]">{state.center || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Room Type</p>
+                      <p className="font-semibold text-[13px] ">{state.roomType || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Room No.</p>
+                      <p className="font-semibold text-[13px]">{state?.room || "--"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Locker No</p>
+                      <p className="font-semibold text-[13px]">{state?.lockerNo || "--"}</p>
+                    </div>
+
+                    <div className="col-span-2">
+                      <p className="text-gray-500 text-xs font-medium">Belongings in Locker</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state?.belongingsInLocker) || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Doctor</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.assignedDoctor.trim() || "--"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs font-medium">Therapist</p>
+                      <p className="font-semibold text-[13px]">
+                        {state?.assignedTherapist.trim() || "--"}
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-gray-500 text-xs font-medium">Nurse</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state.nurse) || "--"}
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-gray-500 text-xs font-medium">Care Staff</p>
+                      <p className="font-semibold text-[13px]">
+                        {capitalizeFirstLetter(state?.careStaff?.trim()) || "--"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="md:col-span-3 lg:col-span-1  sm:col-span-3 sm:col-start-1 h-fit col-start-3 grid lg:grid-cols-1 sm:grid-cols-1 gap-5">
-              <div className="h-fit rounded-xl bg-white p-5 flex flex-col  items-start">
-                <p className="text-[15px] font-bold mb-5">Resource Allocation</p>
-                <p className="text-[13px] font-bold mb-5 uppercase">Assigned Resources</p>
-
-                <div className="grid sm:grid-cols-2 grid-cols-1 w-full gap-5 md:grid-cols-2 lg:grid-cols-2">
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Center</p>
-                    <p className="font-semibold text-[13px]">{state.center || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Room Type</p>
-                    <p className="font-semibold text-[13px] ">{state.roomType || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Room No.</p>
-                    <p className="font-semibold text-[13px]">{state?.room || "--"}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Locker No</p>
-                    <p className="font-semibold text-[13px]">{state?.lockerNo || "--"}</p>
-                  </div>
-
-                  <div className="col-span-2">
-                    <p className="text-gray-500 text-xs font-medium">Belongings in Locker</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state?.belongingsInLocker) || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Doctor</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.assignedDoctor.trim() || "--"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium">Therapist</p>
-                    <p className="font-semibold text-[13px]">
-                      {state?.assignedTherapist.trim() || "--"}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-gray-500 text-xs font-medium">Nurse</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state.nurse) || "--"}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-gray-500 text-xs font-medium">Care Staff</p>
-                    <p className="font-semibold text-[13px]">
-                      {capitalizeFirstLetter(state?.careStaff?.trim()) || "--"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>

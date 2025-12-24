@@ -35,11 +35,14 @@ import { RBACGuard } from "@/components/RBACGuard/RBACGuard";
 import { RESOURCES } from "@/constants/resources";
 import { BsFiletypePdf } from "react-icons/bs";
 import DowloadDailyProgress from "./DowloadDailyProgress/DowloadDailyProgress";
+import { useAuth } from "@/providers/AuthProvider";
 // import { ShimmerPostDetails } from "react-shimmer-effects";
 
 const DailyProgress = () => {
   const { id, aId } = useParams();
   const dispatch = useDispatch();
+
+  const { auth } = useAuth();
 
   const [searchParams, _setSearchParams] = useSearchParams();
 
@@ -252,27 +255,40 @@ const DailyProgress = () => {
                   <div className="relative w-[42px] h-[22px] ring-1 ring-[#9E9E9E]   peer-checked:after:bg-[#7C8E30]  rounded-full  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:start-[1px] after:bg-[#656565] peer-checked:ring-[#D6DCB9]! peer-checked:bg-[#F9FFD9]! after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                 </label>
               </RBACGuard>
-
               <Link
-                to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`}
+                to={
+                  auth.user.roleId.name === "DoctorReferral"
+                    ? `/doctor/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`
+                    : `/admin/patients/in-patient/${id}/daily-progress/${aId}/doctor/notes`
+                }
                 className=" font-semibold px-3! py-2! text-nowrap whitespace-nowrap  text-[#575F4A] items-center flex   bg-[#F0F5DB]  rounded-[9px]!  border border-[#575F4A]"
               >
-                Doctor Notes  
+                Doctor Notes
               </Link>
               <Link
-                to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/therapist`}
+                to={
+                  auth.user.roleId.name === "DoctorReferral"
+                    ? `/doctor/patients/in-patient/${id}/daily-progress/${aId}/therapist`
+                    : `/admin/patients/in-patient/${id}/daily-progress/${aId}/therapist`
+                }
                 className=" font-semibold px-3! text-nowrap whitespace-nowrap py-2! items-center flex  bg-[#F0F5DB] text-[#575F4A] rounded-[9px]!  border border-[#575F4A]"
               >
                 Therapist Notes
               </Link>
+              <RBACGuard resource={RESOURCES.NURSE_NOTES} action="write">
+                <Link
+                  to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/nurse`}
+                  className=" font-semibold px-3! py-2! text-nowrap whitespace-nowrap items-center flex  bg-[#F0F5DB] text-[#575F4A] rounded-[9px]!  border border-[#575F4A]"
+                >
+                  RMO / Nurse Notes
+                </Link>
+              </RBACGuard>
               <Link
-                to={`/admin/patients/in-patient/${id}/daily-progress/${aId}/nurse`}
-                className=" font-semibold px-3! py-2! text-nowrap whitespace-nowrap items-center flex  bg-[#F0F5DB] text-[#575F4A] rounded-[9px]!  border border-[#575F4A]"
-              >
-                RMO / Nurse Notes
-              </Link>
-              <Link
-                to={`/admin/patients/in-patient/group-activity`}
+                to={
+                  auth.user.roleId.name === "DoctorReferral"
+                    ? `/doctor/patients/in-patient/group-activity`
+                    : `/admin/patients/in-patient/group-activity`
+                }
                 className=" font-semibold px-3! py-2! text-nowrap whitespace-nowrap  text-[#575F4A] items-center flex   bg-[#F0F5DB]  rounded-[9px]!  border border-[#575F4A]"
               >
                 Group Activity
@@ -636,37 +652,31 @@ const DailyProgress = () => {
                     </div>
                   )}
                 </div>
-               <div className="text-xs text-gray-600">
-  {/* <span>Admission Date:</span>
+                <div className="text-xs text-gray-600">
+                  {/* <span>Admission Date:</span>
   <span className="font-medium ml-1 text-black">
     {state?.admissionDate && formatDate(state?.admissionDate)}
   </span> */}
 
-  {/* UHID Row */}
-  <p className="text-xs text-gray-600 mt-1">
-    UHID:
-    <span className="font-medium ml-1 text-nowrap whitespace-nowrap text-black">
-      {formatId(state?.UHID)}
-    </span>
-  </p>
+                  {/* UHID Row */}
+                  <p className="text-xs text-gray-600 mt-1">
+                    UHID:
+                    <span className="font-medium ml-1 text-nowrap whitespace-nowrap text-black">
+                      {formatId(state?.UHID)}
+                    </span>
+                  </p>
 
-
-<p className="text-xs text-gray-600 mt-0.5">
-  AGE:{" "}
-  <span className="font-semibold text-black">
-    {state?.age ? `${state.age} yrs` : "--"}
-  </span>{" "}
-  | DOA:{" "}
-  <span className="font-semibold text-black">
-    {state?.admissionDate
-      ? formatDate(state?.admissionDate)
-      : "--/--/----"}
-  </span>
-
-
-  </p>
-</div>
-
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    AGE:{" "}
+                    <span className="font-semibold text-black">
+                      {state?.age ? `${state.age} yrs` : "--"}
+                    </span>{" "}
+                    | DOA:{" "}
+                    <span className="font-semibold text-black">
+                      {state?.admissionDate ? formatDate(state?.admissionDate) : "--/--/----"}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
             <h1 className="mb-6 text-xs font-bold">Assigned Resources</h1>
