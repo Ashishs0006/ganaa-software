@@ -39,6 +39,11 @@ const leadSchema = new mongoose.Schema<ILead>({
     type: String,
     trim: true,
   },
+    referredDoctorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
 
   firstName: {
     type: String,

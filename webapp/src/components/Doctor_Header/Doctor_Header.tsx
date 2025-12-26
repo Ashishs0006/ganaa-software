@@ -146,7 +146,7 @@ const Doctor_Header = () => {
               </p>
               <div className="hidden group-hover:flex absolute left-0  top-10   bg-transparent pt-4">
                 <div className="p-2  gap-2 flex-col shadow flex justify-center bg-white  rounded-lg w-40">
-                  <NavLink
+                  {/* <NavLink
                     className={() =>
                       classNames(
                         "text-xs font-semibold cursor-pointer p-2 text-nowrap whitespace-nowrap hover:font-bold"
@@ -155,7 +155,7 @@ const Doctor_Header = () => {
                     to="/doctor/lead/create-lead"
                   >
                     Create Lead
-                  </NavLink>
+                  </NavLink> */}
                   <hr />
                   <NavLink
                     className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"

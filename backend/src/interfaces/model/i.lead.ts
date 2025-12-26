@@ -23,7 +23,7 @@ export interface ILead extends mongoose.Document {
   progressStatus?: IProgressStatus;
   referralTypeId?: ObjectId | IReferredType;
   referralDetails?: string;
-
+referredDoctorId?: ObjectId | IUser;
   firstName: string;
   lastName?: string;
   dob?: Date;

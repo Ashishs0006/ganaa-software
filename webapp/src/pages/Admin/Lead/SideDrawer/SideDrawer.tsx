@@ -18,6 +18,7 @@ import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setDisQualifiedLead, setQualifiedLead } from "@/redux/slice/LeadSlice";
 import { RootState } from "@/redux/store/store";
+import { useAuth } from "@/providers/AuthProvider";
 
 const SideBar = ({
   toggleSidebar,
@@ -36,6 +37,8 @@ const SideBar = ({
     label: SingleleadData?.progressStatus || "",
     value: SingleleadData?.progressStatus || ""
   });
+
+  const { auth } = useAuth();
 
   const [comments, setComments] = useState<IComments[]>(SingleleadData?.comments || []);
   const [comment, setComment] = useState<string>("");
@@ -225,12 +228,12 @@ const SideBar = ({
                 </Button>
               )}
 
-              <Link
+              {auth.user.roleId.name !== "DoctorReferral" && <Link
                 to={`/admin/lead/update-lead/${SingleleadData?._id}`}
                 className=" font-semibold text-black text-xs underline cursor-pointer"
               >
                 Edit
-              </Link>
+              </Link>}
 
               {SingleleadData.progressStatus !== "Admit" && (
                 <div

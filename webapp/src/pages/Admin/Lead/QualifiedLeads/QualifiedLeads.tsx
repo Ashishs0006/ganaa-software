@@ -126,6 +126,7 @@ const QualifiedLeads = () => {
   };
 
   const fetchAllQualifiedLeadsFilter = async () => {
+    const userId = auth.user._id;
        let centers;
     if (selected === "All" || !selected) {
       centers = auth.user.centerId.map((data) => data._id);
@@ -142,6 +143,8 @@ const QualifiedLeads = () => {
         sort,
         page: currentPage,
         status: "Qualified",
+        userId,
+        ...(auth.user.roleId.name === "DoctorReferral" && { referredDoctorId: userId }),
          centers: centers.join(","),
         ...(searchParams.get("search") && { searchField: "firstName,lastName,phoneNumber,assignedTo.firstName,assignedTo.lastName" }),
 
@@ -437,7 +440,7 @@ useEffect(() => {
                             className={`"cursor-pointer"`}
                             onClick={() => {handleOpenMenu(data)}}
                           />
-                            <Link to={`/admin/lead/update-lead/${data?._id}`}>
+                            {auth.user.roleId.name !== "DoctorReferral" && <> <Link to={`/admin/lead/update-lead/${data?._id}`}>
                               <img
                                 src={edit}
                                 className={`"cursor-pointer"`}
@@ -448,7 +451,7 @@ useEffect(() => {
                             src={bin}
                             onClick={() => {handleDelete(data?._id)}}
                             className={`"cursor-pointer"`}
-                          />
+                          /> </>}
                         </div>
                       </td>
                     </tr>

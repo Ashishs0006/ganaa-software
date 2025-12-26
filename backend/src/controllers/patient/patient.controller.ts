@@ -143,7 +143,7 @@ export const uploadPatientFiles = multer({
 export const getAllPatient = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
     console.log('✌️req.user role --->', req?.user?.roleId?.name);
-    console.log('✌️req.user _id --->', req?.user?._id);
+    console.log('✌️req.user _id --->', req?.user);
 
     // Filtering Based on Center & Status with Doctor filter
     const filterIds = await _buildPatientFilterQuery(req.query, req.user);

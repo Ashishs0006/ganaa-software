@@ -19,6 +19,7 @@ export const getAllLeads = catchAsync(
     console.log("Query from frontend:", req.query);
 
     let centersFilter = {};
+    let doctorFilter: any = {};
 
     if (req.query.centers && typeof req.query.centers === "string") {
       const centersArray = req.query.centers.split(",");
@@ -41,7 +42,26 @@ export const getAllLeads = catchAsync(
       delete req.query.centers;
     }
 
-    const features = new APIFeatures<ILead>(Lead.find({ ...centersFilter }), req.query)
+     // --------------------------------------------------
+    // 🔥 DOCTOR-BASED FILTER (NEW)
+    // --------------------------------------------------
+    if (req.user?.roleId?._id?.toString() === "69477cd67a68a9b80fbee63a") {
+      console.log("Applying doctor-based filter for user:", req.user._id);
+      doctorFilter = {
+        referredDoctorId: req.user._id
+      };
+    }
+
+     // --------------------------------------------------
+    // 🔥 FINAL QUERY
+    // --------------------------------------------------
+    // const baseQuery = {
+    //   req.user?.roleId?._id?.toString() === "69477cd67a68a9b80fbee63a" ?
+    //   ...centersFilter,
+    //   ...doctorFilter
+    // };
+
+    const features = new APIFeatures<ILead>(Lead.find(req.user?.roleId?._id?.toString() !== "69477cd67a68a9b80fbee63a" ? {...centersFilter} : {...doctorFilter} ), req.query)
       .filter()
       .search()
       .sort()
@@ -67,6 +87,14 @@ export const getAllLeads = catchAsync(
   }
 );
 
+const resolveReferredDoctorId = async () => {
+  const doctor = await User.findOne({
+    roleId: '69477cd67a68a9b80fbee63a', // DoctorReferral role
+    isDeleted: false,
+  }).select('_id');
+
+  return doctor?._id || null;
+};
 
 export const createNewLead = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -89,6 +117,11 @@ export const createNewLead = catchAsync(
     if (req.body.lastName) req.body.lastName = normalizeAndTitleCase(req.body.lastName);
 
     req.body.createdBy = req.user?._id;
+
+    // ---------------------------------------------------
+    // 🔥 RESOLVE REFERRED DOCTOR ID (SAME AS ADMIT LOGIC)
+    // ---------------------------------------------------
+    req.body.referredDoctorId = await resolveReferredDoctorId();
 
     const data = await Lead.create(req.body);
 
