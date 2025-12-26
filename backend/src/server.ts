@@ -158,16 +158,11 @@ cron.schedule('30 0 * * 0', () => {
   buildWeeklyReport();
 });
 
-// Create HTTP server
+
 const server = http.createServer(app);
+server.keepAliveTimeout = 5000;
+server.headersTimeout = 65000; 
 
-// Anti-Slowloris: Set Timeouts
-server.keepAliveTimeout = 5000; // 5 seconds
-server.headersTimeout = 65000; // 65 seconds (must be > keepAliveTimeout)
-
-
-// 🔥 ONE-TIME FIX FUNCTION — RUN AND REMOVE 🔥
-seedRoles()
 
 
 server.listen(port, host, () => {
