@@ -169,7 +169,7 @@ const Discharge = () => {
   const [data, setData] = useState({
     chiefComplaints: "",
     historyOfPresentIllness: "",
-     diagnosticFormulation:"",
+    diagnosticFormulation: "",
     physicalExaminationAtAdmission: "",
     mentalStatusExamination: "",
     hospitalisationSummary: "",
@@ -178,11 +178,10 @@ const Discharge = () => {
     referBackTo: "",
     conditionAtTheTimeOfDischarge: { label: "Select", value: "" },
     adviseAndPlan: "",
-    PsychologistNotes:"",
-    PsychiatricNotes:"",
-    mentalStatusExaminationatDischarge:"",
-    diagnosis:""
-
+    PsychologistNotes: "",
+    PsychiatricNotes: "",
+    mentalStatusExaminationatDischarge: "",
+    diagnosis: ""
   });
 
   const [prescriptionDateTime, setPrescriptionDateTime] = useState<string>();
@@ -190,7 +189,7 @@ const Discharge = () => {
   const [data1, setData1] = useState({
     chiefComplaints: "",
     historyOfPresentIllness: "",
-     diagnosticFormulation:"",
+    diagnosticFormulation: "",
     physicalExaminationAtAdmission: "",
     mentalStatusExamination: "",
     hospitalisationSummary: "",
@@ -199,10 +198,10 @@ const Discharge = () => {
     referBackTo: "",
     conditionAtTheTimeOfDischarge: { label: "", value: "" },
     adviseAndPlan: "",
-     PsychologistNotes:"",
-    PsychiatricNotes:"",
-    mentalStatusExaminationatDischarge:"",
-    diagnosis:""
+    PsychologistNotes: "",
+    PsychiatricNotes: "",
+    mentalStatusExaminationatDischarge: "",
+    diagnosis: ""
   });
 
   const [deleteModal, setDeleteModal] = useState<{ isModal: boolean; id?: number }>({
@@ -225,11 +224,11 @@ const Discharge = () => {
     if (id && aId) {
       try {
         const familyDetailsResponse = await getPatientFamily(id);
-      
+
         setFamilyDetails(familyDetailsResponse.data.data);
 
         const { data: patientData } = await getSinglePatient(id);
-        console.log("patient data is :", patientData)
+        console.log("patient data is :", patientData);
         setPatientDetails((prevData) => ({
           ...prevData,
           gender: patientData?.data?.gender,
@@ -247,14 +246,14 @@ const Discharge = () => {
         }));
 
         const { data: patientAdmissionHistory } = await getSinglePatientAdmissionHistory(id, aId);
-        console.log("patient admission histoy",patientAdmissionHistory)
+        console.log("patient admission histoy", patientAdmissionHistory);
 
         if (patientAdmissionHistory?.data?._id && patientData?.data?._id) {
           const { data: dischargeData } = await getDischarge(
             patientData.data?._id,
             patientAdmissionHistory.data?._id
           );
-          console.log("dicharge Data is :",dischargeData)
+          console.log("dicharge Data is :", dischargeData);
           setPatientDetails((prevData) => ({
             ...prevData,
             shouldSendfeedbackNotification: dischargeData?.data?.shouldSendfeedbackNotification,
@@ -266,9 +265,10 @@ const Discharge = () => {
             dischargeStatus: dischargeData?.data?.status,
             admissionType: patientAdmissionHistory?.data?.admissionType,
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
-  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
-  mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
-  diagnosis:dischargeData?.data?.diagnosis || "",
+            PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+            mentalStatusExaminationatDischarge:
+              dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+            diagnosis: dischargeData?.data?.diagnosis || "",
             involuntaryAdmissionType: patientAdmissionHistory?.data?.involuntaryAdmissionType,
             doctor: `${
               patientAdmissionHistory?.data?.resourceAllocation?.assignedDoctorId?.firstName || ""
@@ -321,10 +321,10 @@ const Discharge = () => {
             ...prevData,
             chiefComplaints: dischargeData?.data?.chiefComplaints || "",
             historyOfPresentIllness: dischargeData?.data?.historyOfPresentIllness || "",
-            diagnosticFormulation:dischargeData?.data.diagnosticFormulation || "",
+            diagnosticFormulation: dischargeData?.data.diagnosticFormulation || "",
             physicalExaminationAtAdmission:
               dischargeData?.data?.physicalExaminationAtAdmission || "",
-         
+
             hospitalisationSummary: dischargeData?.data?.hospitalisationSummary || "",
             investigation: dischargeData?.data?.investigation || "",
             referBackTo: dischargeData?.data?.referBackTo || "",
@@ -332,14 +332,14 @@ const Discharge = () => {
               label: dischargeData?.data?.conditionAtTheTimeOfDischarge || "",
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
-           adviseAndPlan:
-    dischargeData?.data?.adviseAndPlan?.trim()
-      ? dischargeData.data.adviseAndPlan
-      : defaultAdviseAndPlan, 
+            adviseAndPlan: dischargeData?.data?.adviseAndPlan?.trim()
+              ? dischargeData.data.adviseAndPlan
+              : defaultAdviseAndPlan,
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
-  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
-    mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
-     diagnosis:dischargeData?.data?.diagnosis || "",
+            PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+            mentalStatusExaminationatDischarge:
+              dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+            diagnosis: dischargeData?.data?.diagnosis || ""
           }));
           setPrescriptionDateTime(dischargeData?.data?.prescriptionDateTime || "");
           const prescriptionMedicineUpdate =
@@ -368,8 +368,8 @@ const Discharge = () => {
             historyOfPresentIllness: dischargeData?.data?.historyOfPresentIllness || "",
             physicalExaminationAtAdmission:
               dischargeData?.data?.physicalExaminationAtAdmission || "",
-                  diagnosticFormulation:dischargeData?.data.diagnosticFormulation || "",
-        
+            diagnosticFormulation: dischargeData?.data.diagnosticFormulation || "",
+
             hospitalisationSummary: dischargeData?.data?.hospitalisationSummary || "",
             investigation: dischargeData?.data?.investigation || "",
             referBackTo: dischargeData?.data?.referBackTo || "",
@@ -377,16 +377,16 @@ const Discharge = () => {
               label: dischargeData?.data?.conditionAtTheTimeOfDischarge || "",
               value: dischargeData?.data?.conditionAtTheTimeOfDischarge || ""
             },
-          
-            adviseAndPlan:
-    dischargeData?.data?.adviseAndPlan?.trim()
-      ? dischargeData.data.adviseAndPlan
-      : defaultAdviseAndPlan,
+
+            adviseAndPlan: dischargeData?.data?.adviseAndPlan?.trim()
+              ? dischargeData.data.adviseAndPlan
+              : defaultAdviseAndPlan,
             prescriptionMedicine: prescriptionMedicineUpdate,
             PsychologistNotes: dischargeData?.data?.PsychologistNotes || "",
-  PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
-    mentalStatusExaminationatDischarge:dischargeData?.data?.mentalStatusExaminationatDischarge || "",
-     diagnosis:dischargeData?.data?.diagnosis || "",
+            PsychiatricNotes: dischargeData?.data?.PsychiatricNotes || "",
+            mentalStatusExaminationatDischarge:
+              dischargeData?.data?.mentalStatusExaminationatDischarge || "",
+            diagnosis: dischargeData?.data?.diagnosis || ""
           }));
         }
         setLoading(false);
@@ -433,12 +433,11 @@ const Discharge = () => {
       conditionAtTheTimeOfDischarge: data.conditionAtTheTimeOfDischarge.value,
       prescriptionMedicine: formatPrescription,
       PsychologistNotes: data.PsychologistNotes,
-    PsychiatricNotes: data.PsychiatricNotes,
-        mentalStatusExaminationatDischarge:data.mentalStatusExaminationatDischarge,
-         diagnosis:data.diagnosis || "",
-    
+      PsychiatricNotes: data.PsychiatricNotes,
+      mentalStatusExaminationatDischarge: data.mentalStatusExaminationatDischarge,
+      diagnosis: data.diagnosis || ""
     };
-    console.log("hii the update payload is :", payload)
+    console.log("hii the update payload is :", payload);
 
     if (Object.keys(payload).length === 0) return;
     return updateDischarge(
@@ -820,357 +819,356 @@ const Discharge = () => {
               </div>
             </div>
           </div>
-          <div className="w-full px-5 pb-10 flex flex-col gap-8">
-            <RichTextEditor
-              value={data.chiefComplaints}
-              onChange={handleChangeQuill}
-              name="chiefComplaints"
-              label="Chief complaints"
-            />
-            <RichTextEditor
-              name="diagnosticformulation"
-              value={data.diagnosticFormulation}
-              onChange={handleChangeQuill}
-              label="Diagnostic Formulation"
-            />
-                <RichTextEditor
-              name="diagnosis"
-              value={data.diagnosis }
-              onChange={handleChangeQuill}
-              label="Diagnosis"
-          
-            />
-            <RichTextEditor
-              name="mentalStatusExaminationatdisharge"
-              value={data.mentalStatusExaminationatDischarge}
-              onChange={handleChangeQuill}
-              label="Mental Status Examination at Discharge"
-            />
- <div className="flex flex-col gap-4">
- <p className="text-sm font-semibold text-gray-800">Hospitalization Summary</p>
-
-
-  <div className="border border-gray-300 rounded-xl p-4 bg-white flex flex-col gap-4">
-    <RichTextEditor
-      name="psychiatricnotes"
-      value={data.PsychiatricNotes}
-      onChange={handleChangeQuill}
-      label="Psychiatrist’s Notes"
-    />
-  
-    <RichTextEditor
-      name="psychologistnotes"
-      value={data.PsychologistNotes}
-      onChange={handleChangeQuill}
-      label="Psychologist’s Notes"
-      
-    />
-
-  
-  </div>
-</div>
-
-
-          <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
-  <div className="flex-1 w-1/2">
-    <div className="mb-4 flex flex-col space-x-2">
-      <h2 className="text-sm mb-2 leading-5 font-semibold">Assessment Scores</h2>
-      <div className="flex gap-8 space-x-4">
-        {Object.entries(
-          groupBy(patientDetails.therapistNotes, (el) => el.subSessionType)
-        ).map(([key, _items], index) => (
-          <div key={key} className="flex gap-1 items-center space-x-1">
-            <div
-              className="h-3 w-3 rounded-sm"
-              style={{ backgroundColor: colors[index % colors.length] }}
-            ></div>
-            <span className="legend-label font-semibold text-xs">{key}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <div className="relative h-[280px] w-full">
-      <LineChart labels={chartLabels} datasets={chartData} />
-    </div>
-
-    <div className="mt-2 flex max-w-[600px] justify-between text-xs font-semibold">
-      <span>At the time of admission</span>
-      <span>At the time of Discharge</span>
-    </div>
-  </div>
-</div>
-{/* data handling  */}
-
-            <div className="grid gap-[88px]">
+          <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
+            <div className="w-full px-5 pb-10 flex flex-col gap-8">
               <RichTextEditor
-                // height="24"
-                // showToolBar={false}
-                value={data.investigation}
-                name="investigation"
+                value={data.chiefComplaints}
                 onChange={handleChangeQuill}
-                label="Investigation"
+                name="chiefComplaints"
+                label="Chief complaints"
               />
-            </div>
-            {/* table */}
-            <div>
-              <label className="mb-2 block font-semibold text-xs text-black">
-                Prescrption at Discharge
-              </label>
-              {prescriptionArray.length > 0 && (
-                <div className="w-full">
-                  <table className="sm:w-[1000px] lg:w-full rounded-lg text-sm text-left">
-                    <thead className="bg-[rgb(233,232,229)] w-full h-full top-0 sticky z-10">
-                      <tr className="text-[#505050] text-xs font-medium">
-                        <th className="px-4 py-3 font-medium text-[#505050] text-xs ">Date</th>
-                        <th className="px-4 py-3 font-medium text-[#505050] text-xs ">Medicine</th>
-                        <th className="px-4 py-3 font-medium text-[#505050] text-xs ">
-                          Frequency/Routine
-                        </th>
-                        <th className="px-4 py-3 font-medium text-[#505050] text-xs">Duration</th>
-                        <th className="px-4 py-3 font-medium text-[#505050] text-xs w-1/4">
-                          Instructions
-                        </th>
-                        <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
-                          <th className="pl-4 py-3 text-black text-xs ">{""}</th>
-                        </RBACGuard>
-                      </tr>
-                    </thead>
+              <RichTextEditor
+                name="diagnosticformulation"
+                value={data.diagnosticFormulation}
+                onChange={handleChangeQuill}
+                label="Diagnostic Formulation"
+              />
+              <RichTextEditor
+                name="diagnosis"
+                value={data.diagnosis}
+                onChange={handleChangeQuill}
+                label="Diagnosis"
+              />
+              <RichTextEditor
+                name="mentalStatusExaminationatdisharge"
+                value={data.mentalStatusExaminationatDischarge}
+                onChange={handleChangeQuill}
+                label="Mental Status Examination at Discharge"
+              />
+              <div className="flex flex-col gap-4">
+                <p className="text-sm font-semibold text-gray-800">Hospitalization Summary</p>
 
-                    <tbody className="bg-white w-full h-full">
-                      {prescriptionArray.map((data: IprescriptionState, index: number) => (
-                        <tr key={index} className="text-[#505050] text-xs border-b font-medium">
-                          {index === 0 && (
-                            <td
-                              rowSpan={prescriptionArray.length}
-                              className="pl-4 p-3 align-center text-black text-xs font-semibold text-nowrap"
-                            >
+                <div className="border border-gray-300 rounded-xl p-4 bg-white flex flex-col gap-4">
+                  <RichTextEditor
+                    name="psychiatricnotes"
+                    value={data.PsychiatricNotes}
+                    onChange={handleChangeQuill}
+                    label="Psychiatrist’s Notes"
+                  />
+
+                  <RichTextEditor
+                    name="psychologistnotes"
+                    value={data.PsychologistNotes}
+                    onChange={handleChangeQuill}
+                    label="Psychologist’s Notes"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col bg-[#F4F2F0] h-[446px] md:flex-row md:space-x-8 p-10 items-center">
+                <div className="flex-1 w-1/2">
+                  <div className="mb-4 flex flex-col space-x-2">
+                    <h2 className="text-sm mb-2 leading-5 font-semibold">Assessment Scores</h2>
+                    <div className="flex gap-8 space-x-4">
+                      {Object.entries(
+                        groupBy(patientDetails.therapistNotes, (el) => el.subSessionType)
+                      ).map(([key, _items], index) => (
+                        <div key={key} className="flex gap-1 items-center space-x-1">
+                          <div
+                            className="h-3 w-3 rounded-sm"
+                            style={{ backgroundColor: colors[index % colors.length] }}
+                          ></div>
+                          <span className="legend-label font-semibold text-xs">{key}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="relative h-[280px] w-full">
+                    <LineChart labels={chartLabels} datasets={chartData} />
+                  </div>
+
+                  <div className="mt-2 flex max-w-[600px] justify-between text-xs font-semibold">
+                    <span>At the time of admission</span>
+                    <span>At the time of Discharge</span>
+                  </div>
+                </div>
+              </div>
+              {/* data handling  */}
+
+              <div className="grid gap-[88px]">
+                <RichTextEditor
+                  // height="24"
+                  // showToolBar={false}
+                  value={data.investigation}
+                  name="investigation"
+                  onChange={handleChangeQuill}
+                  label="Investigation"
+                />
+              </div>
+              {/* table */}
+              <div>
+                <label className="mb-2 block font-semibold text-xs text-black">
+                  Prescrption at Discharge
+                </label>
+                {prescriptionArray.length > 0 && (
+                  <div className="w-full">
+                    <table className="sm:w-[1000px] lg:w-full rounded-lg text-sm text-left">
+                      <thead className="bg-[rgb(233,232,229)] w-full h-full top-0 sticky z-10">
+                        <tr className="text-[#505050] text-xs font-medium">
+                          <th className="px-4 py-3 font-medium text-[#505050] text-xs ">Date</th>
+                          <th className="px-4 py-3 font-medium text-[#505050] text-xs ">
+                            Medicine
+                          </th>
+                          <th className="px-4 py-3 font-medium text-[#505050] text-xs ">
+                            Frequency/Routine
+                          </th>
+                          <th className="px-4 py-3 font-medium text-[#505050] text-xs">Duration</th>
+                          <th className="px-4 py-3 font-medium text-[#505050] text-xs w-1/4">
+                            Instructions
+                          </th>
+                          <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
+                            <th className="pl-4 py-3 text-black text-xs ">{""}</th>
+                          </RBACGuard>
+                        </tr>
+                      </thead>
+
+                      <tbody className="bg-white w-full h-full">
+                        {prescriptionArray.map((data: IprescriptionState, index: number) => (
+                          <tr key={index} className="text-[#505050] text-xs border-b font-medium">
+                            {index === 0 && (
+                              <td
+                                rowSpan={prescriptionArray.length}
+                                className="pl-4 p-3 align-center text-black text-xs font-semibold text-nowrap"
+                              >
+                                <p>
+                                  {" "}
+                                  {prescriptionDateTime && formateNormalDate(prescriptionDateTime)}
+                                </p>
+                                <p className="text-gray-500 ">
+                                  {prescriptionDateTime &&
+                                    convertBackendDateToTime(prescriptionDateTime)}
+                                </p>
+                              </td>
+                            )}
+
+                            {/* Medicine Column */}
+                            <td className=" align-center border text-black text-xs font-semibold text-nowrap">
+                              <div className="w-full h-10 flex justify-start items-center p-5">
+                                <p>{data?.medicine?.label || "--"}</p>
+                              </div>
+                            </td>
+
+                            {/* Frequency/Routine Column */}
+                            <td className=" align-center border text-black  px-5 text-xs">
+                              {data.usages.map((usage: IUsage, key: number) => (
+                                <div key={key} className="flex my-1 items-center flex-wrap gap-2">
+                                  <span className="bg-[#ECF3CA] mr-1 text-black text-nowrap px-1 py-[2px] rounded-[10px] border-[#C9D686] border">
+                                    <span className="text-xs font-bold">{usage.frequency}</span>,{" "}
+                                    {usage.quantity} Tablet {usage.dosage.label} {usage.when.label}
+                                  </span>
+                                </div>
+                              ))}
+                            </td>
+
+                            {/* Duration Column */}
+                            <td className=" border align-center text-black  px-5 text-xs text-nowrap">
                               <p>
-                                {" "}
-                                {prescriptionDateTime && formateNormalDate(prescriptionDateTime)}
-                              </p>
-                              <p className="text-gray-500 ">
-                                {prescriptionDateTime &&
-                                  convertBackendDateToTime(prescriptionDateTime)}
+                                {data?.customDuration &&
+                                data?.durationFrequency.value === "Custom Date"
+                                  ? data?.customDuration
+                                      ?.split("|")
+                                      .map((d) => moment(d).format("D MMMM"))
+                                      .join(" to ")
+                                  : data?.durationFrequency?.label || "--"}
                               </p>
                             </td>
-                          )}
 
-                          {/* Medicine Column */}
-                          <td className=" align-center border text-black text-xs font-semibold text-nowrap">
-                            <div className="w-full h-10 flex justify-start items-center p-5">
-                              <p>{data?.medicine?.label || "--"}</p>
-                            </div>
-                          </td>
+                            {/* Instructions Column */}
+                            <td className=" align-center px-5 text-black text-xs">
+                              <p className="break-all whitespace-normal" title={data.instructions}>
+                                {data.instructions || "--"}
+                              </p>
+                            </td>
 
-                          {/* Frequency/Routine Column */}
-                          <td className=" align-center border text-black  px-5 text-xs">
-                            {data.usages.map((usage: IUsage, key: number) => (
-                              <div key={key} className="flex my-1 items-center flex-wrap gap-2">
-                                <span className="bg-[#ECF3CA] mr-1 text-black text-nowrap px-1 py-[2px] rounded-[10px] border-[#C9D686] border">
-                                  <span className="text-xs font-bold">{usage.frequency}</span>,{" "}
-                                  {usage.quantity} Tablet {usage.dosage.label} {usage.when.label}
-                                </span>
-                              </div>
-                            ))}
-                          </td>
-
-                          {/* Duration Column */}
-                          <td className=" border align-center text-black  px-5 text-xs text-nowrap">
-                            <p>
-                              {data?.customDuration && data?.durationFrequency.value === "Custom Date"
-                                ? data?.customDuration
-                                    ?.split("|")
-                                    .map((d) => moment(d).format("D MMMM"))
-                                    .join(" to ")
-                                : data?.durationFrequency?.label || "--"}
-                            </p>
-                          </td>
-
-                          {/* Instructions Column */}
-                          <td className=" align-center px-5 text-black text-xs">
-                            <p className="break-all whitespace-normal" title={data.instructions}>
-                              {data.instructions || "--"}
-                            </p>
-                          </td>
-
-                          {/* Actions Column */}
-                          <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
-                            <td className="w-fit  align-center pl-5 relative">
-                              <div
-                                onClick={() => handlePopup(index)}
-                                className="bg-[#E5EBCD] relative flex w-5 h-7 items-center justify-center rounded-md hover:bg-[#D4E299] cursor-pointer"
-                              >
-                                <img src={kabab} alt="icon" className="w-full h-full" />
-                                {index === state.popId && (
-                                  <div
-                                    ref={popUpRef}
-                                    className="absolute right-3 top-0 overflow-hidden shadow-[0px_0px_20px_#00000017] mt-2 w-fit bg-white border border-gray-300 rounded-lg z-10 flex items-center justify-center"
-                                  >
-                                    <div className="p-1 text-nowrap whitespace-nowrap gap-0 flex-col flex justify-center bg-white shadow-lg rounded-lg w-fit">
-                                      <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
-                                        <div
-                                          onClick={() => handleUpdate(data, index)}
-                                          className="flex items-center cursor-pointer"
-                                        >
-                                          <p>Edit</p>
+                            {/* Actions Column */}
+                            <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
+                              <td className="w-fit  align-center pl-5 relative">
+                                <div
+                                  onClick={() => handlePopup(index)}
+                                  className="bg-[#E5EBCD] relative flex w-5 h-7 items-center justify-center rounded-md hover:bg-[#D4E299] cursor-pointer"
+                                >
+                                  <img src={kabab} alt="icon" className="w-full h-full" />
+                                  {index === state.popId && (
+                                    <div
+                                      ref={popUpRef}
+                                      className="absolute right-3 top-0 overflow-hidden shadow-[0px_0px_20px_#00000017] mt-2 w-fit bg-white border border-gray-300 rounded-lg z-10 flex items-center justify-center"
+                                    >
+                                      <div className="p-1 text-nowrap whitespace-nowrap gap-0 flex-col flex justify-center bg-white shadow-lg rounded-lg w-fit">
+                                        <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
+                                          <div
+                                            onClick={() => handleUpdate(data, index)}
+                                            className="flex items-center cursor-pointer"
+                                          >
+                                            <p>Edit</p>
+                                          </div>
                                         </div>
-                                      </div>
-                                      <hr />
-                                      <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
-                                        <div
-                                          onClick={() => toggleModalDelete(index)}
-                                          className="flex text-red-600 items-center cursor-pointer"
-                                        >
-                                          <p>Delete</p>
+                                        <hr />
+                                        <div className="text-xs font-semibold cursor-pointer p-2 px-3 text-nowrap whitespace-nowrap">
+                                          <div
+                                            onClick={() => toggleModalDelete(index)}
+                                            className="flex text-red-600 items-center cursor-pointer"
+                                          >
+                                            <p>Delete</p>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </RBACGuard>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
-                <div
-                  onClick={toggleModal}
-                  className="w-full flex items-center cursor-pointer justify-center py-1 rounded-[6px] bg-[#E5EBCD]"
-                >
-                  <p className="text-[#575F4A] text-[13px] font-semibold"> Add 1 more</p>
-                </div>
-              </RBACGuard>
-            </div>
-            {/* table */}
-            <div className="grid grid-cols-2 gap-[88px]">
-              <Input
-                // disabled={}
-                label="Referred back to"
-                labelClassName="text-black!"
-                className="rounded-lg! font-bold placeholder:font-normal"
-                placeholder="Enter"
-                value={data.referBackTo}
-                onChange={handleChange}
-                name="referBackTo"
-              />
-              <Select
-                label="Condition at the time of discharge"
-                containerClass="w-full! "
-                value={data.conditionAtTheTimeOfDischarge}
-                labelClassName="text-black! font-medium! g"
-                name="conditionAtTheTimeOfDischarge"
-                options={[
-                  { label: "Select", value: "" },
-                  { label: "Improved", value: "Improved" },
-                  { label: "Partially Improved", value: "Partially Improved" },
-                  { label: "Status Quo", value: "Status Quo" }
-                ]}
-                onChange={(name, value) => {
-                  setData((prev) => ({ ...prev, [name]: value }));
-                }}
-                className="w-full! rounded-[7px]! max-w-full! border border-gray-300 px-3 py-6!"
-              />
-            </div>
-            {/* here we have to edit  */}
-            <RichTextEditor
-              name="adviseAndPlan"
-              value={data.adviseAndPlan}
-              onChange={handleChangeQuill}
-              label="Advise and Plan on Discharge"
-            />
-            <div className="w-full flex justify-between items-center">
-              <div>
-                <p className="text-sm font-semibold mb-2">Feedback form status</p>
-                {patientDetails.feedbackId === "Completed" ? (
-                  <div className="flex gap-2 items-center justify-center">
-                    <Button
-                      type="submit"
-                      className=" text-xs! cursor-default! min-w-[90px]! hover:bg-auto  text-white! bg-[#3F9536] border-none   rounded-[10px]!"
-                      name="next"
-                      variant="outlined"
-                      size="base"
-                    >
-                      <FaCheck />
-                      Complete
-                    </Button>
-                    {
-                      <Link to={`/feedback/${id}/${aId}`}>
-                        <Button
-                          type="submit"
-                          className=" text-xs! hover:bg-auto  text-white! bg-[#F1F2ED] border-none  rounded-[10px]!"
-                          name="next"
-                          variant="outlined"
-                          size="base"
-                        >
-                          <img src={eye} />
-                        </Button>
-                      </Link>
-                    }
-                  </div>
-                ) : (
-                  <div className="flex gap-2 items-center justify-center">
-                    <Button
-                      type="submit"
-                      className=" text-xs! cursor-default! min-w-[90px]! hover:bg-auto  text-[#B74F00]! bg-[#FFEDD5] border-none   rounded-[10px]!"
-                      name="next"
-                      variant="outlined"
-                      size="base"
-                    >
-                      Pending
-                    </Button>
-
-                    {
-                      <Link to={`/feedback/${id}/${aId}`} target="_blank">
-                        <Button
-                          type="submit"
-                          className=" text-xs! hover:bg-auto  text-white! bg-[#F1F2ED] border-none  rounded-[10px]!"
-                          name="next"
-                          variant="outlined"
-                          size="base"
-                        >
-                          <img src={eye} />
-                        </Button>
-                      </Link>
-                    }
-                    {!loading ? (
-                      IsLocked ? (
-                        <Button
-                          type="submit"
-                          title="Please wait 30 seconds. Feedback form is in progress."
-                          className=" text-sm! cursor-not-allowed!  hover:bg-auto text-[#848d5e]  bg-[#F1F2ED] border-none   rounded-[10px]!"
-                          name="next"
-                          variant="outlined"
-                          size="base"
-                        >
-                          <IoIosRefresh className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          type="submit"
-                          className=" text-sm! cursor-pointer!  hover:bg-auto text-[#848d5e]  bg-[#ecfab1] border-none   rounded-[10px]!"
-                          name="next"
-                          variant="outlined"
-                          size="base"
-                          onClick={fetchData}
-                        >
-                          <IoIosRefresh className="w-4 h-4" />
-                        </Button>
-                      )
-                    ) : null}
+                                  )}
+                                </div>
+                              </td>
+                            </RBACGuard>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
+                <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
+                  <div
+                    onClick={toggleModal}
+                    className="w-full flex items-center cursor-pointer justify-center py-1 rounded-[6px] bg-[#E5EBCD]"
+                  >
+                    <p className="text-[#575F4A] text-[13px] font-semibold"> Add 1 more</p>
+                  </div>
+                </RBACGuard>
               </div>
-              <div>
-                <p className="text-sm font-semibold">{patientDetails.doctor || "--"}</p>
-                <p className="text-xs font-medium text-[#636363]">Psychiatrist</p>
+              {/* table */}
+              <div className="grid grid-cols-2 gap-[88px]">
+                <Input
+                  // disabled={}
+                  label="Referred back to"
+                  labelClassName="text-black!"
+                  className="rounded-lg! font-bold placeholder:font-normal"
+                  placeholder="Enter"
+                  value={data.referBackTo}
+                  onChange={handleChange}
+                  name="referBackTo"
+                />
+                <Select
+                  label="Condition at the time of discharge"
+                  containerClass="w-full! "
+                  value={data.conditionAtTheTimeOfDischarge}
+                  labelClassName="text-black! font-medium! g"
+                  name="conditionAtTheTimeOfDischarge"
+                  options={[
+                    { label: "Select", value: "" },
+                    { label: "Improved", value: "Improved" },
+                    { label: "Partially Improved", value: "Partially Improved" },
+                    { label: "Status Quo", value: "Status Quo" }
+                  ]}
+                  onChange={(name, value) => {
+                    setData((prev) => ({ ...prev, [name]: value }));
+                  }}
+                  className="w-full! rounded-[7px]! max-w-full! border border-gray-300 px-3 py-6!"
+                />
+              </div>
+              {/* here we have to edit  */}
+              <RichTextEditor
+                name="adviseAndPlan"
+                value={data.adviseAndPlan}
+                onChange={handleChangeQuill}
+                label="Advise and Plan on Discharge"
+              />
+              <div className="w-full flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-semibold mb-2">Feedback form status</p>
+                  {patientDetails.feedbackId === "Completed" ? (
+                    <div className="flex gap-2 items-center justify-center">
+                      <Button
+                        type="submit"
+                        className=" text-xs! cursor-default! min-w-[90px]! hover:bg-auto  text-white! bg-[#3F9536] border-none   rounded-[10px]!"
+                        name="next"
+                        variant="outlined"
+                        size="base"
+                      >
+                        <FaCheck />
+                        Complete
+                      </Button>
+                      {
+                        <Link to={`/feedback/${id}/${aId}`}>
+                          <Button
+                            type="submit"
+                            className=" text-xs! hover:bg-auto  text-white! bg-[#F1F2ED] border-none  rounded-[10px]!"
+                            name="next"
+                            variant="outlined"
+                            size="base"
+                          >
+                            <img src={eye} />
+                          </Button>
+                        </Link>
+                      }
+                    </div>
+                  ) : (
+                    <div className="flex gap-2 items-center justify-center">
+                      <Button
+                        type="submit"
+                        className=" text-xs! cursor-default! min-w-[90px]! hover:bg-auto  text-[#B74F00]! bg-[#FFEDD5] border-none   rounded-[10px]!"
+                        name="next"
+                        variant="outlined"
+                        size="base"
+                      >
+                        Pending
+                      </Button>
+
+                      {
+                        <Link to={`/feedback/${id}/${aId}`} target="_blank">
+                          <Button
+                            type="submit"
+                            className=" text-xs! hover:bg-auto  text-white! bg-[#F1F2ED] border-none  rounded-[10px]!"
+                            name="next"
+                            variant="outlined"
+                            size="base"
+                          >
+                            <img src={eye} />
+                          </Button>
+                        </Link>
+                      }
+                      {!loading ? (
+                        IsLocked ? (
+                          <Button
+                            type="submit"
+                            title="Please wait 30 seconds. Feedback form is in progress."
+                            className=" text-sm! cursor-not-allowed!  hover:bg-auto text-[#848d5e]  bg-[#F1F2ED] border-none   rounded-[10px]!"
+                            name="next"
+                            variant="outlined"
+                            size="base"
+                          >
+                            <IoIosRefresh className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            type="submit"
+                            className=" text-sm! cursor-pointer!  hover:bg-auto text-[#848d5e]  bg-[#ecfab1] border-none   rounded-[10px]!"
+                            name="next"
+                            variant="outlined"
+                            size="base"
+                            onClick={fetchData}
+                          >
+                            <IoIosRefresh className="w-4 h-4" />
+                          </Button>
+                        )
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">{patientDetails.doctor || "--"}</p>
+                  <p className="text-xs font-medium text-[#636363]">Psychiatrist</p>
+                </div>
               </div>
             </div>
-          </div>
+          </RBACGuard>
         </div>
 
         <RBACGuard resource={RESOURCES.DISCHARGE} action="write">
@@ -1200,33 +1198,32 @@ const Discharge = () => {
               Save
               {state.loading && <Loader size="xs" />}
             </Button>
-     {patientDetails.currentStatus !== "Discharged" && (
-  <Button
-    type="submit"
-    disabled={state.loading}
-    className="min-w-[130px]! text-xs! py-[11px]! bg-[#323E2A]! rounded-[10px]!"
-    name="next"
-    variant="contained"
-    size="base"
-    onClick={() => {
-      const dischargeDate = patientDetails?.dischargeDate;
-      if (dischargeDate) {
-        const today = new Date();
-        const discharge = new Date(dischargeDate);
+            {patientDetails.currentStatus !== "Discharged" && (
+              <Button
+                type="submit"
+                disabled={state.loading}
+                className="min-w-[130px]! text-xs! py-[11px]! bg-[#323E2A]! rounded-[10px]!"
+                name="next"
+                variant="contained"
+                size="base"
+                onClick={() => {
+                  const dischargeDate = patientDetails?.dischargeDate;
+                  if (dischargeDate) {
+                    const today = new Date();
+                    const discharge = new Date(dischargeDate);
 
-        if (discharge > today) {
-          toast.error("Discharge Date cannot be in the future.");
-          return; // prevent submit
-        }
-      }
-      toggleOpen1(); // normal behavior
-    }}
-  >
-    Submit
-    {state.loading && <Loader size="xs" />}
-  </Button>
-)}
-
+                    if (discharge > today) {
+                      toast.error("Discharge Date cannot be in the future.");
+                      return; // prevent submit
+                    }
+                  }
+                  toggleOpen1(); // normal behavior
+                }}
+              >
+                Submit
+                {state.loading && <Loader size="xs" />}
+              </Button>
+            )}
           </div>
         </RBACGuard>
       </div>

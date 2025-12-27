@@ -175,9 +175,9 @@ const Doctor_Header = () => {
             </div>
           </RBACGuardArray>
 
-          <RBACGuardArray
+          {/* <RBACGuardArray
             resource={[
-              // { resource: `${RESOURCES.NEW_REGISTRATION}`, action: "write" },
+              { resource: `${RESOURCES.NEW_REGISTRATION}`, action: "write" },
               { resource: `${RESOURCES.SEARCH_EXISTING_PATIENT}`, action: "read" }
             ]}
           >
@@ -188,7 +188,7 @@ const Doctor_Header = () => {
               </p>
               <div className="hidden group-hover:flex absolute left-0  top-10   bg-transparent pt-4">
                 <div className="p-2 shadow  gap-2 flex-col flex justify-center bg-white  rounded-lg w-40">
-                  {/* <NavLink
+                  <NavLink
                     className={() =>
                       classNames(
                         "text-xs font-semibold cursor-pointer p-2 text-nowrap whitespace-nowrap hover:font-bold"
@@ -198,7 +198,7 @@ const Doctor_Header = () => {
                   >
                     New Registration
                   </NavLink>
-                  <hr /> */}
+                  <hr />
                   <NavLink
                     className="text-xs cursor-pointer font-semibold p-2 hover:font-bold"
                     to="/doctor/existing-patient"
@@ -208,7 +208,7 @@ const Doctor_Header = () => {
                 </div>
               </div>
             </div>
-          </RBACGuardArray>
+          </RBACGuardArray> */}
           <RBACGuardArray
             resource={[
               { resource: `${RESOURCES.IN_PATIENT}`, action: "read" },

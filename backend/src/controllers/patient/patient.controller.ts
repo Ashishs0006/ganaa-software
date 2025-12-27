@@ -179,15 +179,15 @@ export const getAllPatient = catchAsync(
 
     // 🔥 Build base query with filters
     let baseQuery: any = {};
-    
+
     // Add filterIds if they exist
     if (filterIds.length > 0) {
       baseQuery._id = { $in: filterIds };
     }
-    
+
     // If doctor is logged in but filterIds is empty (no patients match other filters)
     // We still need to apply doctor filter directly to Patient model
-    if (req?.user?._id && req?.user?.roleId?.name === "DoctorReferral" && filterIds.length === 0) {
+    if (req?.user?._id && req?.user?.roleId?.name === 'DoctorReferral' && filterIds.length === 0) {
       baseQuery.referredDoctorId = req.user._id;
       console.log('🔍 Applying doctor filter directly to Patient query');
     }
@@ -208,27 +208,25 @@ export const getAllPatient = catchAsync(
     const rawQuery = features.rawQuery();
     const data = await features.query.lean();
     console.log('🔍 Patients found:', data.length);
-    
+
     const patientIds = data.map((el) => el._id as ObjectId);
 
     // 🔥 FIX: Call PaginationInfo.exec correctly
     // First param: Query object (not count)
     // Third param: rawQuery from features
-    
+
     // Create a count query with the same base conditions
     const countQuery = Patient.find(baseQuery);
-    
+
     // Apply search to count query if it exists in features
     // You might need to check how APIFeatures applies search
     // This is a simplified version - adjust based on your actual APIFeatures implementation
-    
-    const paginationInfo = await PaginationInfo.exec(
-      countQuery,      // First param: Query object
-      cleanQuery,      // Second param: query string
-      rawQuery         // Third param: raw query
-    );
 
-    console.log('🔍 Pagination info:', paginationInfo);
+    const paginationInfo = await PaginationInfo.exec(
+      countQuery, // First param: Query object
+      cleanQuery, // Second param: query string
+      rawQuery // Third param: raw query
+    );
 
     if (onlyPatient) {
       return res.status(200).json({
@@ -237,12 +235,20 @@ export const getAllPatient = catchAsync(
         data: data,
       });
     }
-    
+
     const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
     const enrichedData = data.map((record) => ({
       ...record,
       patientHistory: admissionHistoryMap[record._id?.toString()!],
     }));
+
+    const allowedStatuses = (req.query.status as string)?.split(',');
+
+    const filteredData = enrichedData.filter((record) =>
+      allowedStatuses.includes(record.patientHistory?.currentStatus)
+    );
+
+    console.log('filteredData --->', filteredData);
 
     res.status(200).json({
       status: 'success',
@@ -477,13 +483,12 @@ export const updateSinglePatient = catchAsync(
       filterObj.patientPicFileName = fileName;
     }
 
-    
     const patientPreviousDoc = await Patient.findById(req.params.id).lean();
     if (!patientPreviousDoc) return next(new AppError('Please Provide Valid Patient ID', 400));
-    
+
     const data = await Patient.findByIdAndUpdate(req.params.id, filterObj, { new: true });
     if (!data) return next(new AppError('Please Provide Valid Patient ID', 400));
-    
+
     for (const file of idProofFiles) {
       const fileName = `${Date.now()}-${random.randomAlphaNumeric(6)}-${file.originalname}`;
       const filePath = S3Path.idProof(data._id?.toString() ?? '', fileName);
@@ -1134,13 +1139,14 @@ const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
   };
 
   // 🔥 ADD DOCTOR FILTER HERE
-  if (user?._id && user?.roleId?.name === "DoctorReferral") {
+  if (user?._id && user?.roleId?.name === 'DoctorReferral') {
     query['$and'].push({ referredDoctorId: user._id });
     console.log('🔍 Adding doctor filter to query:', { referredDoctorId: user._id });
   }
 
   if (queryObj.hasOwnProperty('status') && queryObj.status !== 'All') {
     let status = (queryObj.status as string).split(',');
+    console.log('✌️status --->', status);
     if (status.includes('All')) status = status.filter((s) => s !== 'All');
     query['$and'].push({ currentStatus: status.length > 1 ? { $in: status } : status[0] });
   }

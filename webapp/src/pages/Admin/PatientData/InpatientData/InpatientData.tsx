@@ -114,7 +114,9 @@ const InpatientData = () => {
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
 
-      dispatch(setAllPatient(response?.data));
+      const filteredPatients = response?.data?.data.filter(((patient:any) => patient.patientHistory.currentStatus !== "Discharged"));
+      console.log('filteredPatients --->', filteredPatients);
+      dispatch(setAllPatient(auth.user.roleId.name === 'DoctorReferral' ? filteredPatients : response?.data));
       setTimeout(() => {
         setState((prev) => ({
           ...prev,

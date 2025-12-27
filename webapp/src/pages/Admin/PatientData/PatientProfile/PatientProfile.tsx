@@ -431,7 +431,7 @@ const PatientProfile = () => {
                 </Link>
               </RBACGuard>
             )}
-            {state.currentStatus == "Discharged" && (
+            {state.currentStatus == "Discharged" && auth.user.roleId.name !== "DoctorReferral" && (
               <Button
                 type="submit"
                 name="save"
@@ -504,25 +504,27 @@ const PatientProfile = () => {
               </RBACGuard>
             )}
 
-            <RBACGuard resource={RESOURCES.AUDIT_LOG} action="read">
-              <Link
-                to={
-                  auth.user.roleId.name === "DoctorReferral"
-                    ? `/doctor/patients/all-patient/${id}/audit/${aId}`
-                    : `/admin/patients/all-patient/${id}/audit/${aId}`
-                }
-              >
-                <Button
-                  type="submit"
-                  name="save"
-                  className="min-w-[150px]! font-bold! text-xs! px-[12px]! py-[8px]! rounded-xl! border-gray-300! text-black!"
-                  variant="outlined"
-                  size="base"
+            {/* {(auth.user.roleId.name === "DoctorReferral" && state.currentStatus !== "Discharged") && ( */}
+              <RBACGuard resource={RESOURCES.AUDIT_LOG} action="read">
+                <Link
+                  to={
+                    auth.user.roleId.name === "DoctorReferral"
+                      ? `/doctor/patients/all-patient/${id}/audit/${aId}`
+                      : `/admin/patients/all-patient/${id}/audit/${aId}`
+                  }
                 >
-                  Audit Logs
-                </Button>
-              </Link>
-            </RBACGuard>
+                  <Button
+                    type="submit"
+                    name="save"
+                    className="min-w-[150px]! font-bold! text-xs! px-[12px]! py-[8px]! rounded-xl! border-gray-300! text-black!"
+                    variant="outlined"
+                    size="base"
+                  >
+                    Audit Logs
+                  </Button>
+                </Link>
+              </RBACGuard>
+            {/* )} */}
           </div>
 
           {auth.user.roleId.name !== "DoctorReferral" && (
