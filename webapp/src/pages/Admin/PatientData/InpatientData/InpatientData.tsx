@@ -78,7 +78,7 @@ const InpatientData = () => {
   const fetchAllPatient = async () => {
     let centers;
     const selected = searchParams.get("filter") || "All";
-    if (selected === "All" || selected) {
+    if (selected === "All" || !selected) {
       centers = auth.user.centerId.map((data: { _id: string }) => data._id);
       if (centers.length <= 0) navigate("/");
     } else {
@@ -114,9 +114,16 @@ const InpatientData = () => {
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
 
-      const filteredPatients = response?.data?.data.filter(((patient:any) => patient.patientHistory.currentStatus !== "Discharged"));
-      console.log('filteredPatients --->', filteredPatients);
-      dispatch(setAllPatient(auth.user.roleId.name === 'DoctorReferral' ? filteredPatients : response?.data));
+      const filteredPatients = response?.data?.data.filter((patient: any) => patient.patientHistory?.currentStatus !== "Discharged");
+      console.log("filteredPatients --->", filteredPatients);
+      // Ensure we dispatch the same shape that the reducer expects (IAllPatient)
+      dispatch(
+        setAllPatient(
+          auth.user.roleId.name === "DoctorReferral"
+            ? { ...response?.data, data: filteredPatients }
+            : response?.data
+        )
+      );
       setTimeout(() => {
         setState((prev) => ({
           ...prev,
@@ -167,7 +174,13 @@ const InpatientData = () => {
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
 
-      dispatch(setAllPatient(response?.data));
+      // If user is DoctorReferral, filter out discharged patients on the client to preserve same shape
+      if (auth.user.roleId.name === "DoctorReferral") {
+        const filtered = response?.data?.data.filter((patient: any) => patient.patientHistory?.currentStatus !== "Discharged");
+        dispatch(setAllPatient({ ...response?.data, data: filtered }));
+      } else {
+        dispatch(setAllPatient(response?.data));
+      }
     } catch (err) {
       console.error("Error fetching patients:", err);
       throw new Error("Failed to fetch patient data");
@@ -253,7 +266,13 @@ const InpatientData = () => {
           controller.signal
         );
 
-        dispatch(setAllPatient(response?.data));
+        // Preserve reducer payload shape and filter for DoctorReferral role
+        if (auth.user.roleId.name === "DoctorReferral") {
+          const filtered = response?.data?.data.filter((patient: any) => patient.patientHistory?.currentStatus !== "Discharged");
+          dispatch(setAllPatient({ ...response?.data, data: filtered }));
+        } else {
+          dispatch(setAllPatient(response?.data));
+        }
         setTimeout(() => {
           setState((prev) => ({
             ...prev,
