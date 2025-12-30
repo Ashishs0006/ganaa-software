@@ -142,12 +142,10 @@ export const uploadPatientFiles = multer({
 
 export const getAllPatient = catchAsync(
   async (req: UserRequest, res: Response, next: NextFunction) => {
-    console.log('✌️req.user role --->', req?.user?.roleId?.name);
-    console.log('✌️req.user _id --->', req?.user);
 
     // Filtering Based on Center & Status with Doctor filter
     const filterIds = await _buildPatientFilterQuery(req.query, req.user);
-    console.log('🔍 filterIds from _buildPatientFilterQuery:', filterIds);
+    console.log('filterIds from _buildPatientFilterQuery:', filterIds);
 
     if (filterIds.length < 1 && req.query.isStatusAndFilterQuery) {
       return res.status(200).json({
@@ -177,7 +175,7 @@ export const getAllPatient = catchAsync(
       delete cleanQuery.onlyPatient;
     }
 
-    // 🔥 Build base query with filters
+    // Build base query with filters
     let baseQuery: any = {};
 
     // Add filterIds if they exist
@@ -189,10 +187,8 @@ export const getAllPatient = catchAsync(
     // We still need to apply doctor filter directly to Patient model
     if (req?.user?._id && req?.user?.roleId?.name === 'DoctorReferral' && filterIds.length === 0) {
       baseQuery.referredDoctorId = req.user._id;
-      console.log('🔍 Applying doctor filter directly to Patient query');
+      console.log('Applying doctor filter directly to Patient query');
     }
-
-    console.log('🔍 Final baseQuery:', baseQuery);
 
     // Use APIFeatures with the base query
     const features = new APIFeatures<IPatient>(
@@ -207,7 +203,6 @@ export const getAllPatient = catchAsync(
 
     const rawQuery = features.rawQuery();
     const data = await features.query.lean();
-    console.log('🔍 Patients found:', data.length);
 
     const patientIds = data.map((el) => el._id as ObjectId);
 
@@ -236,19 +231,11 @@ export const getAllPatient = catchAsync(
       });
     }
 
-    const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
+   const admissionHistoryMap = await PatientAdmissionHistory.getLatestPatientHistory(patientIds);
     const enrichedData = data.map((record) => ({
       ...record,
       patientHistory: admissionHistoryMap[record._id?.toString()!],
     }));
-
-    const allowedStatuses = (req.query.status as string)?.split(',');
-
-    const filteredData = enrichedData.filter((record) =>
-      allowedStatuses.includes(record.patientHistory?.currentStatus)
-    );
-
-    console.log('filteredData --->', filteredData);
 
     res.status(200).json({
       status: 'success',
@@ -1131,6 +1118,7 @@ export const reAdmitPatient = catchAsync(
 // };
 
 const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
+
   let query: IBasicObj = {
     $and: [],
   };
@@ -1138,15 +1126,30 @@ const _buildPatientFilterQuery = async (queryObj: IBasicObj, user?: any) => {
     $and: [],
   };
 
-  // 🔥 ADD DOCTOR FILTER HERE
+  // ADD DOCTOR FILTER HERE
+  // For DoctorReferral role, referredDoctorId is stored on Patient model, not on PatientAdmissionHistory.
+  // So first fetch patient IDs referred by this doctor and then apply them to the admission-history query
   if (user?._id && user?.roleId?.name === 'DoctorReferral') {
-    query['$and'].push({ referredDoctorId: user._id });
-    console.log('🔍 Adding doctor filter to query:', { referredDoctorId: user._id });
+    const referredPatients = await Patient.find({ referredDoctorId: user._id })
+      .select('_id')
+      .setOptions({ skipResAllPopulate: true })
+      .lean();
+
+    const referredPatientIds = referredPatients.map((p) => p._id?.toString()).filter(Boolean);
+
+    console.log('Adding doctor filter to query with patientIds count:', referredPatientIds.length);
+
+    if (referredPatientIds.length === 0) {
+      // No patients referred by this doctor -> no admission-history matches
+      return [];
+    }
+
+    query['$and'].push({ patientId: { $in: referredPatientIds } });
   }
 
   if (queryObj.hasOwnProperty('status') && queryObj.status !== 'All') {
     let status = (queryObj.status as string).split(',');
-    console.log('✌️status --->', status);
+    console.log('status --->', status);
     if (status.includes('All')) status = status.filter((s) => s !== 'All');
     query['$and'].push({ currentStatus: status.length > 1 ? { $in: status } : status[0] });
   }
