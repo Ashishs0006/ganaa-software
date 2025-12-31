@@ -51,4 +51,6 @@ export interface ISingleLead {
   involuntaryAdmissionType: string;
   chiefComplaints: string;
   firstPersonContactedAtGanaa: string;
+    notConvertedReason:string
+      admittedElsewhereDetails:string
 }

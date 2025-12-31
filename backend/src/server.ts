@@ -27,7 +27,7 @@ import { buildWeeklyReport } from './jobs/download.weekly.report';
 import { generateDailyResourceAllocationReport } from './jobs/daily.resource.allocation.report';
 import { updatePatientAdmissionHistoryStatus } from './jobs/update.patient.admission.history.status';
 import { seedRoles } from './utils/seedRoles';
-
+import Role from "./models/role.model"
 // Config ENV
 const envValidationStatus = Env.validateEnv();
 if (envValidationStatus != null) {
@@ -81,6 +81,65 @@ fixGroupTabOldIndex()})
     process.exit(1);
   });
 
+const testFetchAllRoles = async () => {
+  try {
+    const roles = await Role.find({});
+    console.log('✅ ALL ROLES FROM DB:');
+    console.log(JSON.stringify(roles, null, 2));
+  } catch (error) {
+    console.error('❌ Error fetching roles:', error);
+  }
+};
+const migrateRolesOnStartup = async () => {
+  try {
+    console.log('🔄 Running role migration...');
+
+    // 1️⃣ Rename "Sales" → "Finance Head"
+    const renameResult = await Role.updateOne(
+      { name: 'Sales' },
+      { $set: { name: 'Finance Head' } }
+    );
+
+    if (renameResult.matchedCount > 0) {
+      console.log('✅ Role renamed: Sales → Finance Head');
+    } else {
+      console.log('ℹ️ Sales role not found or already renamed');
+    }
+
+    // 2️⃣ Add Discharge permission to Finance Head
+    const permissionResult = await Role.updateOne(
+      { name: 'Finance Head' },
+      {
+        $addToSet: {
+          permissions: {
+            resource: 'Discharge',
+            actions: ['*'],
+          },
+        },
+      }
+    );
+
+    if (permissionResult.modifiedCount > 0) {
+      console.log('✅ Discharge permission added to Finance Head');
+    } else {
+      console.log('ℹ️ Discharge permission already exists');
+    }
+
+    // 3️⃣ Log final state (for verification)
+    const financeHeadRole = await Role.findOne(
+      { name: 'Finance Head' },
+      { name: 1, permissions: 1 }
+    );
+
+    console.log(
+      '📌 Finance Head role (final):',
+      JSON.stringify(financeHeadRole, null, 2)
+    );
+  } catch (error) {
+    console.error('❌ Role migration failed:', error);
+  }
+};
+migrateRolesOnStartup()
 // Middleware
 app.set('trust proxy', 1);
 

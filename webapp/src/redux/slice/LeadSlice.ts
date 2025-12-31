@@ -37,6 +37,9 @@ export interface ILead {
   assignedTo?: ISelectOption;
   nextFollowUpDate?: string;
   centerVisitDateTime?: string;
+  notConvertedReason?: string 
+      admittedElsewhereDetails?:string
+
 }
 
 export interface IQualifiedLead {

@@ -77,7 +77,8 @@ const QualifiedLeads = () => {
     admissionType: "",
     involuntaryAdmissionType: "",
     chiefComplaints: "",
-    firstPersonContactedAtGanaa: ""
+    firstPersonContactedAtGanaa: "",
+      notConvertedReason:""
   });
 
   const fetchAllQualifiedLeads = async () => {

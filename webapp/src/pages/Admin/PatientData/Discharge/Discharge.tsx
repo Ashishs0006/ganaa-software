@@ -437,7 +437,7 @@ const Discharge = () => {
       mentalStatusExaminationatDischarge: data.mentalStatusExaminationatDischarge,
       diagnosis: data.diagnosis || ""
     };
-    console.log("hii the update payload is :", payload);
+  
 
     if (Object.keys(payload).length === 0) return;
     return updateDischarge(

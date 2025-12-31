@@ -23,6 +23,7 @@ export interface LeadState {
   gender: string;
   guardianName: string;
   guardianNameRelationshipId: ISelectOption;
+  
 
   country: ISelectOption;
   fullAddress: string;
@@ -34,5 +35,8 @@ export interface LeadState {
   firstPersonContactedAtGanaa: string;
   assignedTo: ISelectOption;
   nextFollowUpDate: string;
+  notConvertedReason: string;
   centerVisitDateTime: string;
+  admittedElsewhereDetails: string;
+
 }

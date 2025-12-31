@@ -273,6 +273,12 @@ const _buildColumns = (data: any) => {
     'First Person Contacted At Ganaa': data?.firstPersonContactedAtGanaa,
     'Assigned To': `${(data?.assignedTo as IUser)?.firstName ?? ''} ${(data?.assignedTo as IUser)?.lastName ?? ''}`,
     'Next Follow Up Date': followUpDate,
+    'Reason Not Converted': data?.notConvertedReason ?? '',
+'Admitted Elsewhere (If Applicable)':
+  data?.notConvertedReason === 'Admitted elsewhere'
+    ? data?.admittedElsewhereDetails ?? ''
+    : '',
+
     Comments: data?.commentsString ?? '',
     UHID: data?.uhid,
     'Identification Mark': data?.identificationMark,

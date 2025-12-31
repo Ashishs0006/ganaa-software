@@ -40,7 +40,6 @@ const AllPatientData = () => {
   });
 
   const patientData = useSelector((store: RootState) => store.patient);
-  console.log("patientData ---===>", patientData);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -51,7 +50,7 @@ const AllPatientData = () => {
   >([]);
 
   const { auth } = useAuth();
-  console.log("✌️auth --->", auth);
+ 
 
   const fetchAllPatient = async () => {
     // Get query parameters
@@ -96,7 +95,7 @@ const AllPatientData = () => {
         ...(searchParams.get("search") && { term: searchParams.get("search")?.trim() })
       });
 
-      console.log("✌️response --->", response);
+   
 
       dispatch(setAllPatient(response?.data));
       setTimeout(() => {

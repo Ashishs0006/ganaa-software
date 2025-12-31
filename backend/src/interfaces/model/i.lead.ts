@@ -12,6 +12,12 @@ export type ILeadType = 'Online' | 'Offline';
 export type ILeadSelect = 'IPD' | 'OPD';
 export type IProgressStatus = 'Cold' | 'Warm' | 'Hot' | 'Reject' | 'Center Visit Done' | 'Admit';
 export type ILeadStatus = 'Qualified' | 'Unqualified';
+export type INotConvertedReason =
+  | 'OPD only'
+  | 'Financial constraints'
+  | 'Location constraints'
+  | 'Admitted elsewhere';
+
 
 export interface ILead extends mongoose.Document {
   leadDateTime: Date;
@@ -39,6 +45,8 @@ referredDoctorId?: ObjectId | IUser;
   country?: string;
   fullAddress?: string;
   chiefComplaints?: string;
+  admittedElsewhereDetails?:string;
+
   admissionType?: IAdmissionType;
   involuntaryAdmissionType?: IInvoluntaryAdmissionType;
 
@@ -48,6 +56,7 @@ referredDoctorId?: ObjectId | IUser;
   firstPersonContactedAtGanaa?: string;
   assignedTo?: ObjectId | IUser;
   nextFollowUpDate?: Date;
+  notConvertedReason?: INotConvertedReason;
   comments?: [
     {
       userId?: ObjectId | IUser;

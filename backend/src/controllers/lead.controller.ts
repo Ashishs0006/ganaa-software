@@ -69,8 +69,7 @@ export const getAllLeads = catchAsync(
       .paginate();
 
     const rawQuery = features.rawQuery();
-    console.log("Raw query after APIFeatures parsing:", rawQuery);
-
+ 
     const data = await features.query.lean();
 
     const paginationInfo = await PaginationInfo.exec(
@@ -89,7 +88,7 @@ export const getAllLeads = catchAsync(
 
 const resolveReferredDoctorId = async () => {
   const doctor = await User.findOne({
-    roleId: '69477cd67a68a9b80fbee63a', // DoctorReferral role
+    roleId: '69477cd67a68a9b80fbee63a', 
     isDeleted: false,
   }).select('_id');
 
@@ -124,7 +123,7 @@ export const createNewLead = catchAsync(
     req.body.referredDoctorId = await resolveReferredDoctorId();
 
     const data = await Lead.create(req.body);
-
+  
     res.status(200).json({
       status: 'success',
       data: data,
@@ -157,7 +156,7 @@ export const admitLead = catchAsync(async (req: UserRequest, res: Response, next
       referredDoctorId = doctor._id;
     }
   }
-  console.log('✌️referredDoctorId --->', referredDoctorId);
+
 
   const patient = await Patient.create({
     firstName: lead.firstName,

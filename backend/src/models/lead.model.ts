@@ -29,8 +29,23 @@ const leadSchema = new mongoose.Schema<ILead>({
   },
   progressStatus: {
     type: String,
-    enum: ['Cold', 'Warm', 'Hot', 'Reject', 'Center Visit Done', 'Admit'],
+    enum: ['Cold', 'Warm', 'Hot', 'Booked', 'Center Visit Done', 'Admit'],
   },
+  notConvertedReason: {
+  type: String,
+  enum: [
+    'OPD only',
+    'Financial constraints',
+    'Location constraints',
+    'Admitted elsewhere'
+  ],
+  trim: true,
+},
+admittedElsewhereDetails: {
+  type: String,
+  trim: true,
+},
+
   referralTypeId: {
     type: mongoose.Schema.ObjectId,
     ref: Collections.referredType.name,

@@ -96,7 +96,10 @@ const CreateLead = () => {
     firstPersonContactedAtGanaa: "",
     assignedTo: { label: "", value: "" },
     nextFollowUpDate: "",
-    centerVisitDateTime: ""
+    centerVisitDateTime: "",
+    notConvertedReason:"",
+    admittedElsewhereDetails:""
+
   });
 
   const [updateStatus, setUpdateStatus] = useState<boolean>(false);
@@ -223,7 +226,10 @@ const CreateLead = () => {
           },
           firstPersonContactedAtGanaa: data?.data?.firstPersonContactedAtGanaa || "",
           assignedTo: { label: "", value: "" },
-          nextFollowUpDate:
+       notConvertedReason: data?.data?.notConvertedReason || "",
+           admittedElsewhereDetails: data?.data.admittedElsewhereDetails||"",
+
+        nextFollowUpDate:
             (data?.data?.nextFollowUpDate &&
               new Date(data?.data?.nextFollowUpDate).toISOString().split("T")[0]) ||
             "",
@@ -290,6 +296,9 @@ const CreateLead = () => {
           value: data?.data?.centerId?._id || ""
         },
         firstPersonContactedAtGanaa: data?.data?.firstPersonContactedAtGanaa || "",
+        notConvertedReason: data?.data?.notConvertedReason || "",
+            admittedElsewhereDetails:data?.data?.admittedElsewhereDetails||"",
+
         assignedTo: {
           label:
             `${data?.data?.assignedTo?.firstName || ""} ${
@@ -453,63 +462,6 @@ const CreateLead = () => {
     },
     [dispatch, stepperData.discardModal.isFormChanged]
   );
-
-  // const handleApi = () => {
-  //   const payload: { [key: string]: unknown } = {};
-  //   if (id) {
-  //     const states = compareObjects(leadData?.lead, state, true);
-  //     if (Object.keys(states).length === 0) {
-  //       return;
-  //     }
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     const extractValue = (val: any) => {
-  //       if (val && typeof val === "object" && "value" in val) return val.value;
-  //       return val;
-  //     };
-
-  //     Object.keys(states).forEach((key) => {
-  //       const val = extractValue(states[key as keyof typeof states]);
-  //       if (val !== "" && val !== null && val !== undefined) {
-  //         payload[key] = String(val);
-  //       }
-  //     });
-  //     if (states.firstName !== undefined) {
-  //       payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
-  //     }
-  //     if (states.lastName !== undefined) {
-  //       payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
-  //     }
-  //     if (states.leadDate !== undefined || states.leadTime !== undefined) {
-  //       const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
-  //       const formattedDateTime = new Date(combinedDateTime).toISOString();
-  //       payload.leadDateTime = formattedDateTime;
-  //     }
-  //     return updateLead(id, payload);
-  //   } else {
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     const extractValue = (val: any) => {
-  //       if (val && typeof val === "object" && "value" in val) return val.value;
-  //       return val;
-  //     };
-
-  //     Object.keys(state).forEach((key) => {
-  //       const val = extractValue(state[key as keyof typeof state]);
-  //       if (val !== "" && val !== null && val !== undefined) {
-  //         payload[key] = String(val);
-  //       }
-  //     });
-  //     const combinedDateTime = `${state.leadDate} ${state.leadTime}`;
-  //     const formattedDateTime = new Date(combinedDateTime).toISOString();
-  //     payload.leadDateTime = formattedDateTime;
-  //     if (state.firstName.trim()) {
-  //       payload.firstName = state.firstName.charAt(0).toUpperCase() + state.firstName.slice(1);
-  //     }
-  //     if (state.lastName.trim()) {
-  //       payload.lastName = state.lastName.charAt(0).toUpperCase() + state.lastName.slice(1);
-  //     }
-  //     return createLead(payload);
-  //   }
-  // };
 
   const handleApi = (extraPayload?: Record<string, unknown>) => {
     const payload: { [key: string]: unknown } = {};
@@ -1496,7 +1448,55 @@ const CreateLead = () => {
                   </div>
                 </button>
               </div>
+
             </CustomCalendar>
+<Select
+  label="Why not getting converted "
+  options={[
+    { label: "Select", value: "" },
+    { label: "OPD only", value: "OPD only" },
+    { label: "Financial constraints", value: "Financial constraints" },
+    { label: "Location constraints", value: "Location constraints" },
+    { label: "Admitted elsewhere", value: "Admitted elsewhere" }
+  ]}
+  placeholder="Select"
+  name="notConvertedReason"
+  value={{
+    label: state.notConvertedReason,
+    value: state.notConvertedReason
+  }}
+  onChange={(_, option) =>
+    setState((prev) => ({
+      ...prev,
+      notConvertedReason: String(option.value),
+      admittedElsewhereDetails:
+        option.value === "Admitted elsewhere"
+          ? prev.admittedElsewhereDetails
+          : ""
+    }))
+  }
+/>
+
+{state.notConvertedReason === "Admitted elsewhere" ? (
+  <Input
+    id="admittedElsewhereDetails"
+    type="text"
+    label="Where the person got admitted"
+    maxLength={200}
+    placeholder="Enter hospital / center name"
+    name="admittedElsewhereDetails"
+    className="w-[228px] rounded-[7px]! font-bold placeholder:font-normal"
+    value={state.admittedElsewhereDetails}
+    onChange={handleChange}
+  />
+) : (
+  // ✅ Empty placeholder to keep grid alignment
+  <div />
+)}
+
+
+
+
 
             {id && (
               <CustomCalendar

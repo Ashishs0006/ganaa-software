@@ -412,80 +412,118 @@ const SideBar = ({
           </div>
         </div>
 
-        <div className="p-5">
-          <h2 className="text-sm font-bold  mb-5">Other Details</h2>
-          <div className="grid border border-[#D6D6D6] rounded-xl p-5 grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Referral Type</p>
-              <p className="font-semibold text-[13px]">
-                {SingleleadData?.referralTypeId?.name || "--"}
-              </p>
-            </div>
-            <div className="w-full">
-              <p className="text-gray-500 text-xs font-medium">Referral Source</p>
-              <p
-                title={capitalizeFirstLetter(SingleleadData?.referralDetails)}
-                className="font-semibold truncate text-[13px]"
-              >
-                {capitalizeFirstLetter(SingleleadData?.referralDetails)}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-xs  font-medium">Admission Type</p>
-              <p className="font-semibold text-[13px]">
-                {SingleleadData?.admissionType
-                  ? `${SingleleadData?.admissionType}${
-                      SingleleadData?.admissionType !== "Voluntary"
-                        ? ` - ${SingleleadData?.involuntaryAdmissionType}`
-                        : ""
-                    }`
-                  : "--"}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Chief Complaints</p>
-              <p
-                title={capitalizeFirstLetter(SingleleadData?.chiefComplaints)}
-                className="font-semibold text-[13px] truncate"
-              >
-                {capitalizeFirstLetter(SingleleadData?.chiefComplaints)}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Center</p>
-              <p className="font-semibold text-[13px]">
-                {SingleleadData?.centerId?.centerName || "--"}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Created Date</p>
-              <p className="font-semibold text-[13px]">
-                {" "}
-                {(SingleleadData?.leadDateTime && formatDate(SingleleadData?.leadDateTime)) || "--"}
-              </p>
-            </div>
+     <div className="p-5">
+  <h2 className="text-sm font-bold mb-5">Other Details</h2>
 
-            <div className="text-nowrap">
-              <p className="text-gray-500 text-xs font-medium">First Person Contacted at Ganaa</p>
-              <p
-                title={capitalizeFirstLetter(SingleleadData?.firstPersonContactedAtGanaa)}
-                className="font-semibold truncate text-[13px]"
-              >
-                {capitalizeFirstLetter(SingleleadData?.firstPersonContactedAtGanaa)}
-              </p>
-            </div>
+  <div className="grid border border-[#D6D6D6] rounded-xl p-5 grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+    
+    {/* existing fields */}
+    <div>
+      <p className="text-gray-500 text-xs font-medium">Referral Type</p>
+      <p className="font-semibold text-[13px]">
+        {SingleleadData?.referralTypeId?.name || "--"}
+      </p>
+    </div>
 
-            <div className="text-nowrap">
-              <p className="text-gray-500 text-xs font-medium">Illness Type</p>
-              <p
-                title={capitalizeFirstLetter(SingleleadData?.illnessType)}
-                className="font-semibold truncate text-[13px]"
-              >
-                {SingleleadData?.illnessType || "--"}
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="w-full">
+      <p className="text-gray-500 text-xs font-medium">Referral Source</p>
+      <p
+        title={capitalizeFirstLetter(SingleleadData?.referralDetails)}
+        className="font-semibold truncate text-[13px]"
+      >
+        {capitalizeFirstLetter(SingleleadData?.referralDetails)}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-gray-500 text-xs font-medium">Admission Type</p>
+      <p className="font-semibold text-[13px]">
+        {SingleleadData?.admissionType
+          ? `${SingleleadData?.admissionType}${
+              SingleleadData?.admissionType !== "Voluntary"
+                ? ` - ${SingleleadData?.involuntaryAdmissionType}`
+                : ""
+            }`
+          : "--"}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-gray-500 text-xs font-medium">Chief Complaints</p>
+      <p
+        title={capitalizeFirstLetter(SingleleadData?.chiefComplaints)}
+        className="font-semibold text-[13px] truncate"
+      >
+        {capitalizeFirstLetter(SingleleadData?.chiefComplaints)}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-gray-500 text-xs font-medium">Center</p>
+      <p className="font-semibold text-[13px]">
+        {SingleleadData?.centerId?.centerName || "--"}
+      </p>
+    </div>
+
+    <div>
+      <p className="text-gray-500 text-xs font-medium">Created Date</p>
+      <p className="font-semibold text-[13px]">
+        {(SingleleadData?.leadDateTime && formatDate(SingleleadData?.leadDateTime)) || "--"}
+      </p>
+    </div>
+
+    <div className="text-nowrap">
+      <p className="text-gray-500 text-xs font-medium">
+        First Person Contacted at Ganaa
+      </p>
+      <p
+        title={capitalizeFirstLetter(SingleleadData?.firstPersonContactedAtGanaa)}
+        className="font-semibold truncate text-[13px]"
+      >
+        {capitalizeFirstLetter(SingleleadData?.firstPersonContactedAtGanaa)}
+      </p>
+    </div>
+
+    <div className="text-nowrap">
+      <p className="text-gray-500 text-xs font-medium">Illness Type</p>
+      <p
+        title={capitalizeFirstLetter(SingleleadData?.illnessType)}
+        className="font-semibold truncate text-[13px]"
+      >
+        {SingleleadData?.illnessType || "--"}
+      </p>
+    </div>
+
+ 
+      <div className="text-nowrap">
+        <p className="text-gray-500 text-xs font-medium">
+          Reason Not Converted
+        </p>
+        <p
+          title={capitalizeFirstLetter(SingleleadData?.notConvertedReason)}
+          className="font-semibold truncate text-[13px]"
+        >
+          {capitalizeFirstLetter(SingleleadData?.notConvertedReason) || "--"}
+        </p>
+      </div>
+    {SingleleadData?.notConvertedReason === "Admitted elsewhere" && (
+  <div className="text-nowrap">
+    <p className="text-gray-500 text-xs font-medium">
+      Admitted At
+    </p>
+    <p
+      title={capitalizeFirstLetter(SingleleadData?.admittedElsewhereDetails)}
+      className="font-semibold truncate text-[13px]"
+    >
+      {capitalizeFirstLetter(SingleleadData?.admittedElsewhereDetails) || "--"}
+    </p>
+  </div>
+)}
+
+
+  </div>
+</div>
+
 
         <div className="p-5 w-full">
           <h2 className="text-sm font-bold  mb-5">All Comments</h2>
