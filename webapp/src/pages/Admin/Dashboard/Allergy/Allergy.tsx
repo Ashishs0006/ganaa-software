@@ -17,6 +17,7 @@ import { setAllergy } from "@/redux/slice/dropDown";
 import { useEffect, useRef, useState } from "react";
 import { IMedicineArray } from "./type";
 import { IState, IMedicineToBeAdded, IAllergiesToBeAdded } from "./type";
+import handleError from "@/utils/handleError";
 
 const Allergy = () => {
   const dispatch = useDispatch();
@@ -155,17 +156,17 @@ const Allergy = () => {
   const [dosageInput, setDosageInput] = useState("");
 
   const handleAddMoreMedicine = () => {
-    const last = medicineToBeAdd[medicineToBeAdd.length - 1];
-    if (last?.name && last?.genericName) {
-      setMedicineToBeAdd((prev) => [
-        {
-          name: "",
-          genericName: "",
-          dosage: []
-        },
-        ...prev
-      ]);
-    }
+    // const last = medicineToBeAdd[medicineToBeAdd.length - 1];
+    // if (last?.name) {
+    setMedicineToBeAdd((prev) => [
+      {
+        name: "",
+        genericName: "",
+        dosage: []
+      },
+      ...prev
+    ]);
+    // }
     setTimeout(() => {
       const lastIndex = medicineToBeAdd.length;
       inputRefs.current[lastIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -174,7 +175,6 @@ const Allergy = () => {
   };
 
   const handleRemoveMedicine = (index: number) => {
-    console.log("isDeleteModalNewMedine");
     setMedicineToBeAdd((prev) => prev.filter((_, i) => i !== index));
     setState((prev) => ({ ...prev, isDeleteModalNewMedine: false, index: null }));
   };
@@ -295,14 +295,17 @@ const Allergy = () => {
   };
 
   const handleSaveFunction = async () => {
-    try {
-      if (allergiesToBeAdd.length >= 1 || medicineToBeAdd.length >= 1) {
-        await saveAllergiesAndMedicines();
-      }
-      toast.success("Data update successfully");
-    } catch (error) {
-      console.error(error);
+    if (
+      (allergiesToBeAdd.length >= 1 && allergiesToBeAdd[0]?.name != "") ||
+      (medicineToBeAdd.length >= 1 && medicineToBeAdd[0]?.name != "") ||
+      allergiesToBeDelete.size > 0 ||
+      medicinesToBeDelete.size > 0 ||
+      medicinesToBeUpdated.length > 0
+    ) {
+      await saveAllergiesAndMedicines();
     }
+
+    // toast.success("Data update successfully");
   };
 
   const saveAllergiesAndMedicines = async () => {
@@ -312,29 +315,31 @@ const Allergy = () => {
     const allergyPromise =
       allergiesToBeAdd.length > 0
         ? createbulkAllergy({ allergys: allergiesToBeAdd })
-            .then((_res) => {
+            .then((res) => {
               setAllergiesToBeAdd([]);
-              // toast.success("Allergies added successfully");
+              if (res?.status == 201) {
+                toast.success("Allergies added successfully");
+              }
               shouldRefreshAllergies = true;
             })
-            .catch((_err) => {
-              toast.error("Failed to add allergies");
+            .catch((err) => {
+              handleError(err);
             })
         : Promise.resolve();
 
     // Handle medicine addition
-    const validMedicines = medicineToBeAdd.filter(
-      (m) => m?.name && m?.name.trim() !== "" && m?.genericName && m?.genericName.trim() !== ""
-    );
+    const validMedicines = medicineToBeAdd.filter((m) => m?.name && m?.name.trim() !== "");
     const medicinePromise =
-      validMedicines.length > 0 && validMedicines[0].name && validMedicines[0].genericName
+      validMedicines.length > 0 && validMedicines[0].name
         ? createBulkMedicine({ medicines: validMedicines })
-            .then((_res) => {
-              // toast.success("Medicines added successfully");
+            .then((res) => {
+              if (res?.status == 201) {
+                toast.success("Medicines added successfully");
+              }
               shouldRefreshMedicines = true;
             })
-            .catch((_err) => {
-              toast.error("Failed to add medicines");
+            .catch((err) => {
+              handleError(err);
             })
         : Promise.resolve();
 
@@ -342,13 +347,15 @@ const Allergy = () => {
     const updateMedicinePromise =
       medicinesToBeUpdated.length > 0
         ? updateBulkMedicine({ medicines: medicinesToBeUpdated })
-            .then(() => {
+            .then((res) => {
               setMedicinesToBeUpdated([]);
-              // toast.success("Medicines Updated successfully");
+              if (res?.status == 200) {
+                toast.success("Medicines Updated successfully");
+              }
               shouldRefreshMedicines = true;
             })
-            .catch((_err) => {
-              toast.error("Failed to update medicines");
+            .catch((err) => {
+              handleError(err);
             })
         : Promise.resolve();
 
@@ -356,13 +363,15 @@ const Allergy = () => {
     const deleteAllergyPromise =
       allergiesToBeDelete.size > 0
         ? deleteBulkAllergy({ allergys: Array.from(allergiesToBeDelete) })
-            .then(() => {
+            .then((res) => {
               setAllergiesToBeDelete(new Set());
-              // toast.success("Allergies deleted successfully");
+              if (res?.status == 200) {
+                toast.success("Allergies deleted successfully");
+              }
               shouldRefreshAllergies = true;
             })
-            .catch((_err) => {
-              toast.error("Failed to delete allergies");
+            .catch((err) => {
+              handleError(err);
             })
         : Promise.resolve();
 
@@ -370,13 +379,15 @@ const Allergy = () => {
     const deleteMedicinePromise =
       medicinesToBeDelete.size > 0
         ? deleteBulkMedicine({ medicines: Array.from(medicinesToBeDelete) })
-            .then(() => {
+            .then((res) => {
               setMedicinesToBeDelete(new Set());
-              // toast.success("Medicines deleted successfully");
+              if (res?.status == 200) {
+                toast.success("Medicines deleted successfully");
+              }
               shouldRefreshMedicines = true;
             })
-            .catch((_err) => {
-              toast.error("Failed to delete medicines");
+            .catch((err) => {
+              handleError(err);
             })
         : Promise.resolve();
 
@@ -555,7 +566,7 @@ const Allergy = () => {
                           </div>
                           <div className="flex-1">
                             <Input
-                              required
+                              // required
                               onChange={(e) => {
                                 handleChange(e, index);
                               }}
@@ -789,8 +800,23 @@ const Allergy = () => {
                   onClick={() => {
                     handleSaveFunction();
                   }}
+                  disabled={
+                    (allergiesToBeAdd.length < 1 || allergiesToBeAdd[0]?.name == "") &&
+                    medicineToBeAdd[0]?.name.trim() == "" &&
+                    allergiesToBeDelete.size <= 0 &&
+                    medicinesToBeDelete.size <= 0 &&
+                    medicinesToBeUpdated.length <= 0
+                  }
                   type="submit"
-                  className="bg-[#323E2A] text-white text-sm font-normal rounded-lg px-10 py-3"
+                  className={`bg-[#323E2A] text-white text-sm font-normal rounded-lg px-10 py-3 ${
+                    (allergiesToBeAdd.length < 1 || allergiesToBeAdd[0]?.name == "") &&
+                    medicineToBeAdd[0]?.name.trim() == "" &&
+                    allergiesToBeDelete.size <= 0 &&
+                    medicinesToBeDelete.size <= 0 &&
+                    medicinesToBeUpdated.length <= 0
+                      ? "cursor-not-allowed!"
+                      : "cursor-pointer!"
+                  }`}
                 >
                   Save
                 </Button>
@@ -823,8 +849,6 @@ const Allergy = () => {
         isModalOpen={state.isDeleteModalNewMedine}
         toggleModal={toggleModalisDeleteModalNewMedine}
         confirmDeleteNote={() => {
-          console.log("sdfg");
-          console.log(state);
           if (state?.index) handleRemoveMedicine(state.index);
         }}
       />
@@ -837,7 +861,6 @@ const Allergy = () => {
           toggleModalExistingDosageModal();
         }}
         confirmDeleteNote={() => {
-          console.log(existDosageId, existMedId);
           if (existDosageId != null) {
             removeDosageFromExistingMedicine(existMedId, existDosageId);
             setExistDosageModal(false);
@@ -862,8 +885,6 @@ const Allergy = () => {
         isModalOpen={state.isDeleteModalNewMedine}
         toggleModal={toggleModalisDeleteModalNewMedine}
         confirmDeleteNote={() => {
-          console.log("sdfg");
-          console.log(state);
           if (state?.index) handleRemoveMedicine(state.index);
         }}
       />

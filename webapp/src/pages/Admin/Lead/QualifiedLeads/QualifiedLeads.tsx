@@ -78,7 +78,8 @@ const QualifiedLeads = () => {
     involuntaryAdmissionType: "",
     chiefComplaints: "",
     firstPersonContactedAtGanaa: "",
-      notConvertedReason:""
+      notConvertedReason:"",
+      admittedElsewhereDetails:""
   });
 
   const fetchAllQualifiedLeads = async () => {

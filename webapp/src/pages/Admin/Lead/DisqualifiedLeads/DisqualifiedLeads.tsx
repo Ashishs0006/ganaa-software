@@ -73,7 +73,9 @@ const DisqualifiedLeads = () => {
     admissionType: "",
     involuntaryAdmissionType: "",
     chiefComplaints: "",
-    firstPersonContactedAtGanaa: ""
+    firstPersonContactedAtGanaa: "",
+        notConvertedReason:"",
+      admittedElsewhereDetails:""
   });
 
   const controllerRef = useRef<AbortController | null>(null);

@@ -38,6 +38,20 @@ const User = () => {
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
 
+  const dropdownData = useSelector((store: RootState) => store.dropdown);
+
+  const phonecode = useMemo<ISelectOption[]>(() => {
+    if (dropdownData.country.loading) return [];
+
+    const countryList = [{ label: "Select", value: "" }];
+    dropdownData.country.data.forEach((country) => {
+    
+      countryList.push({ label: country.phoneCode, value: country.phoneCode });
+    });
+
+    return countryList;
+  }, [dropdownData.country.data, dropdownData.country.loading]);
+
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -47,12 +61,12 @@ const User = () => {
     firstName: "",
     lastName: "",
     dob: "",
-    phoneNumberCountryCode: { label: "Select", value: "" },
+    phoneNumberCountryCode: { label: "91+", value: "91+" },
     phoneNumber: "",
     email: "",
     profilePic: "",
     role: { label: "Select", value: "" },
-    gender: "Male",
+    gender: "",
     centerId: []
   });
 
@@ -61,12 +75,12 @@ const User = () => {
     firstName: "",
     lastName: "",
     dob: "",
-    phoneNumberCountryCode: { label: "Select", value: "" },
+    phoneNumberCountryCode:{ label: "91+", value: "91+" },
     phoneNumber: "",
     email: "",
     profilePic: "",
     role: { label: "Select", value: "" },
-    gender: "Male",
+    gender: "",
     centerId: []
   });
 
@@ -145,7 +159,7 @@ const User = () => {
       const response = await getAllUser({
         limit: 10,
         page,
-        roles: "doctor,therapist,admin,sales,finance,admission manager,Therapist+AM,ROM+AM,IT"
+        roles: "doctor,therapist,admin,sales,finance,admission manager,Therapist+AM,RMO+AM,IT,Nurse"
       });
       if (response.data.status == "success") {
         dispatch(setUsers(response?.data));
@@ -162,8 +176,12 @@ const User = () => {
         _id: user._id,
         firstName: user.firstName ?? "",
         lastName: user.lastName ?? "",
+        gender: user.gender ?? "",
         dob: user.dob ?? "",
-        phoneNumberCountryCode: { label: "+91", value: "+91" },
+        phoneNumberCountryCode: {
+          label: user.phoneNumberCountryCode || "+91",
+          value: user.phoneNumberCountryCode || "+91"
+        },
         phoneNumber: user.phoneNumber ?? "",
         email: user.email ?? "",
         profilePic: user.profilePic ?? "",
@@ -178,7 +196,12 @@ const User = () => {
         lastName: user.lastName ?? "",
         centerId: user.centerId.map((data) => data._id || ""),
         dob: user.dob ?? "",
-        phoneNumberCountryCode: { label: "+91", value: "+91" },
+        gender: user.gender ?? "",
+
+        phoneNumberCountryCode: {
+          label: user.phoneNumberCountryCode || "+91",
+          value: user.phoneNumberCountryCode || "+91"
+        },
         phoneNumber: user.phoneNumber ?? "",
         email: user.email ?? "",
         profilePic: user.profilePic ?? "",
@@ -190,57 +213,65 @@ const User = () => {
   };
 
   const createAndUpdateUserFunction = async () => {
+    // 🔹 Validate all required fields
     const isValid =
       data.dob &&
       data.firstName &&
-      data.lastName &&
       data?.centerId?.length > 0 &&
       data.email &&
       data.gender &&
       data.role?.value &&
       data.phoneNumber &&
-      data.phoneNumberCountryCode;
+      data.phoneNumberCountryCode.value;
 
     if (!isValid) return toast.error("Kindly Fill All Fields");
 
+    // 🔹 Build body for both JSON and FormData use
     const body = {
       ...data,
+      phoneNumberCountryCode: data.phoneNumberCountryCode.value,
       roleId: data.role?.value,
       centerId: data.centerId
     };
+
     delete body.role;
 
     if (body.email === dataToCheck.email) {
       delete (body as { email?: string }).email;
     }
 
+
+    // 🔹 Prepare FormData
     const formData = new FormData();
 
     for (const key in body) {
       if (!Object.prototype.hasOwnProperty.call(body, key)) continue;
 
-      const value = body[key as keyof typeof body];
-
+      let value = body[key as keyof typeof body];
       if (value === undefined || value === null) continue;
 
-      // 🔹 Special handling for DOB
+      // Handle Select-like fields (object with label/value)
+      if (typeof value === "object" && "value" in value) {
+        value = value.value;
+      }
+
+      // 🔸 Special handling for DOB
       if (key === "dob") {
-        // Always send as YYYY-MM-DD (no timezone issues)
         formData.append("dob", value.toString());
         continue;
       }
 
-      // 🔹 Special handling for centerId (array of ObjectIds)
+      // 🔸 Handle centerId array
       if (key === "centerId" && Array.isArray(value)) {
         value.forEach((id: string) => formData.append("centerId", id));
         continue;
       }
 
-      // 🔹 Everything else
+      // 🔸 Default append
       formData.append(key, value.toString());
     }
 
-    // Handle profilePic separately
+    // 🔹 Handle profilePic separately
     if (data.profilePic && fileInputRef) {
       formData.delete("profilePic");
       formData.append("profilePic", data.profilePic);
@@ -249,6 +280,7 @@ const User = () => {
     try {
       let response;
 
+      // 🔹 Choose API call based on _id
       if (data._id) {
         delete body._id;
         response = await updateUser(data._id, formData);
@@ -256,13 +288,13 @@ const User = () => {
         response = await createUser(formData);
       }
 
-      // Reset form
+      // 🔹 Reset form after successful request
       setData({
         _id: "",
         firstName: "",
         lastName: "",
         dob: "",
-        phoneNumberCountryCode: { label: "Select", value: "" },
+        phoneNumberCountryCode: { label: "+91", value: "+91" },
         phoneNumber: "",
         email: "",
         role: { label: "Select", value: "" },
@@ -271,6 +303,7 @@ const User = () => {
         profilePic: null
       });
 
+      // 🔹 Handle response
       if (response?.data?.status === "success") {
         toggleModal();
         toast.success(data._id ? "Successfully Updated" : "Successfully Created");
@@ -422,7 +455,24 @@ const User = () => {
                         user.isDeleted ? "bg-gray-200" : "hover:bg-[#F6F6F6C7]"
                       } `}
                     >
-                      <td className="py-3 px-3 w-1/7">{index + 1}</td>
+                      <td className="py-3 px-3 w-1/7">
+                        {" "}
+                        {(
+                          (+(searchParams.get("page") || 1) - 1) * +userData.pagination.limit +
+                          1 +
+                          index
+                        ).toString()?.length === 1
+                          ? `0${
+                              (+(searchParams.get("page") || 1) - 1) * +userData.pagination.limit +
+                              1 +
+                              index
+                            }`
+                          : `${
+                              (+(searchParams.get("page") || 1) - 1) * +userData.pagination.limit +
+                              1 +
+                              index
+                            }`}
+                      </td>
                       <td className="py-3 px-3 w-[200px] flex items-center gap-2">
                         <div
                           className={`flex rounded-full overflow-hidden w-[40px] h-[40px] items-center justify-center`}
@@ -450,7 +500,11 @@ const User = () => {
                         </p>
                       </td>
                       <td className="py-3 px-3 w-1/7">{user.email}</td>
-                      <td className="py-3 px-3 w-1/7">{user?.phoneNumber || 9012929592}</td>
+                      <td className="py-3 px-3 w-1/7">
+                        {user?.phoneNumber
+                          ? `${user?.phoneNumberCountryCode} ${user?.phoneNumber}`
+                          : "--"}
+                      </td>
                       <td className="py-3 px-3 w-1/7">{user.roleId?.name}</td>
                       <td className="py-3 px-3 w-1/7">
                         <div
@@ -567,7 +621,7 @@ const User = () => {
             firstName: "",
             lastName: "",
             dob: "",
-            phoneNumberCountryCode: { label: "Select", value: "" },
+            phoneNumberCountryCode: { label: "+91", value: "+91" },
             phoneNumber: "",
             email: "",
             profilePic: "",
@@ -603,7 +657,6 @@ const User = () => {
               <Input
                 id="lastName"
                 type="text"
-                required
                 label="Last Name"
                 placeholder="Enter"
                 name="lastName"
@@ -663,11 +716,11 @@ const User = () => {
                   <Select
                     containerClass="w-fit!"
                     className="border-none w-[80px]!  truncate gap-1 font-semibold"
-                    options={[{ label: "+91", value: "+91" }]}
+                    options={phonecode}
                     optionClassName="w-[130px]!"
                     placeholder="Select"
-                    onChange={() => {}}
-                    value={{ label: "+91", value: "+91" }}
+                    onChange={handleSelect}
+                    value={data.phoneNumberCountryCode}
                     name="phoneNumberCountryCode"
                   />
                   <hr className="block mx-2 w-[2px] h-10 bg-gray-200" />
@@ -918,9 +971,9 @@ const User = () => {
 
       <DeleteConfirm
         btn2="Yes, Reset"
-        isModalOpen={state.isResetModal || false}
+        isModalOpen={state.isResetModal}
         toggleModal={() => {
-          setState((prev) => ({ ...prev, isResetModal: state.isResetModal! }));
+          setState((prev) => ({ ...prev, isResetModal: false }));
         }}
         title="Are you sure you want to Reset this User?"
         confirmDeleteNote={() => {

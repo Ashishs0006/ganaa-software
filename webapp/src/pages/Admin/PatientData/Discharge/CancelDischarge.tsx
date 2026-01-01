@@ -105,7 +105,7 @@
 // };
 
 // export default CancelDischarge;
-import { SyntheticEvent, useContext, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { Button, Modal } from "@/components";
 import { useAuth } from "@/providers/AuthProvider";
 export interface CancelDischargeProps {

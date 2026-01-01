@@ -30,6 +30,7 @@ export interface IUser {
   dob?: string;
   email?: string;
   phoneNumber?: string;
+    phoneNumberCountryCode?: string;
   department?: string;
   password?: string;
   gender?: IGender;

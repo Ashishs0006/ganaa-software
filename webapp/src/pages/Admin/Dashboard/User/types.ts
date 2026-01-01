@@ -2,7 +2,7 @@ export interface IState {
   openMenuId: string | null; // Ensure openMenuId is always a string or null
   loading: boolean;
   toggleAddModal: boolean;
-  isResetModal?: boolean;
+  isResetModal: boolean;
   showModal: boolean;
   croppedImage: string | null;
   isDeleteModal: boolean;
